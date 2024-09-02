@@ -32,7 +32,7 @@
 4. **Build and run the application:**
 
    ```bash
-   go build -o ticket-tracker
+   go build .
    ./ticket-tracker
    ```
 
