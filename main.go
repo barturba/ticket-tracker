@@ -1,13 +1,21 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
+	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 
@@ -16,6 +24,41 @@ func main() {
 		log.Fatal("Couldn't load .env file")
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT environment variable is not set")
+	}
+
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL environment variable is not set")
+	}
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbQueries := database.New(db)
+
+	apiCfg := apiConfig{
+		DB: dbQueries,
+	}
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("POST /v1/users", apiCfg.handleUsers)
+
 	fmt.Printf("ticket-tracker\n")
-	os.Exit(0)
+	srv := http.Server{
+		Handler:      mux,
+		Addr:         ":" + port,
+		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+	}
+
+	fmt.Println("server started on ", port)
+	err = srv.ListenAndServe()
+	log.Fatal(err)
+
+	fmt.Printf("the ticket-tracker has started\n")
 }
