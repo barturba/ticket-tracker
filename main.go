@@ -46,6 +46,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// mux.HandleFunc("POST /v1/users", apiCfg.middlewareAuth(apiCfg.handleUsers))
 	mux.HandleFunc("POST /v1/users", apiCfg.handleUsers)
 
 	fmt.Printf("ticket-tracker\n")
