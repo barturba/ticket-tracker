@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
