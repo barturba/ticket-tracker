@@ -10,6 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type Organization struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+}
+
 type User struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
