@@ -7,7 +7,7 @@ import (
 )
 
 func GetAPIKey(h http.Header) (string, error) {
-	authorization := h.Get("Aunthorization")
+	authorization := h.Get("Authorization")
 	if len(authorization) == 0 {
 		return "", errors.New("no authorization provided")
 	}
