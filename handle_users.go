@@ -47,5 +47,15 @@ func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, user)
+	type response struct {
+		User         User         `json:"user"`
+		Organization Organization `json:"organization"`
+	}
+
+	resp := response{
+		User:         databaseUserToUser(user),
+		Organization: databaseOrganizationToOrganization(organization),
+	}
+
+	respondWithJSON(w, http.StatusCreated, resp)
 }
