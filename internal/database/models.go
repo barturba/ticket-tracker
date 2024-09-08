@@ -18,9 +18,10 @@ type Organization struct {
 }
 
 type User struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string
-	Apikey    string
+	ID             uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Name           string
+	Apikey         string
+	OrganizationID uuid.UUID
 }

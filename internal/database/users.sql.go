@@ -15,7 +15,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO USERS (id, created_at, updated_at, name)
 VALUES ($1, $2, $3, $4)
-RETURNING id, created_at, updated_at, name, apikey
+RETURNING id, created_at, updated_at, name, apikey, organization_id
 `
 
 type CreateUserParams struct {
@@ -39,12 +39,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Name,
 		&i.Apikey,
+		&i.OrganizationID,
 	)
 	return i, err
 }
 
 const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT id, created_at, updated_at, name, apikey FROM USERS WHERE APIKEY = $1
+SELECT id, created_at, updated_at, name, apikey, organization_id FROM USERS WHERE APIKEY = $1
 `
 
 func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, error) {
@@ -56,6 +57,7 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, err
 		&i.UpdatedAt,
 		&i.Name,
 		&i.Apikey,
+		&i.OrganizationID,
 	)
 	return i, err
 }
