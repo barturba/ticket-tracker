@@ -1,7 +1,7 @@
 -- name: CreateOrganization :one
-INSERT INTO ORGANIZATIONS (id, created_at, updated_at, name)
-VALUES ($1, $2, $3, $4)
+INSERT INTO ORGANIZATIONS (id, created_at, updated_at, name, user_id)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
--- name: GetOrganizationByID :one
-SELECT * FROM ORGANIZATIONS WHERE ID = $1;
+-- name: GetOrganizationByUserID :one
+SELECT * FROM ORGANIZATIONS WHERE USER_ID = $1;

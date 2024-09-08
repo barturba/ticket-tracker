@@ -31,29 +31,29 @@ func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := cfg.DB.CreateUser(r.Context(),
+		database.CreateUserParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      params.Name,
+		})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create user")
+		return
+	}
+
 	organization, err := cfg.DB.CreateOrganization(r.Context(),
 		database.CreateOrganizationParams{
 			ID:        uuid.New(),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Name:      params.OrganizationName,
+			UserID:    user.ID,
 		},
 	)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't create organization")
-	}
-
-	user, err := cfg.DB.CreateUser(r.Context(),
-		database.CreateUserParams{
-			ID:             uuid.New(),
-			CreatedAt:      time.Now(),
-			UpdatedAt:      time.Now(),
-			Name:           params.Name,
-			OrganizationID: organization.ID,
-		})
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create user")
-		return
 	}
 
 	type response struct {

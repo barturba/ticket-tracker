@@ -13,9 +13,9 @@ import (
 )
 
 const createOrganization = `-- name: CreateOrganization :one
-INSERT INTO ORGANIZATIONS (id, created_at, updated_at, name)
-VALUES ($1, $2, $3, $4)
-RETURNING id, created_at, updated_at, name
+INSERT INTO ORGANIZATIONS (id, created_at, updated_at, name, user_id)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, created_at, updated_at, name, user_id
 `
 
 type CreateOrganizationParams struct {
@@ -23,6 +23,7 @@ type CreateOrganizationParams struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
+	UserID    uuid.UUID
 }
 
 func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error) {
@@ -31,6 +32,7 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Name,
+		arg.UserID,
 	)
 	var i Organization
 	err := row.Scan(
@@ -38,22 +40,24 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
+		&i.UserID,
 	)
 	return i, err
 }
 
-const getOrganizationByID = `-- name: GetOrganizationByID :one
-SELECT id, created_at, updated_at, name FROM ORGANIZATIONS WHERE ID = $1
+const getOrganizationByUserID = `-- name: GetOrganizationByUserID :one
+SELECT id, created_at, updated_at, name, user_id FROM ORGANIZATIONS WHERE USER_ID = $1
 `
 
-func (q *Queries) GetOrganizationByID(ctx context.Context, id uuid.UUID) (Organization, error) {
-	row := q.db.QueryRowContext(ctx, getOrganizationByID, id)
+func (q *Queries) GetOrganizationByUserID(ctx context.Context, userID uuid.UUID) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, getOrganizationByUserID, userID)
 	var i Organization
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
+		&i.UserID,
 	)
 	return i, err
 }
