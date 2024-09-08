@@ -25,19 +25,21 @@ func databaseOrganizationToOrganization(organization database.Organization) Orga
 }
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
-	APIkey    string    `json:"api_key"`
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	APIkey         string    `json:"api_key"`
+	OrganizationID string    `json:"organization_id"`
 }
 
 func databaseUserToUser(user database.User) User {
 	return User{
-		ID:        user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Name:      user.Name,
-		APIkey:    user.Apikey,
+		ID:             user.ID,
+		CreatedAt:      user.CreatedAt,
+		UpdatedAt:      user.UpdatedAt,
+		Name:           user.Name,
+		APIkey:         user.Apikey,
+		OrganizationID: user.OrganizationID.String(),
 	}
 }

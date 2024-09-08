@@ -22,6 +22,15 @@ func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if params.Name == "" {
+		respondWithError(w, http.StatusInternalServerError, "missing name")
+		return
+	}
+	if params.OrganizationName == "" {
+		respondWithError(w, http.StatusInternalServerError, "missing organization name")
+		return
+	}
+
 	organization, err := cfg.DB.CreateOrganization(r.Context(),
 		database.CreateOrganizationParams{
 			ID:        uuid.New(),

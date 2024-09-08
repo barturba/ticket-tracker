@@ -7,4 +7,4 @@ ON DELETE CASCADE;
 
 -- +goose Down
 ALTER TABLE USERS
-DROP CONSTRAINT organization_id;
+DROP CONSTRAINT fk_organizations;
