@@ -1,0 +1,7 @@
+-- +goose Up
+ALTER TABLE ORGANIZATIONS 
+ADD COLUMN user_id uuid UNIQUE NOT NULL;
+
+-- +goose Down
+ALTER TABLE ORGANIZATIONS 
+DROP COLUMN user_id;
