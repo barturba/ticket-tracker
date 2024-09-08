@@ -11,7 +11,8 @@ import (
 
 func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string `json:"name"`
+		Name             string `json:"name"`
+		OrganizationName string `json:"organization_name"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -21,12 +22,25 @@ func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.DB.CreateUser(r.Context(),
-		database.CreateUserParams{
+	organization, err := cfg.DB.CreateOrganization(r.Context(),
+		database.CreateOrganizationParams{
 			ID:        uuid.New(),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			Name:      params.Name,
+			Name:      params.OrganizationName,
+		},
+	)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create organization")
+	}
+
+	user, err := cfg.DB.CreateUser(r.Context(),
+		database.CreateUserParams{
+			ID:             uuid.New(),
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+			Name:           params.Name,
+			OrganizationID: organization.ID,
 		})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't create user")
