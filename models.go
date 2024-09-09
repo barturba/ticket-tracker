@@ -61,3 +61,11 @@ func databaseConfigurationItemToConfigurationItem(configurationItem database.Con
 		OrganizationID: configurationItem.OrganizationID.String(),
 	}
 }
+
+func databaseConfigurationItemsToConfigurationItems(configurationItems []database.ConfigurationItem) []ConfigurationItem {
+	var items []ConfigurationItem
+	for _, configurationItem := range configurationItems {
+		items = append(items, databaseConfigurationItemToConfigurationItem(configurationItem))
+	}
+	return items
+}

@@ -44,3 +44,37 @@ func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigu
 	)
 	return i, err
 }
+
+const getConfigurationItemsByOrganizationID = `-- name: GetConfigurationItemsByOrganizationID :many
+SELECT id, created_at, updated_at, name, organization_id FROM configuration_items
+WHERE organization_id = $1
+`
+
+func (q *Queries) GetConfigurationItemsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]ConfigurationItem, error) {
+	rows, err := q.db.QueryContext(ctx, getConfigurationItemsByOrganizationID, organizationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ConfigurationItem
+	for rows.Next() {
+		var i ConfigurationItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.OrganizationID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

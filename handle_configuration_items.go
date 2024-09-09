@@ -15,7 +15,6 @@ func (cfg *apiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
 		return
 	}
-	// params: configuration item name
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -44,5 +43,20 @@ func (cfg *apiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 	}
 
 	respondWithJSON(w, http.StatusOK, databaseConfigurationItemToConfigurationItem(configurationItem))
+}
 
+func (cfg *apiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	configurationItems, err := cfg.DB.GetConfigurationItemsByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseConfigurationItemsToConfigurationItems(configurationItems))
 }
