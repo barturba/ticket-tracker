@@ -61,3 +61,29 @@ func (q *Queries) GetOrganizationByUserID(ctx context.Context, userID uuid.UUID)
 	)
 	return i, err
 }
+
+const updateOrganizationByUserID = `-- name: UpdateOrganizationByUserID :one
+UPDATE ORGANIZATIONS
+SET UPDATED_AT = $2, NAME = $3
+WHERE USER_ID = $1
+RETURNING id, created_at, updated_at, name, user_id
+`
+
+type UpdateOrganizationByUserIDParams struct {
+	UserID    uuid.UUID
+	UpdatedAt time.Time
+	Name      string
+}
+
+func (q *Queries) UpdateOrganizationByUserID(ctx context.Context, arg UpdateOrganizationByUserIDParams) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, updateOrganizationByUserID, arg.UserID, arg.UpdatedAt, arg.Name)
+	var i Organization
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.UserID,
+	)
+	return i, err
+}
