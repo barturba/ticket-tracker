@@ -14,12 +14,13 @@ func (cfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 		authorization, err := auth.GetAPIKey(r.Header)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
 		user, err := cfg.DB.GetUserByAPIKey(r.Context(), authorization)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "error getting user")
-
+			return
 		}
 
 		handler(w, r, user)
