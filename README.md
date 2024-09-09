@@ -36,7 +36,7 @@
    ./ticket-tracker
    ```
 
-5. **Access the application:** Open a web browser and go to `http://localhost:3000`.
+5. **Access the application:** Open a web browser and go to `http://localhost:8080`.
 
 ## Disclaimer
 
