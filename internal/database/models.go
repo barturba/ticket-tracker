@@ -10,6 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type ConfigurationItem struct {
+	ID             uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Name           string
+	OrganizationID uuid.UUID
+}
+
 type Organization struct {
 	ID        uuid.UUID
 	CreatedAt time.Time

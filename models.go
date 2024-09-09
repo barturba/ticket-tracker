@@ -43,3 +43,21 @@ func databaseUserToUser(user database.User) User {
 		APIkey:    user.Apikey,
 	}
 }
+
+type ConfigurationItem struct {
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	OrganizationID string    `json:"organization_id"`
+}
+
+func databaseConfigurationItemToConfigurationItem(configurationItem database.ConfigurationItem) ConfigurationItem {
+	return ConfigurationItem{
+		ID:             configurationItem.ID,
+		CreatedAt:      configurationItem.CreatedAt,
+		UpdatedAt:      configurationItem.UpdatedAt,
+		Name:           configurationItem.Name,
+		OrganizationID: configurationItem.OrganizationID.String(),
+	}
+}
