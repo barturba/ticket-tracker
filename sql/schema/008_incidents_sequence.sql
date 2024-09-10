@@ -6,6 +6,11 @@ CREATE TABLE incidents_sequence (
     organization_id UUID NOT NULL,
     sequence BIGINT NOT NULL
 );
+ALTER TABLE incidents_sequence
+    ADD CONSTRAINT fk_organizations
+    FOREIGN KEY (organization_id)
+    REFERENCES organizations(id)
+    ON DELETE CASCADE;
 
 -- +goose Down
 DROP TABLE incidents_sequence;
