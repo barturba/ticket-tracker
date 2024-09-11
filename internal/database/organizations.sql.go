@@ -15,7 +15,7 @@ import (
 const createOrganization = `-- name: CreateOrganization :one
 INSERT INTO ORGANIZATIONS (id, created_at, updated_at, name, user_id)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, name, user_id
+RETURNING id, created_at, updated_at, name, user_id, incidents_sequence
 `
 
 type CreateOrganizationParams struct {
@@ -41,12 +41,13 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		&i.UpdatedAt,
 		&i.Name,
 		&i.UserID,
+		&i.IncidentsSequence,
 	)
 	return i, err
 }
 
 const getOrganizationByUserID = `-- name: GetOrganizationByUserID :one
-SELECT id, created_at, updated_at, name, user_id FROM ORGANIZATIONS WHERE USER_ID = $1
+SELECT id, created_at, updated_at, name, user_id, incidents_sequence FROM ORGANIZATIONS WHERE USER_ID = $1
 `
 
 func (q *Queries) GetOrganizationByUserID(ctx context.Context, userID uuid.UUID) (Organization, error) {
@@ -58,6 +59,7 @@ func (q *Queries) GetOrganizationByUserID(ctx context.Context, userID uuid.UUID)
 		&i.UpdatedAt,
 		&i.Name,
 		&i.UserID,
+		&i.IncidentsSequence,
 	)
 	return i, err
 }
@@ -66,7 +68,7 @@ const updateOrganizationByUserID = `-- name: UpdateOrganizationByUserID :one
 UPDATE ORGANIZATIONS
 SET UPDATED_AT = $2, NAME = $3
 WHERE USER_ID = $1
-RETURNING id, created_at, updated_at, name, user_id
+RETURNING id, created_at, updated_at, name, user_id, incidents_sequence
 `
 
 type UpdateOrganizationByUserIDParams struct {
@@ -84,6 +86,7 @@ func (q *Queries) UpdateOrganizationByUserID(ctx context.Context, arg UpdateOrga
 		&i.UpdatedAt,
 		&i.Name,
 		&i.UserID,
+		&i.IncidentsSequence,
 	)
 	return i, err
 }

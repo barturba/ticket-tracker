@@ -69,3 +69,21 @@ func databaseConfigurationItemsToConfigurationItems(configurationItems []databas
 	}
 	return items
 }
+
+type Company struct {
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	OrganizationID uuid.UUID `json:"organization_id"`
+}
+
+func databaseCompanyToCompany(company database.Company) Company {
+	return Company{
+		ID:             company.ID,
+		CreatedAt:      company.CreatedAt,
+		UpdatedAt:      company.UpdatedAt,
+		Name:           company.Name,
+		OrganizationID: company.ID,
+	}
+}

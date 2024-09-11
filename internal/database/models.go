@@ -5,10 +5,19 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type Company struct {
+	ID             uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Name           string
+	OrganizationID uuid.UUID
+}
 
 type ConfigurationItem struct {
 	ID             uuid.UUID
@@ -18,12 +27,23 @@ type ConfigurationItem struct {
 	OrganizationID uuid.UUID
 }
 
+type Incident struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	OrganizationID      uuid.UUID
+	ConfigurationItemID uuid.UUID
+}
+
 type Organization struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string
-	UserID    uuid.UUID
+	ID                uuid.UUID
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	Name              string
+	UserID            uuid.UUID
+	IncidentsSequence int64
 }
 
 type User struct {
