@@ -14,9 +14,9 @@ import (
 )
 
 const createIncident = `-- name: CreateIncident :one
-INSERT INTO incidents (id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id
+INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, organization_id, configuration_item_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to
 `
 
 type CreateIncidentParams struct {
@@ -25,6 +25,7 @@ type CreateIncidentParams struct {
 	UpdatedAt           time.Time
 	ShortDescription    string
 	Description         sql.NullString
+	State               StateEnum
 	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
@@ -37,6 +38,7 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		arg.UpdatedAt,
 		arg.ShortDescription,
 		arg.Description,
+		arg.State,
 		arg.OrganizationID,
 		arg.ConfigurationItemID,
 		arg.CompanyID,
@@ -51,12 +53,14 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		&i.OrganizationID,
 		&i.ConfigurationItemID,
 		&i.CompanyID,
+		&i.State,
+		&i.AssignedTo,
 	)
 	return i, err
 }
 
 const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
-SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id FROM incidents
+SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents
 WHERE organization_id = $1
 `
 
@@ -78,6 +82,8 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 			&i.OrganizationID,
 			&i.ConfigurationItemID,
 			&i.CompanyID,
+			&i.State,
+			&i.AssignedTo,
 		); err != nil {
 			return nil, err
 		}

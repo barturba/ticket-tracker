@@ -89,14 +89,16 @@ func databaseCompanyToCompany(company database.Company) Company {
 }
 
 type Incident struct {
-	ID                  uuid.UUID `json:"id"`
-	CreatedAt           time.Time `json:"created_at"`
-	UpdatedAt           time.Time `json:"updated_at"`
-	ShortDescription    string    `json:"short_description"`
-	Description         string    `json:"description"`
-	ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
-	OrganizationID      uuid.UUID `json:"organization_id"`
-	CompanyID           uuid.UUID `json:"company_id"`
+	ID                  uuid.UUID          `json:"id"`
+	CreatedAt           time.Time          `json:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at"`
+	ShortDescription    string             `json:"short_description"`
+	Description         string             `json:"description"`
+	State               database.StateEnum `json:"state"`
+	AssignedTo          uuid.UUID          `json:"assigned_to"`
+	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+	OrganizationID      uuid.UUID          `json:"organization_id"`
+	CompanyID           uuid.UUID          `json:"company_id"`
 }
 
 func databaseIncidentToIncident(incident database.Incident) Incident {
@@ -106,6 +108,8 @@ func databaseIncidentToIncident(incident database.Incident) Incident {
 		UpdatedAt:           incident.UpdatedAt,
 		ShortDescription:    incident.ShortDescription,
 		Description:         incident.Description.String,
+		State:               incident.State,
+		AssignedTo:          incident.AssignedTo.UUID,
 		ConfigurationItemID: incident.ConfigurationItemID,
 		OrganizationID:      incident.OrganizationID,
 		CompanyID:           incident.CompanyID,

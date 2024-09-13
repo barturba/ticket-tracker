@@ -59,12 +59,13 @@ func (cfg *apiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 		UpdatedAt:           time.Now(),
 		ShortDescription:    params.ShortDescription,
 		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
+		State:               database.StateEnumNew,
 		OrganizationID:      organization.ID,
 		ConfigurationItemID: configurationItem.ID,
 		CompanyID:           company.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("couldn't create incident %s", err))
 		return
 	}
 	respondWithJSON(w, http.StatusOK, databaseIncidentToIncident(incident))

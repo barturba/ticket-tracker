@@ -6,10 +6,57 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type StateEnum string
+
+const (
+	StateEnumNew        StateEnum = "New"
+	StateEnumInProgress StateEnum = "In Progress"
+	StateEnumAssigned   StateEnum = "Assigned"
+	StateEnumOnHold     StateEnum = "On Hold"
+	StateEnumResolved   StateEnum = "Resolved"
+)
+
+func (e *StateEnum) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = StateEnum(s)
+	case string:
+		*e = StateEnum(s)
+	default:
+		return fmt.Errorf("unsupported scan type for StateEnum: %T", src)
+	}
+	return nil
+}
+
+type NullStateEnum struct {
+	StateEnum StateEnum
+	Valid     bool // Valid is true if StateEnum is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullStateEnum) Scan(value interface{}) error {
+	if value == nil {
+		ns.StateEnum, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.StateEnum.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullStateEnum) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.StateEnum), nil
+}
 
 type Company struct {
 	ID             uuid.UUID
@@ -37,6 +84,8 @@ type Incident struct {
 	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
 }
 
 type Organization struct {
