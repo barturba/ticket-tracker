@@ -96,6 +96,7 @@ type Incident struct {
 	Description         string             `json:"description"`
 	State               database.StateEnum `json:"state"`
 	AssignedTo          uuid.UUID          `json:"assigned_to"`
+	AssignedToName      string             `json:"assigned_to_name"`
 	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
 	OrganizationID      uuid.UUID          `json:"organization_id"`
 	CompanyID           uuid.UUID          `json:"company_id"`
@@ -114,4 +115,36 @@ func databaseIncidentToIncident(incident database.Incident) Incident {
 		OrganizationID:      incident.OrganizationID,
 		CompanyID:           incident.CompanyID,
 	}
+}
+
+func databaseIncidentByOrganizationIDRowToIncident(incident database.GetIncidentsByOrganizationIDRow) Incident {
+	return Incident{
+		ID:                  incident.ID,
+		CreatedAt:           incident.CreatedAt,
+		UpdatedAt:           incident.UpdatedAt,
+		ShortDescription:    incident.ShortDescription,
+		Description:         incident.Description.String,
+		State:               incident.State,
+		AssignedTo:          incident.AssignedTo.UUID,
+		AssignedToName:      incident.Name.String,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		OrganizationID:      incident.OrganizationID,
+		CompanyID:           incident.CompanyID,
+	}
+}
+
+func databaseGetIncidentsByOrganizationIDRowToIncidents(incidents []database.GetIncidentsByOrganizationIDRow) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, databaseIncidentByOrganizationIDRowToIncident(item))
+	}
+	return items
+}
+
+func databaseIncidentsToIncidents(incidents []database.Incident) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, databaseIncidentToIncident(item))
+	}
+	return items
 }

@@ -71,3 +71,23 @@ func (cfg *apiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 	respondWithJSON(w, http.StatusOK, databaseIncidentToIncident(incident))
 
 }
+
+func (cfg *apiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+	// Get the organization -- should this be a part of the authentication
+	// process? I mean we're using the organization quite a bit.
+	//
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	incidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseGetIncidentsByOrganizationIDRowToIncidents(incidents))
+
+}

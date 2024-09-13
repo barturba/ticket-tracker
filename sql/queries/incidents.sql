@@ -5,4 +5,6 @@ RETURNING *;
 
 -- name: GetIncidentsByOrganizationID :many
 SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
 WHERE organization_id = $1;

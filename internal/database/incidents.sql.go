@@ -60,19 +60,39 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 }
 
 const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
-SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
 WHERE organization_id = $1
 `
 
-func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]Incident, error) {
+type GetIncidentsByOrganizationIDRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	OrganizationID      uuid.UUID
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+}
+
+func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]GetIncidentsByOrganizationIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getIncidentsByOrganizationID, organizationID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Incident
+	var items []GetIncidentsByOrganizationIDRow
 	for rows.Next() {
-		var i Incident
+		var i GetIncidentsByOrganizationIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
@@ -84,6 +104,11 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 			&i.CompanyID,
 			&i.State,
 			&i.AssignedTo,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name,
+			&i.Apikey,
 		); err != nil {
 			return nil, err
 		}
