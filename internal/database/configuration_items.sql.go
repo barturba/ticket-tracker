@@ -13,8 +13,8 @@ import (
 )
 
 const createConfigurationItem = `-- name: CreateConfigurationItem :one
-INSERT INTO configuration_items (id, created_at, updated_at, name, organization_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO configuration_items (id, created_at, updated_at, name, organization_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id, created_at, updated_at, name, organization_id, company_id
 `
 
@@ -24,6 +24,7 @@ type CreateConfigurationItemParams struct {
 	UpdatedAt      time.Time
 	Name           string
 	OrganizationID uuid.UUID
+	CompanyID      uuid.UUID
 }
 
 func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigurationItemParams) (ConfigurationItem, error) {
@@ -33,7 +34,27 @@ func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigu
 		arg.UpdatedAt,
 		arg.Name,
 		arg.OrganizationID,
+		arg.CompanyID,
 	)
+	var i ConfigurationItem
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.OrganizationID,
+		&i.CompanyID,
+	)
+	return i, err
+}
+
+const getConfigurationItemByID = `-- name: GetConfigurationItemByID :one
+SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+WHERE id = $1
+`
+
+func (q *Queries) GetConfigurationItemByID(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, getConfigurationItemByID, id)
 	var i ConfigurationItem
 	err := row.Scan(
 		&i.ID,

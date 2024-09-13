@@ -7,14 +7,15 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 const createIncident = `-- name: CreateIncident :one
-INSERT INTO incidents (id, created_at, updated_at, short_description, organization_id, configuration_item_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO incidents (id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id
 `
 
@@ -23,8 +24,10 @@ type CreateIncidentParams struct {
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	ShortDescription    string
+	Description         sql.NullString
 	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
 }
 
 func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) (Incident, error) {
@@ -33,8 +36,10 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.ShortDescription,
+		arg.Description,
 		arg.OrganizationID,
 		arg.ConfigurationItemID,
+		arg.CompanyID,
 	)
 	var i Incident
 	err := row.Scan(

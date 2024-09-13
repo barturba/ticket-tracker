@@ -6,3 +6,7 @@ RETURNING *;
 -- name: GetCompaniesByOrganizationID :many
 SELECT * from companies
 WHERE organization_id = $1;
+
+-- name: GetCompanyByID :one
+SELECT * from companies
+WHERE id = $1;
