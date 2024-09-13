@@ -19,13 +19,8 @@ func (cfg *apiConfig) getOrganizations(w http.ResponseWriter, r *http.Request, u
 }
 
 func (cfg *apiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request, u database.User) {
-	// organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-	// 	return
-	// }
 	type parameters struct {
-		OrganizationName string `json:"organization_name"`
+		Name string `json:"name"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -34,7 +29,7 @@ func (cfg *apiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request
 		respondWithError(w, http.StatusInternalServerError, "error decoding parameters")
 		return
 	}
-	if params.OrganizationName == "" {
+	if params.Name == "" {
 		respondWithError(w, http.StatusInternalServerError, "missing organization name")
 	}
 
@@ -42,7 +37,7 @@ func (cfg *apiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request
 		database.UpdateOrganizationByUserIDParams{
 			UserID:    u.ID,
 			UpdatedAt: time.Now(),
-			Name:      params.OrganizationName,
+			Name:      params.Name,
 		})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't update organization")
