@@ -15,7 +15,7 @@ import (
 const createConfigurationItem = `-- name: CreateConfigurationItem :one
 INSERT INTO configuration_items (id, created_at, updated_at, name, organization_id)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, name, organization_id
+RETURNING id, created_at, updated_at, name, organization_id, company_id
 `
 
 type CreateConfigurationItemParams struct {
@@ -41,12 +41,13 @@ func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigu
 		&i.UpdatedAt,
 		&i.Name,
 		&i.OrganizationID,
+		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getConfigurationItemsByOrganizationID = `-- name: GetConfigurationItemsByOrganizationID :many
-SELECT id, created_at, updated_at, name, organization_id FROM configuration_items
+SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
 WHERE organization_id = $1
 `
 
@@ -65,6 +66,7 @@ func (q *Queries) GetConfigurationItemsByOrganizationID(ctx context.Context, org
 			&i.UpdatedAt,
 			&i.Name,
 			&i.OrganizationID,
+			&i.CompanyID,
 		); err != nil {
 			return nil, err
 		}
@@ -77,4 +79,38 @@ func (q *Queries) GetConfigurationItemsByOrganizationID(ctx context.Context, org
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateConfigurationItem = `-- name: UpdateConfigurationItem :one
+UPDATE configuration_items
+SET name = $3,
+updated_at = $4
+WHERE id = $1 AND organization_id = $2
+RETURNING id, created_at, updated_at, name, organization_id, company_id
+`
+
+type UpdateConfigurationItemParams struct {
+	ID             uuid.UUID
+	OrganizationID uuid.UUID
+	Name           string
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) UpdateConfigurationItem(ctx context.Context, arg UpdateConfigurationItemParams) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, updateConfigurationItem,
+		arg.ID,
+		arg.OrganizationID,
+		arg.Name,
+		arg.UpdatedAt,
+	)
+	var i ConfigurationItem
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.OrganizationID,
+		&i.CompanyID,
+	)
+	return i, err
 }

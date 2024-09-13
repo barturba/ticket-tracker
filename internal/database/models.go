@@ -25,6 +25,7 @@ type ConfigurationItem struct {
 	UpdatedAt      time.Time
 	Name           string
 	OrganizationID uuid.UUID
+	CompanyID      uuid.UUID
 }
 
 type Incident struct {
@@ -35,6 +36,7 @@ type Incident struct {
 	Description         sql.NullString
 	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
 }
 
 type Organization struct {

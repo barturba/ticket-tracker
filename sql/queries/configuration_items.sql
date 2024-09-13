@@ -6,3 +6,10 @@ RETURNING *;
 -- name: GetConfigurationItemsByOrganizationID :many
 SELECT * FROM configuration_items
 WHERE organization_id = $1;
+
+-- name: UpdateConfigurationItem :one
+UPDATE configuration_items
+SET name = $3,
+updated_at = $4
+WHERE id = $1 AND organization_id = $2
+RETURNING *;

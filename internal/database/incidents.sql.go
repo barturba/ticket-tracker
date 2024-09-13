@@ -15,7 +15,7 @@ import (
 const createIncident = `-- name: CreateIncident :one
 INSERT INTO incidents (id, created_at, updated_at, short_description, organization_id, configuration_item_id)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id
+RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id
 `
 
 type CreateIncidentParams struct {
@@ -45,12 +45,13 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		&i.Description,
 		&i.OrganizationID,
 		&i.ConfigurationItemID,
+		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
-SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id FROM incidents
+SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id FROM incidents
 WHERE organization_id = $1
 `
 
@@ -71,6 +72,7 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 			&i.Description,
 			&i.OrganizationID,
 			&i.ConfigurationItemID,
+			&i.CompanyID,
 		); err != nil {
 			return nil, err
 		}
