@@ -11,10 +11,16 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	JWT_EXPIRES_IN_SECONDS = 3600
 )
 
 type apiConfig struct {
-	DB *database.Queries
+	DB        *database.Queries
+	JWTSecret string
 }
 
 func main() {
@@ -34,6 +40,21 @@ func main() {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
+	}
+
+	adminPasswordTest := os.Getenv("ADMIN_PASSWORD")
+	if adminPasswordTest == "" {
+		log.Fatal("ADMIN_PASSWORD environment variable is not set")
+	}
+	dat, err := bcrypt.GenerateFromPassword([]byte(adminPasswordTest), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatal("couldn't generate admin password")
+	}
+	fmt.Printf("%s\n", string(dat))
+
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +62,8 @@ func main() {
 	dbQueries := database.New(db)
 
 	apiCfg := apiConfig{
-		DB: dbQueries,
+		DB:        dbQueries,
+		JWTSecret: jwtSecret,
 	}
 
 	mux := http.NewServeMux()
@@ -54,6 +76,9 @@ func main() {
 	mux.HandleFunc("POST /v1/companies", apiCfg.middlewareAuth(apiCfg.handleCompanies))
 	mux.HandleFunc("POST /v1/incidents", apiCfg.middlewareAuth(apiCfg.handleIncidents))
 	mux.HandleFunc("GET /v1/incidents", apiCfg.middlewareAuth(apiCfg.getIncidents))
+	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
+	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
+	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)
 
 	fmt.Printf("ticket-tracker\n")
 	srv := http.Server{

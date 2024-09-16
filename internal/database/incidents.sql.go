@@ -60,7 +60,7 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 }
 
 const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE organization_id = $1
@@ -82,6 +82,8 @@ type GetIncidentsByOrganizationIDRow struct {
 	UpdatedAt_2         sql.NullTime
 	Name                sql.NullString
 	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
 }
 
 func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]GetIncidentsByOrganizationIDRow, error) {
@@ -109,6 +111,8 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 			&i.UpdatedAt_2,
 			&i.Name,
 			&i.Apikey,
+			&i.Email,
+			&i.Password,
 		); err != nil {
 			return nil, err
 		}

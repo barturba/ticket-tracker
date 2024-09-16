@@ -31,7 +31,9 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Name      string    `json:"name"`
+	Email     string    `json:"email"`
 	APIkey    string    `json:"api_key"`
+	Token     string    `json:"token"`
 }
 
 func databaseUserToUser(user database.User) User {
@@ -147,4 +149,7 @@ func databaseIncidentsToIncidents(incidents []database.Incident) []Incident {
 		items = append(items, databaseIncidentToIncident(item))
 	}
 	return items
+}
+
+type Page struct {
 }
