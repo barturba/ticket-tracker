@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
@@ -90,22 +91,8 @@ func databaseCompanyToCompany(company database.Company) Company {
 	}
 }
 
-type Incident struct {
-	ID                  uuid.UUID          `json:"id"`
-	CreatedAt           time.Time          `json:"created_at"`
-	UpdatedAt           time.Time          `json:"updated_at"`
-	ShortDescription    string             `json:"short_description"`
-	Description         string             `json:"description"`
-	State               database.StateEnum `json:"state"`
-	AssignedTo          uuid.UUID          `json:"assigned_to"`
-	AssignedToName      string             `json:"assigned_to_name"`
-	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
-	OrganizationID      uuid.UUID          `json:"organization_id"`
-	CompanyID           uuid.UUID          `json:"company_id"`
-}
-
-func databaseIncidentToIncident(incident database.Incident) Incident {
-	return Incident{
+func databaseIncidentToIncident(incident database.Incident) models.Incident {
+	return models.Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
 		UpdatedAt:           incident.UpdatedAt,
@@ -119,8 +106,8 @@ func databaseIncidentToIncident(incident database.Incident) Incident {
 	}
 }
 
-func databaseIncidentByOrganizationIDRowToIncident(incident database.GetIncidentsByOrganizationIDRow) Incident {
-	return Incident{
+func databaseIncidentByOrganizationIDRowToIncident(incident database.GetIncidentsByOrganizationIDRow) models.Incident {
+	return models.Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
 		UpdatedAt:           incident.UpdatedAt,
@@ -135,16 +122,16 @@ func databaseIncidentByOrganizationIDRowToIncident(incident database.GetIncident
 	}
 }
 
-func databaseGetIncidentsByOrganizationIDRowToIncidents(incidents []database.GetIncidentsByOrganizationIDRow) []Incident {
-	var items []Incident
+func databaseGetIncidentsByOrganizationIDRowToIncidents(incidents []database.GetIncidentsByOrganizationIDRow) []models.Incident {
+	var items []models.Incident
 	for _, item := range incidents {
 		items = append(items, databaseIncidentByOrganizationIDRowToIncident(item))
 	}
 	return items
 }
 
-func databaseIncidentsToIncidents(incidents []database.Incident) []Incident {
-	var items []Incident
+func databaseIncidentsToIncidents(incidents []database.Incident) []models.Incident {
+	var items []models.Incident
 	for _, item := range incidents {
 		items = append(items, databaseIncidentToIncident(item))
 	}
