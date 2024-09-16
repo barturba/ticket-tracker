@@ -6,6 +6,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/views"
+	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -26,4 +27,23 @@ func (cfg *apiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 	page := views.NewPage()
 
 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
+}
+
+func (cfg *apiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+
+	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't find incident")
+		return
+	}
+
+	incident := databaseIncidentToIncident(databaseIncident)
+
+	templ.Handler(views.IncidentForm(incident)).ServeHTTP(w, r)
 }

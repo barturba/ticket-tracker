@@ -59,6 +59,28 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 	return i, err
 }
 
+const getIncidentByID = `-- name: GetIncidentByID :one
+SELECt id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
+`
+
+func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
+	row := q.db.QueryRowContext(ctx, getIncidentByID, id)
+	var i Incident
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ShortDescription,
+		&i.Description,
+		&i.OrganizationID,
+		&i.ConfigurationItemID,
+		&i.CompanyID,
+		&i.State,
+		&i.AssignedTo,
+	)
+	return i, err
+}
+
 const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users

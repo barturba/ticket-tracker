@@ -23,27 +23,26 @@ templ Incidents(page Page, incidents []models.Incident) {
 <body>
     <div class="container">
         <h1 class="mt-5">Incidents</h1>
-        // <div id="todo-list" hx-get="/v1/incidents" hx-trigger="load" hx-target="#todo-list" hx-swap="innerHTML" <div>
-            <div>
-                @IncidentsList(incidents)
-            </div>
-            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
+        <div>
+            @IncidentsList(incidents)
         </div>
+        <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
+    </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", (event) => {
-                document.body.addEventListener("htmx:beforeSwap", function (evt) {
-                    if (evt.detail.xhr.status == 422) {
-                        evt.detail.shouldSwap = true;
-                        evt.detail.isError = false;
-                    }
-                    if (evt.detail.xhr.status == 204) {
-                        evt.detail.shouldSwap = true;
-                        evt.detail.isError = false;
-                    }
-                });
-            })
-        </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener("htmx:beforeSwap", function (evt) {
+                if (evt.detail.xhr.status == 422) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+                if (evt.detail.xhr.status == 204) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            });
+        })
+    </script>
 </body>
 
 
@@ -72,7 +71,7 @@ templ IncidentRow(incident models.Incident) {
     <td>{incident.ID.String()}</td>
     <td>{incident.ShortDescription}</td>
     <td>
-        <button class="btn danger" hx-get={"/v1/incidents/"+ incident.ID.String() +"/edit"} hx-trigger="edit" onClick="let editing = document.querySelector('.editing')
+        <button class="btn danger" hx-get={"/incidents/"+ incident.ID.String() +"/edit"} hx-trigger="edit" onClick="let editing = document.querySelector('.editing')
                          if(editing) {
                            Swal.fire({title: 'Already Editing',
                                       showCancelButton: true,
@@ -88,6 +87,21 @@ templ IncidentRow(incident models.Incident) {
                             htmx.trigger(this, 'edit')
                          }">
             Edit
+        </button>
+    </td>
+</tr>
+}
+
+templ IncidentForm(incident models.Incident) {
+<tr hx-trigger='cancel' class='editing' hx-get={"/incident/" + incident.ID.String()}>
+    <td><input name='id' value={incident.ID.String()}></td>
+    <td><input name='short description' value={incident.ShortDescription}></td>
+    <td>
+        <button class="btn danger" hx-get={"/incident/"+incident.ID.String()}>
+            Cancel
+        </button>
+        <button class="btn danger" hx-put={"/incident/"+incident.ID.String()} hx-include="closest tr">
+            Save
         </button>
     </td>
 </tr>

@@ -8,3 +8,6 @@ SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE organization_id = $1;
+
+-- name: GetIncidentByID :one
+SELECt * FROM incidents WHERE id = $1;

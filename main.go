@@ -77,6 +77,7 @@ func main() {
 	mux.HandleFunc("POST /v1/incidents", apiCfg.middlewareAuth(apiCfg.handleIncidents))
 	mux.HandleFunc("GET /v1/incidents", apiCfg.middlewareAuth(apiCfg.getIncidents))
 	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuth(apiCfg.handleIncidentsPage))
+	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuth(apiCfg.handleIncidentsEditPage))
 	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
 	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)
