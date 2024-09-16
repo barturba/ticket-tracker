@@ -74,12 +74,19 @@ func main() {
 	mux.HandleFunc("POST /v1/configuration-items", apiCfg.middlewareAuth(apiCfg.handleConfigurationItems))
 	mux.HandleFunc("GET /v1/configuration-items", apiCfg.middlewareAuth(apiCfg.getConfigurationItems))
 	mux.HandleFunc("POST /v1/companies", apiCfg.middlewareAuth(apiCfg.handleCompanies))
+
+	mux.HandleFunc("GET /companies", apiCfg.middlewareAuth(apiCfg.handleCompaniesPage))
+	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuth(apiCfg.handleConfigurationItemsPage))
+
 	mux.HandleFunc("POST /v1/incidents", apiCfg.middlewareAuth(apiCfg.handleIncidents))
 	mux.HandleFunc("GET /v1/incidents", apiCfg.middlewareAuth(apiCfg.getIncidents))
 	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuth(apiCfg.handleIncidentsPage))
+	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuth(apiCfg.handleIncidentsNewPage))
+	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuth(apiCfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuth(apiCfg.handleIncidentsEditPage))
 	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuth(apiCfg.handleIncidentsGetPage))
 	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuth(apiCfg.handleIncidentsUpdatePage))
+
 	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
 	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)

@@ -120,9 +120,96 @@ templ IncidentGet(incident models.Incident) {
         <button class="btn danger" hx-get={"/incidents/"+incident.ID.String()}>
             Cancel
         </button>
-        <button class="btn danger" hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr">
+        <button class="btn danger" hx-on:keydown="(event.keyCode===13&&!event.shiftKey)?event.preventDefault():null"
+            hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr">
             Save
         </button>
     </td>
 </tr>
+}
+
+templ IncidentNew(companies []models.Company, configurationItems []models.ConfigurationItem) {
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>New Incident</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mt-5">New Incident</h1>
+        <div>
+            @IncidentFormNew(companies, configurationItems)
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            document.body.addEventListener("htmx:beforeSwap", function (evt) {
+                if (evt.detail.xhr.status == 422) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+                if (evt.detail.xhr.status == 204) {
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            });
+        })
+    </script>
+</body>
+
+
+</html>
+}
+
+templ IncidentFormNew(companies []models.Company, configurationItems []models.ConfigurationItem) {
+
+
+
+<form hx-post={"/v1/incidents"} hx-ext="json-enc">
+
+    <div>
+        <label>Companies</label>
+        <select name="company_id" hx-get="/configuration-items" hx-target="#configurationItems"
+            hx-indicator=".htmx-indicator">
+            for _, company := range companies{
+            <option value={company.ID.String()}>{ company.Name }</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Configuration Item</label>
+        <select id="configurationItems" name="configuration_item_id">
+            <option value="a1">A1</option>
+            ...
+        </select>
+        <img class="htmx-indicator" width="20" src="/img/bars.svg">
+    </div>
+
+    <input name="short_description" type="text" id="shortDescription" placeholder="Enter short description">
+    <input name="description" type="text" id="description" placeholder="Enter description">
+
+    <div class="form-group">
+        <label for="incidentShortDescription">Short Description</label>
+        <input type="text" class="form-control" id="incidentShortDescription" aria-describedby="shortDescriptionHelp"
+            placeholder="Enter short description">
+        <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
+    </div>
+    <div class="form-group">
+        <label for="incidentDescription">Description</label>
+        <input type="text" class="form-control" id="incidentDescription" aria-describedby="descriptionHelp"
+            placeholder="Enter description">
+        <small id="descriptionHelp" class="form-text text-muted">Enter the description here.</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
 }

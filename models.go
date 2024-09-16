@@ -47,16 +47,8 @@ func databaseUserToUser(user database.User) User {
 	}
 }
 
-type ConfigurationItem struct {
-	ID             uuid.UUID `json:"id"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	Name           string    `json:"name"`
-	OrganizationID string    `json:"organization_id"`
-}
-
-func databaseConfigurationItemToConfigurationItem(configurationItem database.ConfigurationItem) ConfigurationItem {
-	return ConfigurationItem{
+func databaseConfigurationItemToConfigurationItem(configurationItem database.ConfigurationItem) models.ConfigurationItem {
+	return models.ConfigurationItem{
 		ID:             configurationItem.ID,
 		CreatedAt:      configurationItem.CreatedAt,
 		UpdatedAt:      configurationItem.UpdatedAt,
@@ -65,30 +57,29 @@ func databaseConfigurationItemToConfigurationItem(configurationItem database.Con
 	}
 }
 
-func databaseConfigurationItemsToConfigurationItems(configurationItems []database.ConfigurationItem) []ConfigurationItem {
-	var items []ConfigurationItem
+func databaseConfigurationItemsToConfigurationItems(configurationItems []database.ConfigurationItem) []models.ConfigurationItem {
+	var items []models.ConfigurationItem
 	for _, configurationItem := range configurationItems {
 		items = append(items, databaseConfigurationItemToConfigurationItem(configurationItem))
 	}
 	return items
 }
 
-type Company struct {
-	ID             uuid.UUID `json:"id"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	Name           string    `json:"name"`
-	OrganizationID uuid.UUID `json:"organization_id"`
-}
-
-func databaseCompanyToCompany(company database.Company) Company {
-	return Company{
+func databaseCompanyToCompany(company database.Company) models.Company {
+	return models.Company{
 		ID:             company.ID,
 		CreatedAt:      company.CreatedAt,
 		UpdatedAt:      company.UpdatedAt,
 		Name:           company.Name,
 		OrganizationID: company.ID,
 	}
+}
+func databaseCompaniesToCompanies(companies []database.Company) []models.Company {
+	var items []models.Company
+	for _, item := range companies {
+		items = append(items, databaseCompanyToCompany(item))
+	}
+	return items
 }
 
 func databaseIncidentToIncident(incident database.Incident) models.Incident {

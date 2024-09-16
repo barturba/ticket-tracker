@@ -7,6 +7,22 @@ import (
 	"github.com/google/uuid"
 )
 
+type Company struct {
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	OrganizationID uuid.UUID `json:"organization_id"`
+}
+
+type ConfigurationItem struct {
+	ID             uuid.UUID `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	Name           string    `json:"name"`
+	OrganizationID string    `json:"organization_id"`
+}
+
 type Incident struct {
 	ID                  uuid.UUID          `json:"id"`
 	CreatedAt           time.Time          `json:"created_at"`

@@ -67,6 +67,41 @@ func (q *Queries) GetConfigurationItemByID(ctx context.Context, id uuid.UUID) (C
 	return i, err
 }
 
+const getConfigurationItemsByCompanyID = `-- name: GetConfigurationItemsByCompanyID :many
+SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+WHERE company_id = $1
+`
+
+func (q *Queries) GetConfigurationItemsByCompanyID(ctx context.Context, companyID uuid.UUID) ([]ConfigurationItem, error) {
+	rows, err := q.db.QueryContext(ctx, getConfigurationItemsByCompanyID, companyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ConfigurationItem
+	for rows.Next() {
+		var i ConfigurationItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.OrganizationID,
+			&i.CompanyID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getConfigurationItemsByOrganizationID = `-- name: GetConfigurationItemsByOrganizationID :many
 SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
 WHERE organization_id = $1

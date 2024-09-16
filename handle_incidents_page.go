@@ -111,3 +111,80 @@ func (cfg *apiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.R
 
 	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
 }
+
+func (cfg *apiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
+
+	companies := databaseCompaniesToCompanies(databaseCompanies)
+	firstCompany := companies[0]
+
+	configurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), firstCompany.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+		return
+	}
+
+	templ.Handler(views.IncidentNew(companies, databaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
+}
+
+func (cfg *apiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	type parameters struct {
+		ShortDescription string    `json:"short_description"`
+		Description      string    `json:"description"`
+		CompanyID        uuid.UUID `json:"description"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err = decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("couldn't decode parameters %s", err))
+		return
+	}
+	if params.ShortDescription == "" {
+		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
+		return
+	}
+	// newIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+	// 	ID:                  uuid.New(),
+	// 	CreatedAt:           time.Now(),
+	// 	UpdatedAt:           time.Now(),
+	// 	ShortDescription:    params.ShortDescription,
+	// 	Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
+	// 	State:               "New",
+	// 	OrganizationID:      organization.ID,
+	// 	ConfigurationItemID: params.ConfigurationItemID,
+	// 	CompanyID:           params.CompanyID,
+	// })
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "couldn't create new incident")
+	// 	return
+	// }
+
+	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		return
+	}
+	incidents := databaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	page := views.NewPage()
+
+	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
+}

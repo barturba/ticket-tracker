@@ -1,0 +1,12 @@
+package views
+
+import (
+"github.com/barturba/ticket-tracker/models"
+)
+
+templ Companies(companies []models.Company) {
+for _, company := range companies {
+<option value={company.ID.String()}>{ company.Name }</option>
+}
+
+}

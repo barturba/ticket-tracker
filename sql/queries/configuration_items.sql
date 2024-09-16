@@ -11,6 +11,10 @@ WHERE id = $1;
 SELECT * FROM configuration_items
 WHERE organization_id = $1;
 
+-- name: GetConfigurationItemsByCompanyID :many
+SELECT * FROM configuration_items
+WHERE company_id = $1;
+
 -- name: UpdateConfigurationItem :one
 UPDATE configuration_items
 SET name = $3,
