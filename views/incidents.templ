@@ -55,6 +55,7 @@ templ IncidentsList(incidents []models.Incident) {
         <tr>
             <th>ID</th>
             <th>Short Description</th>
+            <th>Description</th>
             <th></th>
         </tr>
     </thead>
@@ -70,6 +71,7 @@ templ IncidentRow(incident models.Incident) {
 <tr>
     <td>{incident.ID.String()}</td>
     <td>{incident.ShortDescription}</td>
+    <td>{incident.Description}</td>
     <td>
         <button class="btn danger" hx-get={"/incidents/"+ incident.ID.String() +"/edit"} hx-trigger="edit" onClick="let editing = document.querySelector('.editing')
                          if(editing) {
@@ -93,14 +95,32 @@ templ IncidentRow(incident models.Incident) {
 }
 
 templ IncidentForm(incident models.Incident) {
-<tr hx-trigger='cancel' class='editing' hx-get={"/incident/" + incident.ID.String()}>
-    <td><input name='id' value={incident.ID.String()}></td>
-    <td><input name='short description' value={incident.ShortDescription}></td>
+<tr hx-trigger='cancel' class='editing' hx-get={"/incidents/" + incident.ID.String()}>
+    <td>{incident.ID.String()}</td>
+    <td><input name='short_description' value={incident.ShortDescription}></td>
+    <td><input name='description' value={incident.Description}></td>
     <td>
-        <button class="btn danger" hx-get={"/incident/"+incident.ID.String()}>
+        <button class="btn danger" hx-get={"/incidents/"+incident.ID.String()}>
             Cancel
         </button>
-        <button class="btn danger" hx-put={"/incident/"+incident.ID.String()} hx-include="closest tr">
+        <button class="btn danger" hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr"
+            hx-ext="json-enc">
+            Save
+        </button>
+    </td>
+</tr>
+}
+
+templ IncidentGet(incident models.Incident) {
+<tr hx-trigger='cancel' class='editing' hx-get={"/incidents/" + incident.ID.String()}>
+    <td><input name='id' value={incident.ID.String()}></td>
+    <td><input name='short_description' value={incident.ShortDescription}></td>
+    <td><input name='description' value={incident.Description}></td>
+    <td>
+        <button class="btn danger" hx-get={"/incidents/"+incident.ID.String()}>
+            Cancel
+        </button>
+        <button class="btn danger" hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr">
             Save
         </button>
     </td>

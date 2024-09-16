@@ -86,6 +86,7 @@ SELECT incidents.id, incidents.created_at, incidents.updated_at, short_descripti
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE organization_id = $1
+ORDER BY incidents.updated_at DESC
 `
 
 type GetIncidentsByOrganizationIDRow struct {
@@ -147,4 +148,41 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateIncident = `-- name: UpdateIncident :one
+UPDATE incidents
+SET updated_at = $2, description = $3, short_description = $4
+WHERE ID = $1
+RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to
+`
+
+type UpdateIncidentParams struct {
+	ID               uuid.UUID
+	UpdatedAt        time.Time
+	Description      sql.NullString
+	ShortDescription string
+}
+
+func (q *Queries) UpdateIncident(ctx context.Context, arg UpdateIncidentParams) (Incident, error) {
+	row := q.db.QueryRowContext(ctx, updateIncident,
+		arg.ID,
+		arg.UpdatedAt,
+		arg.Description,
+		arg.ShortDescription,
+	)
+	var i Incident
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ShortDescription,
+		&i.Description,
+		&i.OrganizationID,
+		&i.ConfigurationItemID,
+		&i.CompanyID,
+		&i.State,
+		&i.AssignedTo,
+	)
+	return i, err
 }

@@ -7,7 +7,14 @@ RETURNING *;
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1;
+WHERE organization_id = $1
+ORDER BY incidents.updated_at DESC;
 
 -- name: GetIncidentByID :one
 SELECt * FROM incidents WHERE id = $1;
+
+-- name: UpdateIncident :one
+UPDATE incidents
+SET updated_at = $2, description = $3, short_description = $4
+WHERE ID = $1
+RETURNING *;
