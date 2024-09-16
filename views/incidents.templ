@@ -51,14 +51,44 @@ templ Incidents(page Page, incidents []models.Incident) {
 }
 
 templ IncidentsList(incidents []models.Incident) {
-<ul>
-    for _, incident := range incidents {
-    <div class="card mb-2"></div>
-    <div class="card-body">
-        <h5 class="card-title item-task">{incident.ID.String()}</h5>
-        <button class="btn btn-warning" onclick="openEditModal('{{id}}', '{{task}}')">Edit</button>
-        <button class="btn btn-danger" onclick="deleteTodo('{{id}}')">Delete</button>
-    </div>
-    }
-</ul>
+<table class="table delete-row-example">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Short Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody hx-target="closest tr" hx-swap="outerHTML">
+        for _, incident := range incidents {
+        @IncidentRow(incident)
+        }
+    </tbody>
+</table>
+}
+
+templ IncidentRow(incident models.Incident) {
+<tr>
+    <td>{incident.ID.String()}</td>
+    <td>{incident.ShortDescription}</td>
+    <td>
+        <button class="btn danger" hx-get={"/v1/incidents/"+ incident.ID.String() +"/edit"} hx-trigger="edit" onClick="let editing = document.querySelector('.editing')
+                         if(editing) {
+                           Swal.fire({title: 'Already Editing',
+                                      showCancelButton: true,
+                                      confirmButtonText: 'Yep, Edit This Row!',
+                                      text:'Hey!  You are already editing a row!  Do you want to cancel that edit and continue?'})
+                           .then((result) => {
+                                if(result.isConfirmed) {
+                                   htmx.trigger(editing, 'cancel')
+                                   htmx.trigger(this, 'edit')
+                                }
+                            })
+                         } else {
+                            htmx.trigger(this, 'edit')
+                         }">
+            Edit
+        </button>
+    </td>
+</tr>
 }
