@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -54,8 +53,6 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("handle Login: createJWT: %v\n", jwt)
-
 	cookie := http.Cookie{
 		Name:     "jwtCookie",
 		Value:    string(jwt),
@@ -91,7 +88,6 @@ func (cfg *ApiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, http.ErrNoCookie):
 			http.Error(w, "cookie not found", http.StatusBadRequest)
 		default:
-			log.Println(err)
 			http.Error(w, "server error", http.StatusInternalServerError)
 		}
 		return
@@ -103,15 +99,10 @@ func (cfg *ApiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
 		return []byte(cfg.JWTSecret), nil
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("bad token: %v", err))
+		respondWithError(w, http.StatusInternalServerError, "bad token")
 		return
 	}
 
-	for key, val := range claims {
-		fmt.Printf("Key: %v, value: %v\n", key, val)
-	}
-
-	log.Printf("getCookieHandler: sub %v\n", claims["sub"])
 	// Echo out the cookie value in the response body.
 	w.Write([]byte(fmt.Sprintf("%v", token)))
 }

@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -28,7 +27,7 @@ func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 	params := parameters{}
 	err = decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("couldn't decode parameters %s", err))
+		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
 		return
 	}
 	if params.ShortDescription == "" {
@@ -66,7 +65,7 @@ func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 		CompanyID:           company.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("couldn't create incident %s", err))
+		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
 		return
 	}
 	respondWithJSON(w, http.StatusOK, models.DatabaseIncidentToIncident(incident))

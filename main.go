@@ -11,8 +11,8 @@ import (
 func main() {
 
 	srv := server.NewServer()
-	err := srv.ListenAndServe()
 	fmt.Println("server started on ", srv.Addr)
+	err := srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

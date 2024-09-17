@@ -2,7 +2,6 @@ package server
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -43,16 +41,6 @@ func NewServer() *http.Server {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET environment variable is not set")
 	}
-
-	adminPasswordTest := os.Getenv("ADMIN_PASSWORD")
-	if adminPasswordTest == "" {
-		log.Fatal("ADMIN_PASSWORD environment variable is not set")
-	}
-	dat, err := bcrypt.GenerateFromPassword([]byte(adminPasswordTest), bcrypt.DefaultCost)
-	if err != nil {
-		log.Fatal("couldn't generate admin password")
-	}
-	fmt.Printf("%s\n", string(dat))
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
@@ -96,7 +84,6 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
 	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)
 
-	fmt.Printf("ticket-tracker\n")
 	srv := &http.Server{
 		Handler:      mux,
 		Addr:         ":" + port,

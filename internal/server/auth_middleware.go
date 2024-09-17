@@ -2,8 +2,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/auth"
@@ -22,7 +20,6 @@ func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 		// JWT authorization check
 		cookie, err := r.Cookie("jwtCookie")
 		if err != nil && !errors.Is(err, http.ErrNoCookie) {
-			log.Println(err)
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}
@@ -47,15 +44,10 @@ func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 				return []byte(cfg.JWTSecret), nil
 			})
 			if err != nil {
-				respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("bad token: %v", err))
+				respondWithError(w, http.StatusInternalServerError, "bad token")
 				return
 			}
 
-			for key, val := range claims {
-				fmt.Printf("Key: %v, value: %v\n", key, val)
-			}
-
-			log.Printf("getCookieHandler: sub %v\n", claims["sub"])
 			idString := claims["sub"]
 			if idString == "" {
 				respondWithError(w, http.StatusInternalServerError, "invalid claims")
