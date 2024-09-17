@@ -162,21 +162,6 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
 		return
 	}
-	// newIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
-	// 	ID:                  uuid.New(),
-	// 	CreatedAt:           time.Now(),
-	// 	UpdatedAt:           time.Now(),
-	// 	ShortDescription:    params.ShortDescription,
-	// 	Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
-	// 	State:               "New",
-	// 	OrganizationID:      organization.ID,
-	// 	ConfigurationItemID: params.ConfigurationItemID,
-	// 	CompanyID:           params.CompanyID,
-	// })
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, "couldn't create new incident")
-	// 	return
-	// }
 
 	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
 	if err != nil {
