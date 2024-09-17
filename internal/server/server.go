@@ -68,15 +68,15 @@ func NewServer() *http.Server {
 
 	// Page Endpoints
 
-	mux.HandleFunc("GET /companies", apiCfg.middlewareAuth(apiCfg.handleCompaniesPage))
-	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuth(apiCfg.handleConfigurationItemsPage))
+	mux.HandleFunc("GET /companies", apiCfg.middlewareAuthPage(apiCfg.handleCompaniesPage))
+	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleConfigurationItemsPage))
 
-	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuth(apiCfg.handleIncidentsPage))
-	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuth(apiCfg.handleIncidentsNewPage))
-	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuth(apiCfg.handleIncidentsPostPage))
-	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuth(apiCfg.handleIncidentsEditPage))
-	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuth(apiCfg.handleIncidentsGetPage))
-	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuth(apiCfg.handleIncidentsUpdatePage))
+	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPage))
+	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
+	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
+	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
+	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsGetPage))
+	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsUpdatePage))
 
 	// Login Endpoints
 

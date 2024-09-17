@@ -75,3 +75,48 @@ func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 		handler(w, r, user)
 	}
 }
+
+func (cfg *ApiConfig) middlewareAuthPage(handler authedHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// JWT authorization check
+		cookie, err := r.Cookie("jwtCookie")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		tokenString := cookie.Value
+		claims := jwt.MapClaims{}
+		_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(cfg.JWTSecret), nil
+		})
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "bad token")
+			return
+		}
+
+		idString := claims["sub"]
+		if idString == "" {
+			respondWithError(w, http.StatusInternalServerError, "invalid claims")
+			return
+		}
+		idString, ok := idString.(string)
+		if !ok {
+			respondWithError(w, http.StatusInternalServerError, "invalid claims: sub is not a string")
+			return
+		}
+		id, err := uuid.Parse(idString.(string))
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "invalid claims: can't parse uuid")
+			return
+		}
+
+		user, err := cfg.DB.GetUserByID(r.Context(), id)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		handler(w, r, user)
+
+	}
+
+}

@@ -62,7 +62,9 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/incidents", http.StatusOK)
+
+	w.Header().Set("HX-Redirect", "/incidents")
+	http.Redirect(w, r, "/", http.StatusFound)
 
 	// type response struct {
 	// 	ID    uuid.UUID `json:"id"`
