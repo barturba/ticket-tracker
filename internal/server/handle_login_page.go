@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/barturba/ticket-tracker/views"
 )
 
-func (cfg *apiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	page := views.NewPage()
 
 	templ.Handler(views.Index(page)).ServeHTTP(w, r)

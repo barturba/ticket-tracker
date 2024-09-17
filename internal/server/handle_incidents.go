@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"database/sql"
@@ -8,10 +8,11 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -68,11 +69,11 @@ func (cfg *apiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("couldn't create incident %s", err))
 		return
 	}
-	respondWithJSON(w, http.StatusOK, databaseIncidentToIncident(incident))
+	respondWithJSON(w, http.StatusOK, models.DatabaseIncidentToIncident(incident))
 
 }
 
-func (cfg *apiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 	// Get the organization -- should this be a part of the authentication
 	// process? I mean we're using the organization quite a bit.
 	//
@@ -88,6 +89,6 @@ func (cfg *apiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u dat
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseGetIncidentsByOrganizationIDRowToIncidents(incidents))
+	respondWithJSON(w, http.StatusOK, models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(incidents))
 
 }

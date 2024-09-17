@@ -1,15 +1,16 @@
-package main
+package server
 
 import (
 	"net/http"
 
 	"github.com/a-h/templ"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/barturba/ticket-tracker/views"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleConfigurationItemsPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleConfigurationItemsPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	companyID := r.URL.Query().Get("company_id")
 	if companyID == "" {
@@ -28,5 +29,5 @@ func (cfg *apiConfig) handleConfigurationItemsPage(w http.ResponseWriter, r *htt
 		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
 		return
 	}
-	templ.Handler(views.ConfigurationItems(databaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
+	templ.Handler(views.ConfigurationItems(models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
 }

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"database/sql"
@@ -9,11 +9,12 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/barturba/ticket-tracker/views"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -27,13 +28,13 @@ func (cfg *apiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 	}
 
 	// respondWithJSON(w, http.StatusOK, )
-	incidents := databaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	page := views.NewPage()
 
 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
 }
 
-func (cfg *apiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
 	idString := r.PathValue("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
@@ -47,12 +48,12 @@ func (cfg *apiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	incident := databaseIncidentToIncident(databaseIncident)
+	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
 	templ.Handler(views.IncidentForm(incident)).ServeHTTP(w, r)
 }
 
-func (cfg *apiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
 	idString := r.PathValue("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
@@ -66,12 +67,12 @@ func (cfg *apiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	incident := databaseIncidentToIncident(databaseIncident)
+	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
 	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
 }
 
-func (cfg *apiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
 		ShortDescription string `json:"short_description"`
@@ -107,12 +108,12 @@ func (cfg *apiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	incident := databaseIncidentToIncident(updatedIncident)
+	incident := models.DatabaseIncidentToIncident(updatedIncident)
 
 	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
 }
 
-func (cfg *apiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
@@ -126,7 +127,7 @@ func (cfg *apiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	companies := databaseCompaniesToCompanies(databaseCompanies)
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
 	firstCompany := companies[0]
 
 	configurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), firstCompany.ID)
@@ -135,10 +136,10 @@ func (cfg *apiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	templ.Handler(views.IncidentNew(companies, databaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
+	templ.Handler(views.IncidentNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
 }
 
-func (cfg *apiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
@@ -183,7 +184,7 @@ func (cfg *apiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	incidents := databaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	page := views.NewPage()
 
 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -42,10 +43,10 @@ func (cfg *apiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseConfigurationItemToConfigurationItem(configurationItem))
+	respondWithJSON(w, http.StatusOK, models.DatabaseConfigurationItemToConfigurationItem(configurationItem))
 }
 
-func (cfg *apiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -58,5 +59,5 @@ func (cfg *apiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseConfigurationItemsToConfigurationItems(configurationItems))
+	respondWithJSON(w, http.StatusOK, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
 }

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) createJWT(expiresInSeconds int, userID uuid.UUID) (string, error) {
+func (cfg *ApiConfig) createJWT(expiresInSeconds int, userID uuid.UUID) (string, error) {
 	var (
 		key []byte
 		t   *jwt.Token

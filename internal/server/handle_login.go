@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Email            string `json:"email"`
 		Password         string `json:"password"`
@@ -80,7 +80,7 @@ func (cfg *apiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (cfg *apiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the cookie from the request using its name (which in our case is
 	// "exampleCookie"). If no matching cookie is found, this will return a
 	// http.ErrNoCookie error. We check for this, and return a 400 Bad Request

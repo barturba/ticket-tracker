@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name             string `json:"name"`
 		OrganizationName string `json:"organization_name"`
@@ -57,13 +58,13 @@ func (cfg *apiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type response struct {
-		User         User         `json:"user"`
-		Organization Organization `json:"organization"`
+		User         models.User         `json:"user"`
+		Organization models.Organization `json:"organization"`
 	}
 
 	resp := response{
-		User:         databaseUserToUser(user),
-		Organization: databaseOrganizationToOrganization(organization),
+		User:         models.DatabaseUserToUser(user),
+		Organization: models.DatabaseOrganizationToOrganization(organization),
 	}
 
 	respondWithJSON(w, http.StatusCreated, resp)

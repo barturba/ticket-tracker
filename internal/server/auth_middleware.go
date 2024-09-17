@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"errors"
@@ -14,7 +14,7 @@ import (
 
 type authedHandler func(http.ResponseWriter, *http.Request, database.User)
 
-func (cfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
+func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// check for JWT authorization and API key authorization
 		user := database.User{}

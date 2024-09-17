@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -41,6 +42,6 @@ func (cfg *apiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u 
 		respondWithError(w, http.StatusInternalServerError, "couldn't create company")
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseCompanyToCompany(company))
+	respondWithJSON(w, http.StatusOK, models.DatabaseCompanyToCompany(company))
 
 }

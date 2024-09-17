@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -6,19 +6,20 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 )
 
-func (cfg *apiConfig) getOrganizations(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) getOrganizations(w http.ResponseWriter, r *http.Request, u database.User) {
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseOrganizationToOrganization(organization))
+	respondWithJSON(w, http.StatusOK, models.DatabaseOrganizationToOrganization(organization))
 }
 
-func (cfg *apiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request, u database.User) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -44,5 +45,5 @@ func (cfg *apiConfig) updateOrganizations(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, databaseOrganizationToOrganization(organization))
+	respondWithJSON(w, http.StatusOK, models.DatabaseOrganizationToOrganization(organization))
 }
