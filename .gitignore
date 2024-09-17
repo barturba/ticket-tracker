@@ -1,3 +1,4 @@
 .env
 ticket-tracker
 tmp/
+tmp/build-errors.log

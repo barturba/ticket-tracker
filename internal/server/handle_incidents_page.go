@@ -29,7 +29,6 @@ func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 	// respondWithJSON(w, http.StatusOK, )
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	page := views.NewPage()
-
 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
 }
 

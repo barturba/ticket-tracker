@@ -34,6 +34,10 @@ templ Incidents(page Page, incidents []models.Incident) {
     </div>
     <div class="container">
         <h1 class="mt-5">Incidents</h1>
+
+        <div><button class="btn mt-3" data-toggle="modal"><a href="/incidents/new">New
+                    Incident</a></button>
+        </div>
         <div>
             @IncidentsList(incidents)
         </div>
@@ -64,7 +68,8 @@ templ IncidentsList(incidents []models.Incident) {
 <table class="table delete-row-example">
     <thead>
         <tr>
-            <th>ID</th>
+            <th scope="col" style="cursor: pointer">ID
+            </th>
             <th>Short Description</th>
             <th>Description</th>
             <th></th>

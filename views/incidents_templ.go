@@ -33,7 +33,7 @@ func Incidents(page Page, incidents []models.Incident) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><title>Incidents</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org/dist/htmx.min.js\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\" rel=\"stylesheet\"></head><body><div class=\"container\"><header class=\"d-flex justify-content-center py-3\"><ul class=\"nav nav-pills\"><li class=\"nav-item\"><a href=\"/incidents\" class=\"nav-link active\" aria-current=\"page\">Incidents</a></li></ul></header></div><div class=\"container\"><h1 class=\"mt-5\">Incidents</h1><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><title>Incidents</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org/dist/htmx.min.js\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\" rel=\"stylesheet\"></head><body><div class=\"container\"><header class=\"d-flex justify-content-center py-3\"><ul class=\"nav nav-pills\"><li class=\"nav-item\"><a href=\"/incidents\" class=\"nav-link active\" aria-current=\"page\">Incidents</a></li></ul></header></div><div class=\"container\"><h1 class=\"mt-5\">Incidents</h1><div><button class=\"btn mt-3\" data-toggle=\"modal\"><a href=\"/incidents/new\">New Incident</a></button></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +70,7 @@ func IncidentsList(incidents []models.Incident) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table class=\"table delete-row-example\"><thead><tr><th>ID</th><th>Short Description</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table class=\"table delete-row-example\"><thead><tr><th scope=\"col\" style=\"cursor: pointer\">ID</th><th>Short Description</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -116,7 +116,7 @@ func IncidentRow(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 83, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 88, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -129,7 +129,7 @@ func IncidentRow(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 84, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 89, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -142,7 +142,7 @@ func IncidentRow(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(incident.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 85, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 90, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -155,7 +155,7 @@ func IncidentRow(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String() + "/edit")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 87, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 92, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -197,7 +197,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 109, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 114, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -210,7 +210,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 110, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 115, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -223,7 +223,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 111, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 116, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -236,7 +236,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(incident.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 112, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 117, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -249,7 +249,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 114, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 119, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -262,7 +262,7 @@ func IncidentForm(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 117, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 122, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -304,7 +304,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 126, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 131, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -317,7 +317,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 127, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 132, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -330,7 +330,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 128, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 133, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -343,7 +343,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(incident.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 129, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 134, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -356,7 +356,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 131, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 136, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -369,7 +369,7 @@ func IncidentGet(incident models.Incident) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents/" + incident.ID.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 135, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 140, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -448,7 +448,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs("/v1/incidents")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 189, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 194, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -466,7 +466,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(company.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 196, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 201, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -479,7 +479,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(company.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 196, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 201, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
