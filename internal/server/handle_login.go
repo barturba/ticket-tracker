@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -63,18 +62,19 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/incidents", http.StatusOK)
 
-	type response struct {
-		ID    uuid.UUID `json:"id"`
-		Email string    `json:"email"`
-		Token string    `json:"token"`
-	}
+	// type response struct {
+	// 	ID    uuid.UUID `json:"id"`
+	// 	Email string    `json:"email"`
+	// 	Token string    `json:"token"`
+	// }
 
-	respondWithJSON(w, http.StatusOK, response{
-		ID:    user.ID,
-		Email: user.Email,
-		Token: string(jwt),
-	})
+	// respondWithJSON(w, http.StatusOK, response{
+	// 	ID:    user.ID,
+	// 	Email: user.Email,
+	// 	Token: string(jwt),
+	// })
 }
 
 func (cfg *ApiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
