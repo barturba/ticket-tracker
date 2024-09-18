@@ -341,13 +341,13 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 94, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 113, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\" hx-push-url=\"true\" hx-target=\"body\" hx-swap=\"innerHTML\"><div><label>Companies</label> <select name=\"company_id\" hx-get=\"/configuration-items\" hx-target=\"#configurationItems\" hx-indicator=\".htmx-indicator\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\" hx-push-url=\"true\" hx-target=\"body\" hx-swap=\"innerHTML\"><div class=\"form-group\"><label for=\"companies\">Companies</label> <select class=\"form-control\" name=\"company_id\" hx-get=\"/configuration-items\" aria-describedby=\"companiesHelp\" hx-target=\"#configurationItems\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -359,7 +359,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(company.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 101, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 119, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -372,7 +372,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(company.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 101, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 119, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -383,7 +383,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><div><label>Configuration Item</label> <select id=\"configurationItems\" name=\"configuration_item_id\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select> <small id=\"companiesHelp\" class=\"form-text text-muted\">Select the company in question here.</small></div><div class=\"form-group\"><label for=\"configurationItems\">Configuration Items</label> <select id=\"configurationItems\" class=\"form-control\" name=\"configuration_item_id\" aria-describedby=\"configurationItemsHelp\" hx-target=\"#configurationItems\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -395,7 +395,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(configurationItem.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 109, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 129, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -408,7 +408,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(configurationItem.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 109, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 129, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -419,7 +419,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><input name=\"short_description\" type=\"text\" id=\"shortDescription\" placeholder=\"Enter short description\"> <input name=\"description\" type=\"text\" id=\"description\" placeholder=\"Enter description\"><div class=\"form-group\"><label for=\"incidentShortDescription\">Short Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentShortDescription\" aria-describedby=\"shortDescriptionHelp\" placeholder=\"Enter short description\"> <small id=\"shortDescriptionHelp\" class=\"form-text text-muted\">Enter the short description here.</small></div><div class=\"form-group\"><label for=\"incidentDescription\">Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentDescription\" aria-describedby=\"descriptionHelp\" placeholder=\"Enter description\"> <small id=\"descriptionHelp\" class=\"form-text text-muted\">Enter the description here.</small></div><button type=\"submit\" class=\"btn btn-primary\">Save</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select> <small id=\"configurationItemsHelp\" class=\"form-text text-muted\">Select the configuration item in question here.</small></div><div class=\"form-group\"><label for=\"shortDescription\">Short Description</label> <input type=\"text\" name=\"short_description\" class=\"form-control\" id=\"shortDescription\" aria-describedby=\"shortDescriptionHelp\" placeholder=\"Enter short description\"> <small id=\"shortDescriptionHelp\" class=\"form-text text-muted\">Enter the short description here.</small></div><div class=\"form-group\"><label for=\"description\">Description</label> <input type=\"text\" name=\"description\" class=\"form-control\" id=\"description\" aria-describedby=\"descriptionHelp\" placeholder=\"Enter description\"> <small id=\"descriptionHelp\" class=\"form-text text-muted\">Enter the description here.</small></div><button type=\"submit\" class=\"btn btn-primary\">Save</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
