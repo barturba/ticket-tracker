@@ -4,11 +4,7 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-
-templ Incidents(page Page, incidents []models.Incident) {
-
-<!DOCTYPE html>
-<html lang="en">
+templ HeaderComponent(title string) {
 
 <head>
     <title>Incidents</title>
@@ -17,53 +13,65 @@ templ Incidents(page Page, incidents []models.Incident) {
     <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
 </head>
+}
+
+templ NavigationComponent() {
+<div class="container">
+    <header class="d-flex justify-content-center py-3">
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="/incidents" class="nav-link active" aria-current="page">Incidents</a></li>
+            <li class="nav-item"><a href="/login" class="nav-link">Log in</a></li>
+        </ul>
+    </header>
+</div>
+
+}
+
+templ ContentComponent(title string, body templ.Component) {
+<!DOCTYPE html>
+<html lang="en">
+@HeaderComponent(title)
 
 <body>
-    <div class="container">
-        <header class="d-flex justify-content-center py-3">
-            <ul class="nav nav-pills">
-                <li class="nav-item"><a href="/incidents" class="nav-link active" aria-current="page">Incidents</a></li>
-                // <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                // <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                // <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-                // <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-            </ul>
-        </header>
-    </div>
-    <div class="container">
-        <h1 class="mt-5">Incidents</h1>
-
-        <div><button class="btn mt-3" data-toggle="modal"><a href="/incidents/new">New
-                    Incident</a></button>
-        </div>
-        <div>
-            @IncidentsList(incidents)
-        </div>
-        <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-            document.body.addEventListener("htmx:beforeSwap", function (evt) {
-                if (evt.detail.xhr.status == 422) {
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-                if (evt.detail.xhr.status == 204) {
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-            });
-        })
-    </script>
+    @NavigationComponent()
+    @ContentPage(title, body)
+    @ScriptComponent()
 </body>
-
 
 </html>
 }
 
+templ ContentPage(title string, body templ.Component) {
+<div class="container">
+    <h1 class="mt-5">{title}</h1>
+
+    <div><button class="btn mt-3" data-toggle="modal"><a href="/incidents/new">New
+                Incident</a></button>
+    </div>
+    <div>
+        @body
+    </div>
+    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
+</div>
+}
+
+templ ScriptComponent() {
+<script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+        document.body.addEventListener("htmx:beforeSwap", function (evt) {
+            if (evt.detail.xhr.status == 422) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+            if (evt.detail.xhr.status == 204) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+        });
+    })
+</script>
+}
 templ IncidentsList(incidents []models.Incident) {
 <table class="table delete-row-example">
     <thead>
@@ -89,42 +97,48 @@ templ IncidentRow(incident models.Incident) {
     <td>{incident.ShortDescription}</td>
     <td>{incident.Description}</td>
     <td>
-        <button class="btn danger" hx-get={"/incidents/"+ incident.ID.String() +"/edit"} hx-trigger="edit" onClick="let editing = document.querySelector('.editing')
-                         if(editing) {
-                           Swal.fire({title: 'Already Editing',
-                                      showCancelButton: true,
-                                      confirmButtonText: 'Yep, Edit This Row!',
-                                      text:'Hey!  You are already editing a row!  Do you want to cancel that edit and continue?'})
-                           .then((result) => {
-                                if(result.isConfirmed) {
-                                   htmx.trigger(editing, 'cancel')
-                                   htmx.trigger(this, 'edit')
-                                }
-                            })
-                         } else {
-                            htmx.trigger(this, 'edit')
-                         }">
-            Edit
-        </button>
+        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit! </a>
     </td>
 </tr>
 }
 
-templ IncidentForm(incident models.Incident) {
-<tr hx-trigger='cancel' class='editing' hx-get={"/incidents/" + incident.ID.String()}>
-    <td>{incident.ID.String()}</td>
-    <td><input name='short_description' value={incident.ShortDescription}></td>
-    <td><input name='description' value={incident.Description}></td>
-    <td>
-        <button class="btn danger" hx-get={"/incidents/"+incident.ID.String()}>
-            Cancel
-        </button>
-        <button class="btn danger" hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr"
-            hx-ext="json-enc">
-            Save
-        </button>
-    </td>
-</tr>
+templ IncidentsEditPage(incident models.Incident, companies []models.Company) {
+<form hx-put={"/incidents/" + incident.ID.String()} hx-ext="json-enc" hx-target="html">
+
+    <div>
+        <label>Companies</label>
+        <select name="company_id" hx-get="/configuration-items" hx-target="#configurationItems"
+            hx-indicator=".htmx-indicator">
+            for _, company := range companies{
+            <option value={company.ID.String()}>{ company.Name }</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Configuration Item</label>
+        <select id="configurationItems" name="configuration_item_id">
+            <option value="a1">A1</option>
+            ...
+        </select>
+    </div>
+
+    <input name="short_description" type="text" id="shortDescription" placeholder="Enter short description">
+    <input name="description" type="text" id="description" placeholder="Enter description">
+
+    <div class="form-group">
+        <label for="incidentShortDescription">Short Description</label>
+        <input type="text" class="form-control" id="incidentShortDescription" aria-describedby="shortDescriptionHelp"
+            placeholder="Enter short description">
+        <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
+    </div>
+    <div class="form-group">
+        <label for="incidentDescription">Description</label>
+        <input type="text" class="form-control" id="incidentDescription" aria-describedby="descriptionHelp"
+            placeholder="Enter description">
+        <small id="descriptionHelp" class="form-text text-muted">Enter the description here.</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
 }
 
 templ IncidentGet(incident models.Incident) {
@@ -188,9 +202,6 @@ templ IncidentNew(companies []models.Company, configurationItems []models.Config
 }
 
 templ IncidentFormNew(companies []models.Company, configurationItems []models.ConfigurationItem) {
-
-
-
 <form hx-post={"/v1/incidents"} hx-ext="json-enc">
 
     <div>
@@ -208,7 +219,6 @@ templ IncidentFormNew(companies []models.Company, configurationItems []models.Co
             <option value="a1">A1</option>
             ...
         </select>
-        <img class="htmx-indicator" width="20" src="/img/bars.svg">
     </div>
 
     <input name="short_description" type="text" id="shortDescription" placeholder="Enter short description">

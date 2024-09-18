@@ -73,13 +73,14 @@ func NewServer() *http.Server {
 
 	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPage))
 	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
-	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
+	// mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
 	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsGetPage))
-	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsUpdatePage))
+	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPutPage))
 
 	// Login Endpoints
 
+	mux.HandleFunc("GET /", apiCfg.handleIndexPage)
 	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
 	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)

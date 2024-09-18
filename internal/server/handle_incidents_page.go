@@ -26,10 +26,9 @@ func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// respondWithJSON(w, http.StatusOK, )
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
-	page := views.NewPage()
-	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
+	incidentsComponent := views.IncidentsList(incidents)
+	templ.Handler(views.ContentComponent("Incidents", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -40,6 +39,12 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
 	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "can't find incident")
@@ -47,8 +52,16 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	}
 
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
+	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
 
-	templ.Handler(views.IncidentForm(incident)).ServeHTTP(w, r)
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+
+	incidentsComponent := views.IncidentsEditPage(incident, companies)
+	templ.Handler(views.ContentComponent("Edit Incident", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -70,7 +83,7 @@ func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Requ
 	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
 }
 
-func (cfg *ApiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
 		ShortDescription string `json:"short_description"`
@@ -95,6 +108,12 @@ func (cfg *ApiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
 	updatedIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:               id,
 		UpdatedAt:        time.Now(),
@@ -107,8 +126,16 @@ func (cfg *ApiConfig) handleIncidentsUpdatePage(w http.ResponseWriter, r *http.R
 	}
 
 	incident := models.DatabaseIncidentToIncident(updatedIncident)
+	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
 
-	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+
+	incidentsComponent := views.IncidentsEditPage(incident, companies)
+	templ.Handler(views.ContentComponent("Edit Incident", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -137,38 +164,38 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 	templ.Handler(views.IncidentNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
 }
 
-func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+// func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
+// 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+// 		return
+// 	}
 
-	type parameters struct {
-		ShortDescription string    `json:"short_description"`
-		Description      string    `json:"description"`
-		CompanyID        uuid.UUID `json:"description"`
-	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err = decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
-		return
-	}
-	if params.ShortDescription == "" {
-		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
-		return
-	}
+// 	type parameters struct {
+// 		ShortDescription string    `json:"short_description"`
+// 		Description      string    `json:"description"`
+// 		CompanyID        uuid.UUID `json:"description"`
+// 	}
+// 	decoder := json.NewDecoder(r.Body)
+// 	params := parameters{}
+// 	err = decoder.Decode(&params)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
+// 		return
+// 	}
+// 	if params.ShortDescription == "" {
+// 		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
+// 		return
+// 	}
 
-	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
-		return
-	}
-	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
-	page := views.NewPage()
+// 	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+// 		return
+// 	}
+// 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+// 	page := views.NewPage()
 
-	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
-}
+// 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
+// }
