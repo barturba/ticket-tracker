@@ -29,7 +29,7 @@ templ IncidentRow(incident models.Incident) {
     <td>{incident.ShortDescription}</td>
     <td>{incident.Description}</td>
     <td>
-        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit! </a>
+        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
     </td>
 </tr>
 }
