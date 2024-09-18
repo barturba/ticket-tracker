@@ -1,12 +1,19 @@
 package views
 
-templ NavigationComponent(path string) {
+templ NavigationComponent(path string, loggedIn bool) {
 <div class="container">
     <header class="d-flex justify-content-center py-3">
         <ul class="nav nav-pills">
             <li class="nav-item"><a href="/incidents" class={"nav-link", templ.KV("active", path=="incidents" )}
                     aria-current="page">Incidents</a></li>
+            if loggedIn {
+            <li class="nav-item"><a href="/logout" class={"nav-link", templ.KV("active", path=="logout" )}>Log out</a>
+            </li>
+
+            } else {
             <li class="nav-item"><a href="/login" class={"nav-link", templ.KV("active", path=="login" )}>Log in</a></li>
+
+            }
         </ul>
     </header>
 </div>

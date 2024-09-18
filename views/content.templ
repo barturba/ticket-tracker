@@ -1,12 +1,12 @@
 package views
 
-templ ContentPage(title, path string, body templ.Component) {
+templ ContentPage(title, path string, body templ.Component, loggedIn bool) {
 <!DOCTYPE html>
 <html lang="en">
 @HeaderComponent(title)
 
 <body>
-    @NavigationComponent(path)
+    @NavigationComponent(path, loggedIn)
     @ContentComponent(title, body)
     @ScriptComponent()
 </body>
