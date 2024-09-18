@@ -16,25 +16,14 @@ templ HeaderComponent(title string) {
 </head>
 }
 
-templ NavigationComponent() {
-<div class="container">
-    <header class="d-flex justify-content-center py-3">
-        <ul class="nav nav-pills">
-            <li class="nav-item"><a href="/incidents" class="nav-link active" aria-current="page">Incidents</a></li>
-            <li class="nav-item"><a href="/login" class="nav-link">Log in</a></li>
-        </ul>
-    </header>
-</div>
 
-}
-
-templ ContentComponent(title string, body templ.Component) {
+templ ContentComponent(title, path string, body templ.Component) {
 <!DOCTYPE html>
 <html lang="en">
 @HeaderComponent(title)
 
 <body>
-    @NavigationComponent()
+    @NavigationComponent(path)
     @ContentPage(title, body)
     @ScriptComponent()
 </body>

@@ -1,0 +1,14 @@
+package views
+
+templ NavigationComponent(path string) {
+<div class="container">
+    <header class="d-flex justify-content-center py-3">
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="/incidents" class={"nav-link", templ.KV("active", path=="incidents" )}
+                    aria-current="page">Incidents</a></li>
+            <li class="nav-item"><a href="/login" class={"nav-link", templ.KV("active", path=="login" )}>Log in</a></li>
+        </ul>
+    </header>
+</div>
+
+}

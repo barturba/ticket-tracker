@@ -28,7 +28,7 @@ func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	incidentsComponent := views.IncidentsList(incidents)
-	templ.Handler(views.ContentComponent("Incidents", incidentsComponent)).ServeHTTP(w, r)
+	templ.Handler(views.ContentComponent("Incidents", "incidents", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -61,7 +61,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
 
 	incidentsComponent := views.IncidentsEditPage(incident, companies)
-	templ.Handler(views.ContentComponent("Edit Incident", incidentsComponent)).ServeHTTP(w, r)
+	templ.Handler(views.ContentComponent("Edit Incident", "edit-incident", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -135,7 +135,7 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
 
 	incidentsComponent := views.IncidentsEditPage(incident, companies)
-	templ.Handler(views.ContentComponent("Edit Incident", incidentsComponent)).ServeHTTP(w, r)
+	templ.Handler(views.ContentComponent("Edit Incident", "edit-incident", incidentsComponent)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
