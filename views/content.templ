@@ -25,7 +25,9 @@ templ ContentComponent(title string, body, button templ.Component) {
         <div class="row flex justify-between max-w-2xl mx-auto mb-8 pb-2">
             <div class="col-md-12 d-flex">
                 <h3 id="quote">{title}</h3>
+                if button != nil {
                 @button
+                }
             </div>
         </div>
     </div>
