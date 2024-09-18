@@ -1,0 +1,46 @@
+package views
+
+templ ContentComponent(title, path string, body templ.Component) {
+<!DOCTYPE html>
+<html lang="en">
+@HeaderComponent(title)
+
+<body>
+    @NavigationComponent(path)
+    @ContentPage(title, body)
+    @ScriptComponent()
+</body>
+
+</html>
+}
+
+templ ContentPage(title string, body templ.Component) {
+<div class="container">
+    <h1 class="mt-5">{title}</h1>
+
+    <div><button class="btn mt-3" data-toggle="modal"><a href="/incidents/new">New
+                Incident</a></button>
+    </div>
+    <div>
+        @body
+    </div>
+    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
+</div>
+}
+
+templ ScriptComponent() {
+<script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+        document.body.addEventListener("htmx:beforeSwap", function (evt) {
+            if (evt.detail.xhr.status == 422) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+            if (evt.detail.xhr.status == 204) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = false;
+            }
+        });
+    })
+</script>
+}

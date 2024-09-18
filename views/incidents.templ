@@ -4,63 +4,6 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-templ HeaderComponent(title string) {
-
-<head>
-    <title>{title}</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-}
-
-
-templ ContentComponent(title, path string, body templ.Component) {
-<!DOCTYPE html>
-<html lang="en">
-@HeaderComponent(title)
-
-<body>
-    @NavigationComponent(path)
-    @ContentPage(title, body)
-    @ScriptComponent()
-</body>
-
-</html>
-}
-
-templ ContentPage(title string, body templ.Component) {
-<div class="container">
-    <h1 class="mt-5">{title}</h1>
-
-    <div><button class="btn mt-3" data-toggle="modal"><a href="/incidents/new">New
-                Incident</a></button>
-    </div>
-    <div>
-        @body
-    </div>
-    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addTodoModel">Add TODO</button>
-</div>
-}
-
-templ ScriptComponent() {
-<script>
-    document.addEventListener("DOMContentLoaded", (event) => {
-        document.body.addEventListener("htmx:beforeSwap", function (evt) {
-            if (evt.detail.xhr.status == 422) {
-                evt.detail.shouldSwap = true;
-                evt.detail.isError = false;
-            }
-            if (evt.detail.xhr.status == 204) {
-                evt.detail.shouldSwap = true;
-                evt.detail.isError = false;
-            }
-        });
-    })
-</script>
-}
 templ IncidentsList(incidents []models.Incident) {
 <table class="table delete-row-example">
     <thead>
