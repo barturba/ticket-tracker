@@ -334,7 +334,7 @@ func IncidentNew(companies []models.Company, configurationItems []models.Configu
 			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><title>New Incident</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org/dist/htmx.min.js\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\" rel=\"stylesheet\"></head><body><div class=\"container\"><h1 class=\"mt-5\">New Incident</h1><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><title>New Incident</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"https://unpkg.com/htmx.org/dist/htmx.min.js\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\" rel=\"stylesheet\"></head><body><div class=\"container\"><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -378,7 +378,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs("/v1/incidents")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 137, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 136, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -396,7 +396,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(company.ID.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 144, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 143, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -409,7 +409,7 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(company.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 144, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 143, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
