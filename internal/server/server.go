@@ -83,6 +83,7 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /", apiCfg.middlewareAuthPage(apiCfg.handleIndexPage))
 	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
+	mux.HandleFunc("GET /logout", apiCfg.handleLogout)
 	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)
 
 	srv := &http.Server{

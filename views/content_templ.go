@@ -133,7 +133,7 @@ func ContentComponent(title string, body, button templ.Component) templ.Componen
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"get-quote\"><div class=\"row flex justify-between max-w-2xl mx-auto mb-8 pb-2\"><div class=\"col-md-12 d-flex\"><h3 id=\"quote\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container\"><div class=\"get-quote\"><div class=\"row flex justify-between max-w-2xl mx-auto border-b border-b-slate-600 mb-8 pb-2\"><div class=\"col-md-12 d-flex\"><h3 id=\"quote\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

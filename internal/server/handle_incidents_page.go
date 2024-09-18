@@ -163,41 +163,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	templ.Handler(views.IncidentNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))).ServeHTTP(w, r)
+	incidentNewPage := views.IncidentNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
+
+	templ.Handler(views.ContentPage("New Incident", "", incidentNewPage, nil, true)).ServeHTTP(w, r)
 }
-
-// func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
-
-// 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-// 	if err != nil {
-// 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-// 		return
-// 	}
-
-// 	type parameters struct {
-// 		ShortDescription string    `json:"short_description"`
-// 		Description      string    `json:"description"`
-// 		CompanyID        uuid.UUID `json:"description"`
-// 	}
-// 	decoder := json.NewDecoder(r.Body)
-// 	params := parameters{}
-// 	err = decoder.Decode(&params)
-// 	if err != nil {
-// 		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
-// 		return
-// 	}
-// 	if params.ShortDescription == "" {
-// 		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
-// 		return
-// 	}
-
-// 	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
-// 	if err != nil {
-// 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
-// 		return
-// 	}
-// 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
-// 	page := views.NewPage()
-
-// 	templ.Handler(views.Incidents(page, incidents)).ServeHTTP(w, r)
-// }
