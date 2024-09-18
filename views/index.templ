@@ -1,13 +1,23 @@
 package views
+import(
+"github.com/google/uuid"
+
+)
 
 // Check if user is logged in here
-templ IndexComponent() {
+templ Index(userID uuid.UUID) {
 <!DOCTYPE html>
 <html lang="en">
 @HeaderComponent("TicketTracker")
 
 <body>
-    @NavigationComponent()
+    // LOGIN or DASHBOARD
+    if (userID == uuid.UUID{}) {
+    <div>LOGIN FORM</div>
+    @LoginForm()
+    } else {
+    <div>DASHBOARD</div>
+    }
     // @ContentPage(title, body)
     @ScriptComponent()
 </body>

@@ -1,55 +1,10 @@
 package views
 
+templ LoginForm() {
+<form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
 
-templ Index(page Page) {
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Login</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <div>
-        @LoginForm(page.Form)
-
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-            document.body.addEventListener("htmx:beforeSwap", function (evt) {
-                if (evt.detail.xhr.status == 422) {
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-                if (evt.detail.xhr.status == 204) {
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-            });
-        })
-    </script>
-</body>
-
-
-</html>
-}
-
-templ LoginForm(formData FormData) {
-<form hx-swap="outerHTML" hx-post="/v1/login" hx-ext="json-enc">
-
-    email: <input value={ formData.Values["email"] } type="text" name="email">
-    password: <input value={ formData.Values["password"] } type="password" name="password">
-
-    if formData.Errors["email"] != "" {
-    <div style="color: red">{ formData.Errors["email"] }</div>
-    }
+    email: <input type="text" name="email">
+    password: <input type="password" name="password">
 
     <button type="submit">Login</button>
 </form>

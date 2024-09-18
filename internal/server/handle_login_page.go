@@ -8,7 +8,6 @@ import (
 )
 
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
-	page := views.NewPage()
-
-	templ.Handler(views.Index(page)).ServeHTTP(w, r)
+	loginForm := views.LoginForm()
+	templ.Handler(views.ContentComponent("Login", loginForm)).ServeHTTP(w, r)
 }

@@ -64,7 +64,7 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 
 	w.Header().Set("HX-Redirect", "/incidents")
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/incidents", http.StatusFound)
 
 	// type response struct {
 	// 	ID    uuid.UUID `json:"id"`
