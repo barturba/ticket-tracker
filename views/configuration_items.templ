@@ -8,5 +8,4 @@ templ ConfigurationItems(configurationItems []models.ConfigurationItem) {
 for _, configurationItem := range configurationItems{
 <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
 }
-
 }

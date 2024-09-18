@@ -163,7 +163,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	incidentNewPage := views.IncidentNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
+	incidentNewPage := views.IncidentFormNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
 
 	templ.Handler(views.ContentPage("New Incident", "", incidentNewPage, nil, true)).ServeHTTP(w, r)
 }
