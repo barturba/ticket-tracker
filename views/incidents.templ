@@ -91,7 +91,7 @@ templ IncidentGet(incident models.Incident) {
 }
 
 templ IncidentFormNew(companies []models.Company, configurationItems []models.ConfigurationItem) {
-<form hx-post={"/v1/incidents"} hx-ext="json-enc">
+<form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
 
     <div>
         <label>Companies</label>
@@ -105,8 +105,9 @@ templ IncidentFormNew(companies []models.Company, configurationItems []models.Co
     <div>
         <label>Configuration Item</label>
         <select id="configurationItems" name="configuration_item_id">
-            <option value="a1">A1</option>
-            ...
+            for _, configurationItem := range configurationItems{
+            <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
+            }
         </select>
     </div>
 

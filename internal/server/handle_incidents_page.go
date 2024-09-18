@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -163,7 +164,69 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	incidentNewPage := views.IncidentFormNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
+	log.Printf("firstCompany: %v\n", firstCompany)
+	log.Printf("configurationItems: %v\n", configurationItems)
 
+	incidentNewPage := views.IncidentFormNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
 	templ.Handler(views.ContentPage("New Incident", "", incidentNewPage, nil, true)).ServeHTTP(w, r)
+}
+
+func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	type parameters struct {
+		ShortDescription    string    `json:"short_description"`
+		Description         string    `json:"description"`
+		CompanyID           uuid.UUID `json:"company_id"`
+		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err = decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
+		return
+	}
+	if (params.ConfigurationItemID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
+		return
+	}
+
+	if (params.CompanyID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
+		return
+	}
+
+	if params.Description == "" {
+		respondWithError(w, http.StatusInternalServerError, "description can't be blank")
+		return
+	}
+
+	if params.ShortDescription == "" {
+		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
+		return
+	}
+	_, err = cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+		ID:                  uuid.New(),
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
+		ShortDescription:    params.ShortDescription,
+		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
+		State:               "New",
+		OrganizationID:      organization.ID,
+		ConfigurationItemID: params.ConfigurationItemID,
+		CompanyID:           params.CompanyID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/incidents")
+	http.Redirect(w, r, "/incidents", http.StatusFound)
 }

@@ -339,15 +339,15 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs("/v1/incidents")
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs("/incidents")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 94, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 94, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\"><div><label>Companies</label> <select name=\"company_id\" hx-get=\"/configuration-items\" hx-target=\"#configurationItems\" hx-indicator=\".htmx-indicator\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\" hx-push-url=\"true\" hx-target=\"body\" hx-swap=\"innerHTML\"><div><label>Companies</label> <select name=\"company_id\" hx-get=\"/configuration-items\" hx-target=\"#configurationItems\" hx-indicator=\".htmx-indicator\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -383,7 +383,43 @@ func IncidentFormNew(companies []models.Company, configurationItems []models.Con
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><div><label>Configuration Item</label> <select id=\"configurationItems\" name=\"configuration_item_id\"><option value=\"a1\">A1</option> ...</select></div><input name=\"short_description\" type=\"text\" id=\"shortDescription\" placeholder=\"Enter short description\"> <input name=\"description\" type=\"text\" id=\"description\" placeholder=\"Enter description\"><div class=\"form-group\"><label for=\"incidentShortDescription\">Short Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentShortDescription\" aria-describedby=\"shortDescriptionHelp\" placeholder=\"Enter short description\"> <small id=\"shortDescriptionHelp\" class=\"form-text text-muted\">Enter the short description here.</small></div><div class=\"form-group\"><label for=\"incidentDescription\">Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentDescription\" aria-describedby=\"descriptionHelp\" placeholder=\"Enter description\"> <small id=\"descriptionHelp\" class=\"form-text text-muted\">Enter the description here.</small></div><button type=\"submit\" class=\"btn btn-primary\">Save</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><div><label>Configuration Item</label> <select id=\"configurationItems\" name=\"configuration_item_id\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, configurationItem := range configurationItems {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var22 string
+			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(configurationItem.ID.String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 109, Col: 56}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var23 string
+			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(configurationItem.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 109, Col: 82}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></div><input name=\"short_description\" type=\"text\" id=\"shortDescription\" placeholder=\"Enter short description\"> <input name=\"description\" type=\"text\" id=\"description\" placeholder=\"Enter description\"><div class=\"form-group\"><label for=\"incidentShortDescription\">Short Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentShortDescription\" aria-describedby=\"shortDescriptionHelp\" placeholder=\"Enter short description\"> <small id=\"shortDescriptionHelp\" class=\"form-text text-muted\">Enter the short description here.</small></div><div class=\"form-group\"><label for=\"incidentDescription\">Description</label> <input type=\"text\" class=\"form-control\" id=\"incidentDescription\" aria-describedby=\"descriptionHelp\" placeholder=\"Enter description\"> <small id=\"descriptionHelp\" class=\"form-text text-muted\">Enter the description here.</small></div><button type=\"submit\" class=\"btn btn-primary\">Save</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
