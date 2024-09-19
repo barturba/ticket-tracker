@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -163,9 +162,6 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
 		return
 	}
-
-	log.Printf("firstCompany: %v\n", firstCompany)
-	log.Printf("configurationItems: %v\n", configurationItems)
 
 	incidentNewPage := views.IncidentFormNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
 	templ.Handler(views.ContentPage("New Incident", "", incidentNewPage, nil, true)).ServeHTTP(w, r)
