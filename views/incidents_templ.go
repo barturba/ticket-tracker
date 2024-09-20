@@ -409,7 +409,7 @@ func IncidentsEditIndex(incident models.Incident, companies []models.Company, ci
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"text-2xl font-bold text-center mb-8\">Edit Incident</h1><section class=\"max-w-2xl w-4/5 h-96 mx-auto bg-slate-600 rounded-lg shadow-xl\"><form class=\"rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto\" hx-put=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"text-2xl font-bold text-center mb-8\">Edit Incident</h1><section class=\"max-w-2xl w-4/5 h-fit mx-auto rounded-lg shadow-xl mb-8\"><form class=\"rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto\" hx-put=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -600,7 +600,7 @@ func IncidentsIndex(incidents []models.Incident) templ.Component {
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table class=\"table delete-row-example\"><thead><tr><th scope=\"col\" style=\"cursor: pointer\">ID</th><th>Short Description</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-between max-w-5xl mx-auto border-b border-b-slate-600 mb-8 pb-2\"><h1 class=\"text-2xl font-bold text-center\">Incidents</h1><a hx-swap=\"transition:true\" class=\"badge badge-info p-4 hover:scale-[1.1]\" href=\"/incidents/new\">New</a></div><section class=\"overflow-auto max-w-5xl max-h-96 mx-auto rounded-lg shadow-xl\"><table class=\"table table-zebra\"><thead><tr><th scope=\"col\" style=\"cursor: pointer\">ID</th><th>Short Description</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -610,7 +610,7 @@ func IncidentsIndex(incidents []models.Incident) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tbody></table>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</tbody></table></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

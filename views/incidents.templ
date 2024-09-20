@@ -114,7 +114,7 @@ templ IncidentsEditIndex(incident models.Incident, companies []models.Company, c
 <h1 class="text-2xl font-bold text-center mb-8">
     Edit Incident
 </h1>
-<section class="max-w-2xl w-4/5 h-96 mx-auto bg-slate-600 rounded-lg shadow-xl">
+<section class="max-w-2xl w-4/5 h-fit mx-auto rounded-lg shadow-xl mb-8">
     <form class="rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto" hx-put={"/incidents/"+incident.ID.String()}
         hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
         <div class="form-group">
@@ -168,22 +168,32 @@ cmp templ.Component) {
 
 
 templ IncidentsIndex(incidents []models.Incident) {
-<table class="table delete-row-example">
-    <thead>
-        <tr>
-            <th scope="col" style="cursor: pointer">ID
-            </th>
-            <th>Short Description</th>
-            <th>Description</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody hx-target="closest tr" hx-swap="outerHTML">
-        for _, incident := range incidents {
-        @IncidentRow(incident)
-        }
-    </tbody>
-</table>
+<div class="flex justify-between max-w-5xl mx-auto border-b border-b-slate-600 mb-8 pb-2">
+    <h1 class="text-2xl font-bold text-center">
+        Incidents
+    </h1>
+    <a hx-swap="transition:true" class="badge badge-info p-4 hover:scale-[1.1]" href="/incidents/new">
+        New
+    </a>
+</div>
+<section class="overflow-auto max-w-5xl max-h-96 mx-auto rounded-lg shadow-xl">
+    <table class="table table-zebra">
+        <thead>
+            <tr>
+                <th scope="col" style="cursor: pointer">ID
+                </th>
+                <th>Short Description</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody hx-target="closest tr" hx-swap="outerHTML">
+            for _, incident := range incidents {
+            @IncidentRow(incident)
+            }
+        </tbody>
+    </table>
+</section>
 }
 
 templ IncidentsList(page string,
