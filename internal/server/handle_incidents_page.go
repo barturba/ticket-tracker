@@ -32,7 +32,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 	}
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	iIndex := views.IncidentsIndex(incidents)
-	iList := views.IncidentsList2(" | Incidents List",
+	iList := views.IncidentsList(" | Incidents List",
 		fromProtected,
 		false,
 		"",
@@ -42,6 +42,11 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
 	idString := r.PathValue("id")
 	id, err := uuid.Parse(idString)
 	if err != nil {
@@ -60,18 +65,30 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusInternalServerError, "can't find incident")
 		return
 	}
-
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
+
 	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
 		return
 	}
-
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	incidentsComponent := views.IncidentsEditPage(incident, companies)
 
-	templ.Handler(views.ContentPage("Edit Incident", "edit-incident", incidentsComponent, nil, true)).ServeHTTP(w, r)
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+		return
+	}
+	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
+	iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
+	iEdit := views.IncidentsEdit(" | Incidents List | Edit",
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		iEIndex)
+	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -118,13 +135,7 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
-	updatedIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
+	_, err = cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:               id,
 		UpdatedAt:        time.Now(),
 		Description:      sql.NullString{String: params.Description, Valid: params.Description != ""},
@@ -135,17 +146,8 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	incident := models.DatabaseIncidentToIncident(updatedIncident)
-	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
-		return
-	}
-
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	incidentsComponent := views.IncidentsEditPage(incident, companies)
-
-	templ.Handler(views.ContentPage("Edit Incident", "edit-incident", incidentsComponent, nil, true)).ServeHTTP(w, r)
+	w.Header().Set("HX-Redirect", "/incidents")
+	http.Redirect(w, r, "/incidents", http.StatusOK)
 }
 
 func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {

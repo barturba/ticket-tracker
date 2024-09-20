@@ -4,25 +4,6 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-templ IncidentsList(incidents []models.Incident) {
-<table class="table delete-row-example">
-    <thead>
-        <tr>
-            <th scope="col" style="cursor: pointer">ID
-            </th>
-            <th>Short Description</th>
-            <th>Description</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody hx-target="closest tr" hx-swap="outerHTML">
-        for _, incident := range incidents {
-        @IncidentRow(incident)
-        }
-    </tbody>
-</table>
-}
-
 templ IncidentRow(incident models.Incident) {
 <tr>
     <td>{incident.ID.String()}</td>
@@ -129,6 +110,63 @@ templ IncidentFormNew(companies []models.Company, configurationItems []models.Co
 </form>
 }
 
+templ IncidentsEditIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
+<h1 class="text-2xl font-bold text-center mb-8">
+    Edit Incident
+</h1>
+<section class="max-w-2xl w-4/5 h-96 mx-auto bg-slate-600 rounded-lg shadow-xl">
+    <form class="rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto" hx-put={"/incidents/"+incident.ID.String()}
+        hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="companies">Companies</label>
+            <select class="form-control" name="company_id" hx-get="/configuration-items"
+                aria-describedby="companiesHelp" hx-target="#configurationItems">
+                for _, company := range companies{
+                <option value={company.ID.String()}>{ company.Name }</option>
+                }
+            </select>
+            <small id="companiesHelp" class="form-text text-muted">Select the company in question here.</small>
+        </div>
+        <div class="form-group">
+            <label for="configurationItems">Configuration Items</label>
+            <select id="configurationItems" class="form-control" name="configuration_item_id"
+                aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
+                for _, configurationItem := range cis{
+                <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
+                }
+            </select>
+            <small id="configurationItemsHelp" class="form-text text-muted">Select the configuration item in question
+                here.</small>
+        </div>
+        <div class="form-group">
+            <label for="shortDescription">Short Description</label>
+            <input type="text" name="short_description" class="form-control" id="shortDescription"
+                aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
+                value={incident.ShortDescription}>
+            <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" name="description" class="form-control" id="description"
+                aria-describedby="descriptionHelp" placeholder="Enter description" value={incident.Description}>
+            <small id="descriptionHelp" class="form-text text-muted">Enter the description here.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</section>
+}
+
+templ IncidentsEdit(page string,
+fromProtected, isError bool,
+msg string,
+username string,
+cmp templ.Component) {
+@Layout(page, fromProtected, isError, msg, username) {
+@cmp
+}
+}
+
+
 templ IncidentsIndex(incidents []models.Incident) {
 <table class="table delete-row-example">
     <thead>
@@ -148,7 +186,7 @@ templ IncidentsIndex(incidents []models.Incident) {
 </table>
 }
 
-templ IncidentsList2(page string,
+templ IncidentsList(page string,
 fromProtected, isError bool,
 msg string,
 username string,
