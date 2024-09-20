@@ -71,7 +71,7 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /companies", apiCfg.middlewareAuthPage(apiCfg.handleCompaniesPage))
 	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleConfigurationItemsPage))
 
-	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPage))
+	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleViewIncidents))
 	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
 	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
@@ -80,7 +80,7 @@ func NewServer() *http.Server {
 
 	// Login Endpoints
 
-	mux.HandleFunc("GET /", apiCfg.middlewareAuthPage(apiCfg.handleIndexPage))
+	mux.HandleFunc("GET /", apiCfg.middlewareAuthPageNoRedirect(apiCfg.handlePageIndex))
 	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
 	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
 	mux.HandleFunc("GET /logout", apiCfg.handleLogout)

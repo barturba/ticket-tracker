@@ -13,7 +13,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -25,12 +30,15 @@ func (cfg *ApiConfig) handleIncidentsPage(w http.ResponseWriter, r *http.Request
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
-	incidentsComponent := views.IncidentsList(incidents)
-	incidentsButton := views.Button("New", "/incidents/new")
-
-	templ.Handler(views.ContentPage("Incidents", "incidents", incidentsComponent, incidentsButton, true)).ServeHTTP(w, r)
+	iIndex := views.IncidentsIndex(incidents)
+	iList := views.IncidentsList2(" | Incidents List",
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		iIndex)
+	templ.Handler(iList).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {

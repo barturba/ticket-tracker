@@ -1,0 +1,27 @@
+package views
+
+import (
+"github.com/barturba/ticket-tracker/views/partials"
+)
+
+templ Layout(
+title string, fromProtected, isError bool, msg string, username string,
+) {
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    @HeaderComponent(title)
+    <header>
+        if !isError {
+        @partials.Navbar(fromProtected, username)
+        }
+    </header>
+    <main class={ templ.KV("pt-40", !isError) }>
+        {children...}
+    </main>
+    @ScriptComponent()
+</body>
+
+</html>
+}

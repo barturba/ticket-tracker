@@ -128,3 +128,32 @@ templ IncidentFormNew(companies []models.Company, configurationItems []models.Co
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
 }
+
+templ IncidentsIndex(incidents []models.Incident) {
+<table class="table delete-row-example">
+    <thead>
+        <tr>
+            <th scope="col" style="cursor: pointer">ID
+            </th>
+            <th>Short Description</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody hx-target="closest tr" hx-swap="outerHTML">
+        for _, incident := range incidents {
+        @IncidentRow(incident)
+        }
+    </tbody>
+</table>
+}
+
+templ IncidentsList2(page string,
+fromProtected, isError bool,
+msg string,
+username string,
+cmp templ.Component) {
+@Layout(page, fromProtected, isError, msg, username) {
+@cmp
+}
+}
