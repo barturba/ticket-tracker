@@ -17,10 +17,11 @@ title string, fromProtected, isError bool, msg string, username string,
         @partials.Navbar(fromProtected, username)
         }
     </header>
-    <main class={ templ.KV("pt-40", !isError) }>
-        {children...}
-    </main>
-    @ScriptComponent()
+    <main>
+        // <main class={ templ.KV("pt-10", !isError) }>
+            {children...}
+        </main>
+        @ScriptComponent()
 </body>
 
 </html>
