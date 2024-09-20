@@ -19,5 +19,5 @@ func (cfg *ApiConfig) handleLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 
 	w.Header().Set("HX-Redirect", "/login")
-	http.Redirect(w, r, "/login", http.StatusFound)
+	http.Redirect(w, r, "/login", http.StatusOK)
 }
