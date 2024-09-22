@@ -30,7 +30,18 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	incidents := models.DatabaseIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+
+	for n, i := range incidents {
+		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "couldn't find configuration item name")
+			return
+		}
+		incidents[n].ConfigurationItemName = ci.Name
+
+	}
+
 	iIndex := views.IncidentsIndex(incidents)
 	iList := views.IncidentsList("Incidents List",
 		fromProtected,

@@ -88,6 +88,6 @@ func (cfg *ApiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u dat
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(incidents))
+	respondWithJSON(w, http.StatusOK, models.DatabaseIncidentsByOrganizationIDRowToIncidents(incidents))
 
 }

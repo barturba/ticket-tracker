@@ -8,6 +8,7 @@ templ IncidentRow(incident models.Incident) {
 <tr>
     <td>{incident.ID.String()}</td>
     <td>{incident.ShortDescription}</td>
+    <td>{incident.ConfigurationItemName}</td>
     <td>{incident.Description}</td>
     <td>
         <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
@@ -119,6 +120,7 @@ templ IncidentsIndex(incidents []models.Incident) {
                             <th scope="col" style="cursor: pointer">ID
                             </th>
                             <th>Short Description</th>
+                            <th>Configuration Item</th>
                             <th>Description</th>
                             <th></th>
                         </tr>
