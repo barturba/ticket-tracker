@@ -33,36 +33,40 @@ templ IncidentGet(incident models.Incident) {
 }
 
 templ IncidentFormIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
-<div class="form-group">
-    <label for="companies">Companies</label>
-    <select class="select select-bordered w-full" name="company_id" hx-get="/configuration-items"
-        aria-describedby="companiesHelp" hx-target="#configurationItems">
-        for _, company := range companies{
-        <option value={company.ID.String()}>{ company.Name }</option>
-        }
-    </select>
-</div>
-<div class="form-group">
-    <label for="configurationItems">Configuration Items</label>
-    <select id="configurationItems" class="select select-bordered w-full" name="configuration_item_id"
-        aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
-        for _, configurationItem := range cis{
-        <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
-        }
-    </select>
-</div>
-<div class="form-group">
-    <label for="shortDescription">Short Description</label>
-    <input name="short_description" type="text" class="form-control" id="shortDescription"
-        aria-describedby="shortDescriptionHelp" placeholder="Enter short description" value={incident.ShortDescription}>
-    <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
-</div>
-<div class="form-group">
-    <label for="description">Description</label>
-    <textarea name="description" class="form-control" id="description" rows="3">{incident.Description}</textarea>
-</div>
-<button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<div class="max-w-[100vw] px-6 pb-16">
+    <form>
+        <div class="form-group">
+            <label for="companies">Companies</label>
+            <select class="select select-bordered w-full" name="company_id" hx-get="/configuration-items"
+                aria-describedby="companiesHelp" hx-target="#configurationItems" hx-push-url="false">
+                for _, company := range companies{
+                <option value={company.ID.String()}>{ company.Name }</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="configurationItems">Configuration Items</label>
+            <select id="configurationItems" class="select select-bordered w-full" name="configuration_item_id"
+                aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
+                for _, configurationItem := range cis{
+                <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="shortDescription">Short Description</label>
+            <input name="short_description" type="text" class="input input-bordered w-full" id="shortDescription"
+                aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
+                value={incident.ShortDescription}>
+            <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" class="input input-bordered w-full" id="description"
+                rows="3">{incident.Description}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </div>
 }
 
@@ -70,23 +74,19 @@ templ IncidentsNewIndex(companies []models.Company, cis []models.ConfigurationIt
 <h1 class="text-2xl font-bold text-center mb-8">
     New Incident
 </h1>
-<div class="container">
-    <form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
-        @IncidentFormIndex(models.Incident{}, companies, cis)
-    </form>
-</div>
+<form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
+    @IncidentFormIndex(models.Incident{}, companies, cis)
+</form>
 }
 
 templ IncidentsEditIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
 <h1 class="text-2xl font-bold text-center mb-8">
     Edit Incident
 </h1>
-<div class="container">
-    <form hx-put={"/incidents/"+incident.ID.String()} hx-ext="json-enc" hx-push-url="true" hx-target="body"
-        hx-swap="innerHTML">
-        @IncidentFormIndex(incident, companies, cis)
-    </form>
-</div>
+<form hx-put={"/incidents/"+incident.ID.String()} hx-ext="json-enc" hx-push-url="true" hx-target="body"
+    hx-swap="innerHTML">
+    @IncidentFormIndex(incident, companies, cis)
+</form>
 }
 
 templ IncidentsEdit(page string,
