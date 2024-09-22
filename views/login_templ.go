@@ -8,7 +8,7 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func LoginForm() templ.Component {
+func LoginIndex(fromProtected bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,36 +29,7 @@ func LoginForm() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\">email: <input type=\"text\" name=\"email\"> password: <input type=\"password\" name=\"password\"> <button type=\"submit\">Login</button></form>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return templ_7745c5c3_Err
-	})
-}
-
-func LoginIndex(fromProtected bool) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var2 == nil {
-			templ_7745c5c3_Var2 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-center py-10\"><div class=\"flex flex-col items-center text-center gap-6 max-w-xl\"><div class=\"flex flex-col gap-4 rounded-box bg-base-200 p-6 max-w-md\"><h1 class=\"text-3xl font-bold self-center\">Log in</h1><span class=\"self-center\">Don't have an account? <a class=\"link link-secondary\">Register</a></span> <a class=\"btn btn-neutral\"><i class=\"fa-brands fa-google text-primary\"></i> Log in with Google</a><div class=\"divider\">OR</div><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\"><label class=\"form-control\"><div class=\"label\"><span class=\"label-text\">Email</span></div><input class=\"input input-bordered\" name=\"email\"></label> <label class=\"form-control\"><div class=\"label\"><span class=\"label-text\">Password</span> <a class=\"label-text link link-accent\">Forgot password?</a></div><input type=\"password\" class=\"input input-bordered\" name=\"password\"></label><div class=\"form-control\"><label class=\"cursor-pointer label self-start gap-2\"><input type=\"checkbox\" class=\"checkbox\"> <span class=\"label-text\">Remember me</span></label></div><button class=\"btn btn-primary\">Log in</button></form></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n    html,\n    body {\n        height: 100%;\n    }\n\n    .form-signin {\n        max-width: 330px;\n        padding: 1rem;\n    }\n\n    .form-signin .form-floating:focus-within {\n        z-index: 2;\n    }\n\n    .form-signin input[type=\"email\"] {\n        margin-bottom: -1px;\n        border-bottom-right-radius: 0;\n        border-bottom-left-radius: 0;\n    }\n\n    .form-signin input[type=\"password\"] {\n        margin-bottom: 10px;\n        border-top-left-radius: 0;\n        border-top-right-radius: 0;\n    }\n</style><main class=\"form-signin w-100 m-auto\"><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"form-group\"><label for=\"exampleInputEmail1\">Email address</label> <input name=\"email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail1\" aria-describedby=\"emailHelp\" placeholder=\"Enter email\"></div><div class=\"form-group\"><label for=\"exampleInputPassword1\">Password</label> <input name=\"password\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword1\" placeholder=\"Password\"></div><button type=\"submit\" class=\"btn btn-primary\">Submit</button></form></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -87,12 +58,12 @@ func Login(
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -110,7 +81,7 @@ func Login(
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, "").Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, "").Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

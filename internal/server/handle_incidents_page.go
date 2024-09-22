@@ -32,7 +32,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 	}
 	incidents := models.DatabaseGetIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
 	iIndex := views.IncidentsIndex(incidents)
-	iList := views.IncidentsList(" | Incidents List",
+	iList := views.IncidentsList("Incidents List",
 		fromProtected,
 		false,
 		"",
@@ -82,7 +82,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
 	iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
-	iEdit := views.IncidentsEdit(" | Incidents List | Edit",
+	iEdit := views.IncidentsEdit("Incidents - Edit",
 		fromProtected,
 		false,
 		"",
@@ -178,7 +178,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
 	iNIndex := views.IncidentsNewIndex(companies, configurationItems)
-	iNew := views.IncidentsEdit(" | Incidents List | New",
+	iNew := views.IncidentsEdit("Incidents - New",
 		fromProtected,
 		false,
 		"",

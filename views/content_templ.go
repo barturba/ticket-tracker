@@ -193,7 +193,7 @@ func ScriptComponent() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script>\n    document.addEventListener(\"DOMContentLoaded\", (event) => {\n        document.body.addEventListener(\"htmx:beforeSwap\", function (evt) {\n            if (evt.detail.xhr.status == 422) {\n                evt.detail.shouldSwap = true;\n                evt.detail.isError = false;\n            }\n            if (evt.detail.xhr.status == 204) {\n                evt.detail.shouldSwap = true;\n                evt.detail.isError = false;\n            }\n        });\n    })\n</script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz\" crossorigin=\"anonymous\"></script><script>\n    document.addEventListener(\"DOMContentLoaded\", (event) => {\n        document.body.addEventListener(\"htmx:beforeSwap\", function (evt) {\n            if (evt.detail.xhr.status == 422) {\n                evt.detail.shouldSwap = true;\n                evt.detail.isError = false;\n            }\n            if (evt.detail.xhr.status == 204) {\n                evt.detail.shouldSwap = true;\n                evt.detail.isError = false;\n            }\n        });\n    })\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

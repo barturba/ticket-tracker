@@ -1,62 +1,48 @@
 package views
 
-templ LoginForm() {
-<form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
-
-    email: <input type="text" name="email">
-    password: <input type="password" name="password">
-
-    <button type="submit">Login</button>
-</form>
-}
-
 templ LoginIndex(fromProtected bool) {
-<div class="flex justify-center py-10">
-    <div class="flex flex-col items-center text-center gap-6 max-w-xl">
-        <div class="flex flex-col gap-4 rounded-box bg-base-200 p-6 max-w-md">
-            <h1 class="text-3xl font-bold self-center">Log in</h1>
+<style>
+    html,
+    body {
+        height: 100%;
+    }
 
-            <span class="self-center">
-                Don't have an account?
-                <a class="link link-secondary">Register</a>
-            </span>
+    .form-signin {
+        max-width: 330px;
+        padding: 1rem;
+    }
 
-            <a class="btn btn-neutral">
-                <i class="fa-brands fa-google text-primary"></i>
-                Log in with Google
-            </a>
+    .form-signin .form-floating:focus-within {
+        z-index: 2;
+    }
 
-            <div class="divider">OR</div>
-            <form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
-                <label class="form-control">
-                    <div class="label">
-                        <span class="label-text">Email</span>
-                    </div>
+    .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
 
-                    <input class="input input-bordered" name="email" />
-                </label>
-
-                <label class="form-control">
-                    <div class="label">
-                        <span class="label-text">Password</span>
-                        <a class="label-text link link-accent">Forgot password?</a>
-                    </div>
-
-                    <input type="password" class="input input-bordered" name="password" />
-                </label>
-
-                <div class="form-control">
-                    <label class="cursor-pointer label self-start gap-2">
-                        <input type="checkbox" class="checkbox" />
-                        <span class="label-text">Remember me</span>
-                    </label>
-                </div>
-
-                <button class="btn btn-primary">Log in</button>
-            </form>
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+</style>
+<main class="form-signin w-100 m-auto">
+    <form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                placeholder="Enter email">
         </div>
-    </div>
-</div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input name="password" type="password" class="form-control" id="exampleInputPassword1"
+                placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</main>
 
 }
 

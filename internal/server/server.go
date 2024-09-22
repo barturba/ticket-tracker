@@ -77,6 +77,7 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
 	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsGetPage))
 	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPutPage))
+	mux.HandleFunc("GET /modal", apiCfg.middlewareAuthPage(apiCfg.handleModalPage))
 
 	// Login Endpoints
 
