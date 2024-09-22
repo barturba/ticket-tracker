@@ -70,90 +70,57 @@ templ IncidentGet(incident models.Incident) {
     </td>
 </tr>
 }
+templ IncidentFormIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
+<section class="max-w-2xl w-4/5 h-fit mx-auto rounded-lg shadow-xl mb-8">
+    <form class="rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto" hx-post={"/incidents"} hx-ext="json-enc"
+        hx-push-url="true" hx-target="body" hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="companies">Companies</label>
+            <select class="select select-bordered w-full" name="company_id" hx-get="/configuration-items"
+                aria-describedby="companiesHelp" hx-target="#configurationItems">
+                for _, company := range companies{
+                <option value={company.ID.String()}>{ company.Name }</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="configurationItems">Configuration Items</label>
+            <select id="configurationItems" class="select select-bordered w-full" name="configuration_item_id"
+                aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
+                for _, configurationItem := range cis{
+                <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="shortDescription">Short Description</label>
+            <input type="text" name="short_description" class="input input-bordered w-full" id="shortDescription"
+                aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
+                value={incident.ShortDescription}>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" class="textarea textarea-bordered w-full" id="description"
+                aria-describedby="descriptionHelp" placeholder="Enter description"
+                value={incident.Description}></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</section>
+}
 
-templ IncidentFormNew(companies []models.Company, configurationItems []models.ConfigurationItem) {
-<form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
-    <div class="form-group">
-        <label for="companies">Companies</label>
-        <select class="form-control" name="company_id" hx-get="/configuration-items" aria-describedby="companiesHelp"
-            hx-target="#configurationItems">
-            for _, company := range companies{
-            <option value={company.ID.String()}>{ company.Name }</option>
-            }
-        </select>
-        <small id="companiesHelp" class="form-text text-muted">Select the company in question here.</small>
-    </div>
-    <div class="form-group">
-        <label for="configurationItems">Configuration Items</label>
-        <select id="configurationItems" class="form-control" name="configuration_item_id"
-            aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
-            for _, configurationItem := range configurationItems{
-            <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
-            }
-        </select>
-        <small id="configurationItemsHelp" class="form-text text-muted">Select the configuration item in question
-            here.</small>
-    </div>
-    <div class="form-group">
-        <label for="shortDescription">Short Description</label>
-        <input type="text" name="short_description" class="form-control" id="shortDescription"
-            aria-describedby="shortDescriptionHelp" placeholder="Enter short description">
-        <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
-    </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <input type="text" name="description" class="form-control" id="description" aria-describedby="descriptionHelp"
-            placeholder="Enter description">
-        <small id="descriptionHelp" class="form-text text-muted">Enter the description here.</small>
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+templ IncidentsNewIndex(companies []models.Company, cis []models.ConfigurationItem) {
+<h1 class="text-2xl font-bold text-center mb-8">
+    New Incident
+</h1>
+@IncidentFormIndex(models.Incident{}, companies, cis)
 }
 
 templ IncidentsEditIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
 <h1 class="text-2xl font-bold text-center mb-8">
     Edit Incident
 </h1>
-<section class="max-w-2xl w-4/5 h-fit mx-auto rounded-lg shadow-xl mb-8">
-    <form class="rounded-xl flex flex-col gap-4 w-11/12 p-4 mx-auto" hx-put={"/incidents/"+incident.ID.String()}
-        hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
-        <div class="form-group">
-            <label for="companies">Companies</label>
-            <select class="form-control" name="company_id" hx-get="/configuration-items"
-                aria-describedby="companiesHelp" hx-target="#configurationItems">
-                for _, company := range companies{
-                <option value={company.ID.String()}>{ company.Name }</option>
-                }
-            </select>
-            <small id="companiesHelp" class="form-text text-muted">Select the company in question here.</small>
-        </div>
-        <div class="form-group">
-            <label for="configurationItems">Configuration Items</label>
-            <select id="configurationItems" class="form-control" name="configuration_item_id"
-                aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
-                for _, configurationItem := range cis{
-                <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
-                }
-            </select>
-            <small id="configurationItemsHelp" class="form-text text-muted">Select the configuration item in question
-                here.</small>
-        </div>
-        <div class="form-group">
-            <label for="shortDescription">Short Description</label>
-            <input type="text" name="short_description" class="form-control" id="shortDescription"
-                aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
-                value={incident.ShortDescription}>
-            <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <input type="text" name="description" class="form-control" id="description"
-                aria-describedby="descriptionHelp" placeholder="Enter description" value={incident.Description}>
-            <small id="descriptionHelp" class="form-text text-muted">Enter the description here.</small>
-        </div>
-        <button type="submit" class="btn btn-primary">Save</button>
-    </form>
-</section>
+@IncidentFormIndex(incident, companies, cis)
 }
 
 templ IncidentsEdit(page string,
@@ -168,60 +135,37 @@ cmp templ.Component) {
 
 
 templ IncidentsIndex(incidents []models.Incident) {
-<div class="py-10">
-    <header>
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900">Dashboard</h1>
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-base font-semibold leading-6 text-gray-900">Incidents</h1>
         </div>
-    </header>
-    <main>
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="m-10 flex justify-between max-w-full mx-auto border-b border-b-slate-600 mb-8 pb-2">
-                <h1 class="text-2xl font-bold text-center">
-                    Incidents
-                </h1>
-                <a hx-swap="transition:true" class="btn btn-primary hover:scale-[1.1]" href="/incidents/new">
-                    New
-                </a>
-            </div>
-            <div class="px-4 sm:px-6 lg:px-8">
-                <div class="sm:flex sm:items-center">
-                    <div class="sm:flex-auto">
-                        <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
-                        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their
-                            name, title, email and role.</p>
-                    </div>
-                    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                        <button type="button"
-                            class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add
-                            user</button>
-                    </div>
-                </div>
-                <div class="mt-8 flow-root">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="cursor: pointer">ID
-                                        </th>
-                                        <th>Short Description</th>
-                                        <th>Description</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody hx-target="closest tr" hx-swap="outerHTML">
-                                    for _, incident := range incidents {
-                                    @IncidentRow(incident)
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <a class="btn btn-primary" href="/incidents/new" class="btn btn-primary">Add incident</a>
+        </div>
+    </div>
+    <div class="mt-8 flow-root">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="cursor: pointer">ID
+                            </th>
+                            <th>Short Description</th>
+                            <th>Description</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody hx-target="closest tr" hx-swap="outerHTML">
+                        for _, incident := range incidents {
+                        @IncidentRow(incident)
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
-    </main>
+    </div>
 </div>
 }
 

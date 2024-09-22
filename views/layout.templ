@@ -8,9 +8,9 @@ templ Layout(
 title string, fromProtected, isError bool, msg string, username string,
 ) {
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-white">
 
-<body>
+<body class="h-full">
     @HeaderComponent(title)
     <header>
         if !isError {

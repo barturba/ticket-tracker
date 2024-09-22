@@ -152,6 +152,11 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 
 func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
@@ -163,18 +168,24 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
 		return
 	}
-
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	firstCompany := companies[0]
 
-	configurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), firstCompany.ID)
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
 		return
 	}
+	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
-	incidentNewPage := views.IncidentFormNew(companies, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
-	templ.Handler(views.ContentPage("New Incident", "", incidentNewPage, nil, true)).ServeHTTP(w, r)
+	iNIndex := views.IncidentsNewIndex(companies, configurationItems)
+	iNew := views.IncidentsEdit(" | Incidents List | New",
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		iNIndex)
+	templ.Handler(iNew).ServeHTTP(w, r)
+
 }
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {

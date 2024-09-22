@@ -58,49 +58,7 @@ func LoginIndex(fromProtected bool) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"card w-fit bg-base-200 shadow-xl mx-auto mb-8\"><div class=\"card-body pb-2\"><h1 class=\"card-title border-b border-b-slate-600 pb-[4px]\">Log In</h1><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\" class=\"rounded-xl drop-shadow-xl flex flex-col gap-4 w-96 p-8\"><label class=\"flex flex-col justify-start gap-2\">Email: <input class=\"input input-bordered input-primary bg-slate-800\" type=\"email\" name=\"email\" required autofocus")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" value=\"disabled \"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></label> <label class=\"flex flex-col justify-start gap-2 relative\">Password: <input class=\"input input-bordered input-primary bg-slate-800\" type=\"password\" name=\"password\" required minlength=\"6\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" value=\"disabled \"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></label><footer class=\"card-actions justify-end\"><button class=\"badge badge-primary px-6 py-4 hover:scale-[1.1]\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">Log In</button></footer></form></div></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-center py-10\"><div class=\"flex flex-col items-center text-center gap-6 max-w-xl\"><div class=\"flex flex-col gap-4 rounded-box bg-base-200 p-6 max-w-md\"><h1 class=\"text-3xl font-bold self-center\">Log in</h1><span class=\"self-center\">Don't have an account? <a class=\"link link-secondary\">Register</a></span> <a class=\"btn btn-neutral\"><i class=\"fa-brands fa-google text-primary\"></i> Log in with Google</a><div class=\"divider\">OR</div><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\"><label class=\"form-control\"><div class=\"label\"><span class=\"label-text\">Email</span></div><input class=\"input input-bordered\" name=\"email\"></label> <label class=\"form-control\"><div class=\"label\"><span class=\"label-text\">Password</span> <a class=\"label-text link link-accent\">Forgot password?</a></div><input type=\"password\" class=\"input input-bordered\" name=\"password\"></label><div class=\"form-control\"><label class=\"cursor-pointer label self-start gap-2\"><input type=\"checkbox\" class=\"checkbox\"> <span class=\"label-text\">Remember me</span></label></div><button class=\"btn btn-primary\">Log in</button></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
