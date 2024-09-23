@@ -60,9 +60,11 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 }
 
 const getIncidentByID = `-- name: GetIncidentByID :one
-SELECt id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
+
+SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
 `
 
+// where short_description like $2 or overview like $2;
 func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
 	row := q.db.QueryRowContext(ctx, getIncidentByID, id)
 	var i Incident
@@ -118,6 +120,80 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 	var items []GetIncidentsByOrganizationIDRow
 	for rows.Next() {
 		var i GetIncidentsByOrganizationIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ShortDescription,
+			&i.Description,
+			&i.OrganizationID,
+			&i.ConfigurationItemID,
+			&i.CompanyID,
+			&i.State,
+			&i.AssignedTo,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getIncidentsByOrganizationIDAndSearchTerm = `-- name: GetIncidentsByOrganizationIDAndSearchTerm :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE organization_id = $1 AND short_description like $2
+ORDER BY incidents.updated_at DESC
+`
+
+type GetIncidentsByOrganizationIDAndSearchTermParams struct {
+	OrganizationID   uuid.UUID
+	ShortDescription string
+}
+
+type GetIncidentsByOrganizationIDAndSearchTermRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	OrganizationID      uuid.UUID
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
+}
+
+func (q *Queries) GetIncidentsByOrganizationIDAndSearchTerm(ctx context.Context, arg GetIncidentsByOrganizationIDAndSearchTermParams) ([]GetIncidentsByOrganizationIDAndSearchTermRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsByOrganizationIDAndSearchTerm, arg.OrganizationID, arg.ShortDescription)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetIncidentsByOrganizationIDAndSearchTermRow
+	for rows.Next() {
+		var i GetIncidentsByOrganizationIDAndSearchTermRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,

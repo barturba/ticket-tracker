@@ -10,8 +10,16 @@ ON incidents.assigned_to = users.id
 WHERE organization_id = $1
 ORDER BY incidents.updated_at DESC;
 
+-- name: GetIncidentsByOrganizationIDAndSearchTerm :many
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE organization_id = $1 AND short_description like $2
+ORDER BY incidents.updated_at DESC;
+-- where short_description like $2 or overview like $2;
+
 -- name: GetIncidentByID :one
-SELECt * FROM incidents WHERE id = $1;
+SELECT * FROM incidents WHERE id = $1;
 
 -- name: UpdateIncident :one
 UPDATE incidents

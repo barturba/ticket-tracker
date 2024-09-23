@@ -152,6 +152,30 @@ func DatabaseIncidentsByOrganizationIDRowToIncidents(incidents []database.GetInc
 	return items
 }
 
+func DatabaseIncidentByOrganizationIDRowAndSearchTermToIncident(incident database.GetIncidentsByOrganizationIDAndSearchTermRow) Incident {
+	return Incident{
+		ID:                  incident.ID,
+		CreatedAt:           incident.CreatedAt,
+		UpdatedAt:           incident.UpdatedAt,
+		ShortDescription:    incident.ShortDescription,
+		Description:         incident.Description.String,
+		State:               incident.State,
+		AssignedTo:          incident.AssignedTo.UUID,
+		AssignedToName:      incident.Name.String,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		OrganizationID:      incident.OrganizationID,
+		CompanyID:           incident.CompanyID,
+	}
+}
+
+func DatabaseIncidentsByOrganizationIDRowAndSearchTermToIncidents(incidents []database.GetIncidentsByOrganizationIDAndSearchTermRow) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, DatabaseIncidentByOrganizationIDRowAndSearchTermToIncident(item))
+	}
+	return items
+}
+
 func DatabaseIncidentsToIncidents(incidents []database.Incident) []Incident {
 	var items []Incident
 	for _, item := range incidents {

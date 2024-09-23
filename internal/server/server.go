@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"embed"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,11 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
 )
+
+//go:generate ./tailwindcss -o static/css/tailwind.css
+
+//go:embed static
+var static embed.FS
 
 const (
 	JWT_EXPIRES_IN_SECONDS = 3600
@@ -54,6 +60,9 @@ func NewServer() *http.Server {
 	}
 
 	mux := http.NewServeMux()
+
+	// assuming you have a net/http#ServeMux called `mux`
+	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
 	// API Endpoints
 

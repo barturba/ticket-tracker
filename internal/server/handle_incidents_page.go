@@ -3,6 +3,8 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -54,18 +56,25 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 
+	searchTerm := r.URL.Query().Get("search_term")
+	log.Println("searchTerm: ", searchTerm)
+
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
 		return
 	}
 
-	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationIDAndSearchTerm(r.Context(), database.GetIncidentsByOrganizationIDAndSearchTermParams{
+		OrganizationID:   organization.ID,
+		ShortDescription: fmt.Sprintf("%%%s%%", searchTerm),
+	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	incidents := models.DatabaseIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	incidents := models.DatabaseIncidentsByOrganizationIDRowAndSearchTermToIncidents(databaseIncidents)
+	log.Println("incidents: ", incidents)
 
 	for n, i := range incidents {
 		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
@@ -74,7 +83,6 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		incidents[n].ConfigurationItemName = ci.Name
-
 	}
 
 	iSearch := views.IncidentsSearch(incidents)
