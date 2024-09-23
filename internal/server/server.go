@@ -72,6 +72,7 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleConfigurationItemsPage))
 
 	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleViewIncidents))
+	mux.HandleFunc("GET /search-incidents", apiCfg.middlewareAuthPage(apiCfg.handleSearchIncidents))
 	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
 	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))

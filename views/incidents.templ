@@ -1,13 +1,16 @@
 package views
 
 import (
+"fmt"
 "github.com/barturba/ticket-tracker/models"
 )
 
 templ IncidentRow(incident models.Incident) {
 <tr>
     <td>{incident.ID.String()}</td>
+    <td>{fmt.Sprintf("%v", incident.State)}</td>
     <td>{incident.ShortDescription}</td>
+    <td>{incident.AssignedToName}</td>
     <td>{incident.ConfigurationItemName}</td>
     <td>{incident.Description}</td>
     <td>
@@ -102,10 +105,31 @@ cmp templ.Component) {
 
 
 templ IncidentsIndex(incidents []models.Incident) {
+<script>
+    function get_data() {
+        var val = document.getElementById("data1").value;
+        var opts = document.getElementById('wordList').children;
+        for (var i = 0; i < opts.length; i++) {
+            if (opts[i].value === val) {
+                // An item was selected from the list!
+                // yourCallbackHere()
+                // alert(opts[i].value);
+                window.location.href = "/incidents/" + opts[i].value + "/edit"
+                break;
+            }
+        }
+    }
+</script>
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             <h1 class="text-base font-semibold leading-6 text-gray-900">Incidents</h1>
+        </div>
+        <div>
+            <input id="data1" class="input input-bordered w-full" list="wordList" name="wordInput"
+                hx-get="/search-incidents" hx-target="#wordList" hx-trigger="keyup delay:300ms" onChange="get_data()"
+                placeholder="Search" />
+            <datalist id="wordList"></datalist>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <a class="btn btn-primary" href="/incidents/new" class="btn btn-primary">Add incident</a>
@@ -119,7 +143,9 @@ templ IncidentsIndex(incidents []models.Incident) {
                         <tr>
                             <th scope="col" style="cursor: pointer">ID
                             </th>
+                            <th>State</th>
                             <th>Short Description</th>
+                            <th>Assigned To</th>
                             <th>Configuration Item</th>
                             <th>Description</th>
                             <th></th>
@@ -144,5 +170,11 @@ username string,
 cmp templ.Component) {
 @Layout(page, fromProtected, isError, msg, username) {
 @cmp
+}
+}
+
+templ IncidentsSearch(incidents []models.Incident) {
+for _, incident := range incidents{
+<option value={incident.ID.String()}><b>{incident.ShortDescription}</b></option>
 }
 }

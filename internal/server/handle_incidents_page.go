@@ -52,6 +52,35 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 	templ.Handler(iList).ServeHTTP(w, r)
 }
 
+func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
+		return
+	}
+
+	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		return
+	}
+	incidents := models.DatabaseIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+
+	for n, i := range incidents {
+		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "couldn't find configuration item name")
+			return
+		}
+		incidents[n].ConfigurationItemName = ci.Name
+
+	}
+
+	iSearch := views.IncidentsSearch(incidents)
+	templ.Handler(iSearch).ServeHTTP(w, r)
+}
+
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
 	fromProtected := false
 	if (u != database.User{}) {
