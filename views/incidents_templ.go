@@ -514,7 +514,7 @@ func IncidentsEdit(page string,
 	})
 }
 
-func IncidentSearch() templ.Component {
+func IncidentsIndexTest(incidents []models.Incident) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -535,7 +535,7 @@ func IncidentSearch() templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{ isSearching: false }\" class=\"relative z-10\" role=\"dialog\" aria-modal=\"true\"><div :class=\"{&#39;opacity-100&#39;: isSearching, &#39;opacity-0&#39;: !isSearching}\" role=\"option\" class=\"fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity\" aria-hidden=\"true\"></div><div class=\"fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20\"><div class=\"mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all\"><input id=\"combobox1\" type=\"text\" name=\"search_term\" type=\"text\" class=\"w-full rounded-md border-0 bg-gray-100 px-4 py-2.5 text-gray-900 focus:ring-0 sm:text-sm\" placeholder=\"Search...\" role=\"combobox\" aria-expanded=\"false\" aria-controls=\"options\" role=\"combobox\" aria-controls=\"options\" aria-expanded=\"false\" hx-get=\"/search-incidents\" hx-target=\"#options\" hx-trigger=\"keyup delay:300ms\" _=\"on click from elsewhere add .hidden to #options end on click remove .hidden from #options end on load add .hidden to #options end\" @click=\"isSearching = !isSearching\" @click.outside=\"isSearching = false\"> <button type=\"button\" class=\"absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none\"><svg class=\"h-5 w-5 text-gray-400\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z\" clip-rule=\"evenodd\"></path></svg></button><ul class=\"-mb-2 max-h-72 scroll-py-2 overflow-y-auto py-2 text-sm text-gray-80\" id=\"options\" role=\"listbox\"><li class=\"relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900\" role=\"option\" tabindex=\"-1\"><p class=\"p-4 text-sm text-gray-500\">No incidents found.</p></li></ul></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"wrapper\"></div><script src=\"https://unpkg.com/gridjs/dist/gridjs.umd.js\"></script><script>\n    new gridjs.Grid({\n        search: true,\n        columns: [\"ID\", \"State\", \"Short Description\"],\n        server: {\n            url: '/v1/incidents',\n            then: data => data.map(incident =>\n                [incident.id, incident.state, incident.short_description]\n            )\n        },\n        pagination: {\n            limit: 10,\n            summary: false\n        }\n    }).render(document.getElementById(\"wrapper\"));\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -564,15 +564,7 @@ func IncidentsIndex(incidents []models.Incident) templ.Component {
 			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"px-4 sm:px-6 lg:px-8\"><div class=\"sm:flex sm:items-center\"><div class=\"sm:flex-auto\"><h1 class=\"text-base font-semibold leading-6 text-gray-900\">Incidents</h1></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = IncidentSearch().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mt-4 sm:ml-16 sm:mt-0 sm:flex-none\"><a class=\"btn btn-primary\" href=\"/incidents/new\" class=\"btn btn-primary\">Add incident</a></div></div><div class=\"mt-8 flow-root\"><div class=\"-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8\"><div class=\"inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8\"><table class=\"table\"><thead><tr><th scope=\"col\" style=\"cursor: pointer\">ID</th><th>State</th><th>Short Description</th><th>Assigned To</th><th>Configuration Item</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"px-4 sm:px-6 lg:px-8\"><div class=\"sm:flex sm:items-center\"><div class=\"sm:flex-auto\"><h1 class=\"text-base font-semibold leading-6 text-gray-900\">Incidents</h1></div><div class=\"mt-4 sm:ml-16 sm:mt-0 sm:flex-none\"><a class=\"btn btn-primary\" href=\"/incidents/new\" class=\"btn btn-primary\">Add incident</a></div></div><div class=\"mt-8 flow-root\"><div class=\"-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8\"><div class=\"inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8\"><table class=\"table\"><thead><tr><th scope=\"col\" style=\"cursor: pointer\">ID</th><th>State</th><th>Short Description</th><th>Assigned To</th><th>Configuration Item</th><th>Description</th><th></th></tr></thead> <tbody hx-target=\"closest tr\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -679,7 +671,7 @@ func IncidentsSearch(incidents []models.Incident) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs("option-" + fmt.Sprintf("%d", i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 198, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 181, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -692,7 +684,7 @@ func IncidentsSearch(incidents []models.Incident) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 201, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 184, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {

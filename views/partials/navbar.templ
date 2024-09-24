@@ -1,5 +1,23 @@
 package partials
 
+templ IncidentSearch() {
+<div class="bg-white">
+    <div class="mt-2 z-10 relative">
+        <input hx-get="/search-incidents" hx-target="#options" hx-trigger="keyup delay:300ms"
+            _="on click from elsewhere add .hidden to #options end on click remove .hidden from #options end on load add .hidden to #options end"
+            type="text" name="search_term" id="search_term"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="Search">
+        <div class="absolute bg-white">
+            <ul id="options" class="-mb-2 max-h-72 scroll-py-2 overflow-y-auto py-2 text-sm text-gray-800"
+                role="listbox">
+            </ul>
+        </div>
+    </div>
+</div>
+}
+
+
 templ Navbar(fromProtected bool, username string) {
 <nav class="navbar ">
     <div class="navbar-start">
@@ -9,6 +27,9 @@ templ Navbar(fromProtected bool, username string) {
     </div>
     <div class="navbar-end">
         if fromProtected {
+        <span class="font-bold mr-8">
+            @IncidentSearch()
+        </span>
         <span class="font-bold mr-8">
             { username }
         </span>

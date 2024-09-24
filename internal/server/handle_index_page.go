@@ -14,6 +14,6 @@ func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u 
 		fromProtected = true
 	}
 	hindex := views.HomeIndex(fromProtected)
-	home := views.Home("", fromProtected, false, "msg", hindex)
+	home := views.Home("", fromProtected, false, "msg", u.Name, hindex)
 	templ.Handler(home).ServeHTTP(w, r)
 }

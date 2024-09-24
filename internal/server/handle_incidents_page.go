@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -44,7 +43,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	}
 
-	iIndex := views.IncidentsIndex(incidents)
+	iIndex := views.IncidentsIndexTest(incidents)
 	iList := views.IncidentsList("Incidents List",
 		fromProtected,
 		false,
@@ -57,7 +56,6 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	searchTerm := r.URL.Query().Get("search_term")
-	log.Println("searchTerm: ", searchTerm)
 
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
@@ -74,7 +72,6 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	incidents := models.DatabaseIncidentsByOrganizationIDRowAndSearchTermToIncidents(databaseIncidents)
-	log.Println("incidents: ", incidents)
 
 	for n, i := range incidents {
 		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)

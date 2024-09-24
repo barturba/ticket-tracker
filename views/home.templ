@@ -25,13 +25,12 @@ templ HomeIndex(fromProtected bool) {
 </section>
 }
 
-templ Home(
-page string,
+templ Home(page string,
 fromProtected, isError bool,
 msg string,
-cmp templ.Component,
-) {
-@Layout(page, fromProtected, isError, msg, "") {
+username string,
+cmp templ.Component) {
+@Layout(page, fromProtected, isError, msg, username) {
 @cmp
 }
 }
