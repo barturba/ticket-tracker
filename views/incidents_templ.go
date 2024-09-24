@@ -535,7 +535,7 @@ func IncidentSearch() templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><label for=\"combobox\" class=\"block text-sm font-medium leading-6 text-gray-900\">Search</label><div class=\"relative mt-2\"><input id=\"combobox1\" type=\"text\" name=\"search_term\" class=\"w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6\" role=\"combobox\" aria-controls=\"options\" aria-expanded=\"false\" hx-get=\"/search-incidents\" hx-target=\"#options\" hx-trigger=\"keyup delay:300ms\" _=\"on click from elsewhere add .hidden to #options end on click remove .hidden from #options end on load add .hidden to #options end\"> <button type=\"button\" class=\"absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none\"><svg class=\"h-5 w-5 text-gray-400\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z\" clip-rule=\"evenodd\"></path></svg></button><ul class=\"absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm\" id=\"options\" role=\"listbox\"><!--\n        Combobox option, manage highlight styles based on mouseenter/mouseleave and keyboard navigation.\n\n        Active: \"text-white bg-indigo-600\", Not Active: \"text-gray-900\"\n      --><li class=\"relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900\" role=\"option\" tabindex=\"-1\"><!-- Selected: \"font-semibold\" --><!--\n          Checkmark, only display for selected option.\n\n          Active: \"text-white\", Not Active: \"text-indigo-600\"\n        --><span class=\"block truncate\">Search results</span></li></ul></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{ isSearching: false }\" class=\"relative z-10\" role=\"dialog\" aria-modal=\"true\"><div :class=\"{&#39;opacity-100&#39;: isSearching, &#39;opacity-0&#39;: !isSearching}\" role=\"option\" class=\"fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity\" aria-hidden=\"true\"></div><div class=\"fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20\"><div class=\"mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all\"><input id=\"combobox1\" type=\"text\" name=\"search_term\" type=\"text\" class=\"w-full rounded-md border-0 bg-gray-100 px-4 py-2.5 text-gray-900 focus:ring-0 sm:text-sm\" placeholder=\"Search...\" role=\"combobox\" aria-expanded=\"false\" aria-controls=\"options\" role=\"combobox\" aria-controls=\"options\" aria-expanded=\"false\" hx-get=\"/search-incidents\" hx-target=\"#options\" hx-trigger=\"keyup delay:300ms\" _=\"on click from elsewhere add .hidden to #options end on click remove .hidden from #options end on load add .hidden to #options end\" @click=\"isSearching = !isSearching\" @click.outside=\"isSearching = false\"> <button type=\"button\" class=\"absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none\"><svg class=\"h-5 w-5 text-gray-400\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z\" clip-rule=\"evenodd\"></path></svg></button><ul class=\"-mb-2 max-h-72 scroll-py-2 overflow-y-auto py-2 text-sm text-gray-80\" id=\"options\" role=\"listbox\"><li class=\"relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900\" role=\"option\" tabindex=\"-1\"><p class=\"p-4 text-sm text-gray-500\">No incidents found.</p></li></ul></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -672,33 +672,33 @@ func IncidentsSearch(incidents []models.Incident) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><li class=\"hover:bg-slate-100 relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900\" id=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><li class=\"cursor-pointer select-none px-4 py-2\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs("option-" + fmt.Sprintf("%d", i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 200, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 198, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" role=\"option\" tabindex=\"-1\"><span class=\"block truncate\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" x-data=\"{ isActive: false }\" @mouseenter=\"isActive = !isActive\" @mouseleave=\"isActive = !isActive\" :class=\"{&#39;bg-indigo-600 text-white&#39;: isActive }\" role=\"option\" tabindex=\"-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 201, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 201, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></li></a>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
