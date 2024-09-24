@@ -2,7 +2,5 @@
   "devDependencies": {
     "tailwindcss": "^3.4.13"
   },
-  "dependencies": {
-    "@tanstack/table-core": "^8.20.5"
-  }
+  "dependencies": {}
 }
