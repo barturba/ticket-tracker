@@ -110,11 +110,13 @@ templ IncidentsIndexTest(incidents []models.Incident) {
 <script>
     new gridjs.Grid({
         search: true,
+        sort: true,
+
         columns: ["ID", "State", "Short Description"],
         server: {
             url: '/v1/incidents',
             then: data => data.map(incident =>
-                [incident.id, incident.state, incident.short_description]
+                [gridjs.html(`<a href="/incidents/${incident.id}/edit">${incident.id}</a>`), incident.state, incident.short_description]
             )
         },
         pagination: {

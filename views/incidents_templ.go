@@ -535,7 +535,7 @@ func IncidentsIndexTest(incidents []models.Incident) templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"wrapper\"></div><script src=\"https://unpkg.com/gridjs/dist/gridjs.umd.js\"></script><script>\n    new gridjs.Grid({\n        search: true,\n        columns: [\"ID\", \"State\", \"Short Description\"],\n        server: {\n            url: '/v1/incidents',\n            then: data => data.map(incident =>\n                [incident.id, incident.state, incident.short_description]\n            )\n        },\n        pagination: {\n            limit: 10,\n            summary: false\n        }\n    }).render(document.getElementById(\"wrapper\"));\n</script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"wrapper\"></div><script src=\"https://unpkg.com/gridjs/dist/gridjs.umd.js\"></script><script>\n    new gridjs.Grid({\n        search: true,\n        sort: true,\n\n        columns: [\"ID\", \"State\", \"Short Description\"],\n        server: {\n            url: '/v1/incidents',\n            then: data => data.map(incident =>\n                [gridjs.html(`<a href=\"/incidents/${incident.id}/edit\">${incident.id}</a>`), incident.state, incident.short_description]\n            )\n        },\n        pagination: {\n            limit: 10,\n            summary: false\n        }\n    }).render(document.getElementById(\"wrapper\"));\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -671,7 +671,7 @@ func IncidentsSearch(incidents []models.Incident) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs("option-" + fmt.Sprintf("%d", i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 181, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 183, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -684,7 +684,7 @@ func IncidentsSearch(incidents []models.Incident) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(incident.ShortDescription)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 184, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/incidents.templ`, Line: 186, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
