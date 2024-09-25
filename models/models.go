@@ -184,5 +184,28 @@ func DatabaseIncidentsToIncidents(incidents []database.Incident) []Incident {
 	return items
 }
 
+func DatabaseIncidentByOrganizationIDRowAndSearchTermLimitOffsetToIncident(incident database.GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow) Incident {
+	return Incident{
+		ID:                  incident.ID,
+		CreatedAt:           incident.CreatedAt,
+		UpdatedAt:           incident.UpdatedAt,
+		ShortDescription:    incident.ShortDescription,
+		Description:         incident.Description.String,
+		State:               incident.State,
+		AssignedTo:          incident.AssignedTo.UUID,
+		AssignedToName:      incident.Name.String,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		OrganizationID:      incident.OrganizationID,
+		CompanyID:           incident.CompanyID,
+	}
+}
+func DatabaseIncidentsByOrganizationIDRowAndSearchTermLimitOffsetToIncidents(incidents []database.GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, DatabaseIncidentByOrganizationIDRowAndSearchTermLimitOffsetToIncident(item))
+	}
+	return items
+}
+
 type Page struct {
 }

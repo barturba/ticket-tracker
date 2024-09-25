@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -55,7 +57,29 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 
-	searchTerm := r.URL.Query().Get("search_term")
+	var err error
+	search := r.URL.Query().Get("search")
+	log.Println("search: ", search)
+
+	limitString := r.URL.Query().Get("limit")
+	log.Println("limitString: ", limitString)
+	limit := 5
+	if limitString != "" {
+		if limit, err = strconv.Atoi(limitString); err != nil {
+			respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+			return
+		}
+	}
+
+	offsetString := r.URL.Query().Get("offset")
+	log.Println("offsetString: ", offsetString)
+	offset := 0
+	if offsetString != "" {
+		if offset, err = strconv.Atoi(offsetString); err != nil {
+			respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
+			return
+		}
+	}
 
 	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
 	if err != nil {
@@ -63,15 +87,21 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationIDAndSearchTerm(r.Context(), database.GetIncidentsByOrganizationIDAndSearchTermParams{
+	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationIDAndSearchTermLimitOffset(r.Context(), database.GetIncidentsByOrganizationIDAndSearchTermLimitOffsetParams{
 		OrganizationID:   organization.ID,
-		ShortDescription: fmt.Sprintf("%%%s%%", searchTerm),
+		ShortDescription: fmt.Sprintf("%%%s%%", search),
+		Limit:            int32(limit),
+		Offset:           int32(offset),
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	incidents := models.DatabaseIncidentsByOrganizationIDRowAndSearchTermToIncidents(databaseIncidents)
+	fullCount := 0
+	if len(databaseIncidents) > 0 {
+		fullCount = int(databaseIncidents[0].FullCount)
+	}
+	incidents := models.DatabaseIncidentsByOrganizationIDRowAndSearchTermLimitOffsetToIncidents(databaseIncidents)
 
 	for n, i := range incidents {
 		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
@@ -81,9 +111,15 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		}
 		incidents[n].ConfigurationItemName = ci.Name
 	}
+	type response struct {
+		Count   int               `json:"count"`
+		Results []models.Incident `json:"results"`
+	}
 
-	iSearch := views.IncidentsSearch(incidents)
-	templ.Handler(iSearch).ServeHTTP(w, r)
+	respondWithJSON(w, http.StatusOK, response{
+		Count:   fullCount,
+		Results: incidents,
+	})
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {

@@ -105,24 +105,41 @@ cmp templ.Component) {
 
 templ IncidentsIndexTest(incidents []models.Incident) {
 <div id="wrapper"></div>
-
-<script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 <script>
+    const css = window.emotion.css;
     new gridjs.Grid({
-        search: true,
+        search: {
+            server: {
+                url: (prev, keyword) => `${prev}?search=${keyword}`
+            }
+        },
         sort: true,
-
-        columns: ["ID", "State", "Short Description"],
+        columns: ["ID", "State", "Short Description", "Assigned To", "Configuration Item"],
         server: {
-            url: '/v1/incidents',
-            then: data => data.map(incident =>
-                [gridjs.html(`<a href="/incidents/${incident.id}/edit">${incident.id}</a>`), incident.state, incident.short_description]
-            )
+            url: '/search-incidents',
+            then: data => data.results.map(incident =>
+                [gridjs.html(`<a href="/incidents/${incident.id}/edit">${incident.id}</a>`),
+                incident.state,
+                incident.short_description,
+                incident.assigned_to_name,
+                incident.configuration_item,
+                ]
+            ),
+            total: data => data.count
         },
         pagination: {
-            limit: 10,
-            summary: false
-        }
+            limit: 5,
+            server: {
+                url: (prev, page, limit) => `${prev}?limit=${limit}&offset=${page * limit}`
+            }
+        },
+        className: {
+            table: css`
+              tr:hover td {
+                background-color: rgba(0, 0, 0, 0.1);
+              }
+            `,
+        },
     }).render(document.getElementById("wrapper"));
 </script>
 }
