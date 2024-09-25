@@ -59,11 +59,10 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 
 	var err error
 	search := r.URL.Query().Get("search")
-	log.Println("search: ", search)
 
 	limitString := r.URL.Query().Get("limit")
 	log.Println("limitString: ", limitString)
-	limit := 5
+	limit := 0
 	if limitString != "" {
 		if limit, err = strconv.Atoi(limitString); err != nil {
 			respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")

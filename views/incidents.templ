@@ -108,11 +108,6 @@ templ IncidentsIndexTest(incidents []models.Incident) {
 <script>
     const css = window.emotion.css;
     new gridjs.Grid({
-        search: {
-            server: {
-                url: (prev, keyword) => `${prev}?search=${keyword}`
-            }
-        },
         sort: true,
         columns: ["ID", "State", "Short Description", "Assigned To", "Configuration Item"],
         server: {
@@ -127,10 +122,17 @@ templ IncidentsIndexTest(incidents []models.Incident) {
             ),
             total: data => data.count
         },
+        search: {
+            enabled: true,
+            server: {
+                url: (prev, keyword, page) => `${prev}?search=${keyword}`
+            }
+        },
         pagination: {
+            enabled: true,
             limit: 5,
             server: {
-                url: (prev, page, limit) => `${prev}?limit=${limit}&offset=${page * limit}`
+                url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}limit=${limit}&offset=${page * limit}`
             }
         },
         className: {

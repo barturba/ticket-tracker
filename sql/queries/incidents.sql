@@ -22,7 +22,7 @@ SELECT *, count(*) OVER() AS full_count
 FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1 AND short_description like $2
+WHERE organization_id = $1 AND short_description like $2 or short_description is NULL
 ORDER BY incidents.updated_at DESC
 LIMIT $3 OFFSET $4;
 
