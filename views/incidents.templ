@@ -109,7 +109,7 @@ templ IncidentsIndexTest(incidents []models.Incident) {
     const css = window.emotion.css;
     new gridjs.Grid({
         sort: true,
-        columns: ["ID", "State", "Short Description", "Assigned To", "Configuration Item"],
+        columns: [{ name: "ID", sort: false }, "State", "Short Description", "Assigned To", "Configuration Item"],
         server: {
             url: '/search-incidents',
             then: data => data.results.map(incident =>
@@ -122,6 +122,20 @@ templ IncidentsIndexTest(incidents []models.Incident) {
             ),
             total: data => data.count
         },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = ['state', 'short_description'][col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
         search: {
             enabled: true,
             server: {
@@ -130,7 +144,7 @@ templ IncidentsIndexTest(incidents []models.Incident) {
         },
         pagination: {
             enabled: true,
-            limit: 5,
+            limit: 10,
             server: {
                 url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}limit=${limit}&offset=${page * limit}`
             }
