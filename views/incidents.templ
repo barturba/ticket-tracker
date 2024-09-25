@@ -5,37 +5,6 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-templ IncidentRow(incident models.Incident) {
-<tr>
-    <td>{incident.ID.String()}</td>
-    <td>{fmt.Sprintf("%v", incident.State)}</td>
-    <td>{incident.ShortDescription}</td>
-    <td>{incident.AssignedToName}</td>
-    <td>{incident.ConfigurationItemName}</td>
-    <td>{incident.Description}</td>
-    <td>
-        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
-    </td>
-</tr>
-}
-
-templ IncidentGet(incident models.Incident) {
-<tr hx-trigger='cancel' class='editing' hx-get={"/incidents/" + incident.ID.String()}>
-    <td><input name='id' value={incident.ID.String()}></td>
-    <td><input name='short_description' value={incident.ShortDescription}></td>
-    <td><input name='description' value={incident.Description}></td>
-    <td>
-        <button class="btn danger" hx-get={"/incidents/"+incident.ID.String()}>
-            Cancel
-        </button>
-        <button class="btn danger" hx-on:keydown="(event.keyCode===13&&!event.shiftKey)?event.preventDefault():null"
-            hx-put={"/incidents/"+incident.ID.String()} hx-include="closest tr">
-            Save
-        </button>
-    </td>
-</tr>
-}
-
 templ IncidentFormIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
 <div class="max-w-[100vw] px-6 pb-16">
     <form>
@@ -103,7 +72,7 @@ cmp templ.Component) {
 }
 }
 
-templ IncidentsIndexTest(incidents []models.Incident) {
+templ IncidentsIndex(incidents []models.Incident) {
 <div id="wrapper"></div>
 <script>
     const css = window.emotion.css;
@@ -160,45 +129,20 @@ templ IncidentsIndexTest(incidents []models.Incident) {
 </script>
 }
 
-templ IncidentsIndex(incidents []models.Incident) {
-
-<div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <h1 class="text-base font-semibold leading-6 text-gray-900">Incidents</h1>
-        </div>
-
-        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-            <a class="btn btn-primary" href="/incidents/new" class="btn btn-primary">Add incident</a>
-        </div>
-    </div>
-    <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="cursor: pointer">ID
-                            </th>
-                            <th>State</th>
-                            <th>Short Description</th>
-                            <th>Assigned To</th>
-                            <th>Configuration Item</th>
-                            <th>Description</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody hx-target="closest tr" hx-swap="outerHTML">
-                        for _, incident := range incidents {
-                        @IncidentRow(incident)
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+templ IncidentRow(incident models.Incident) {
+<tr>
+    <td>{incident.ID.String()}</td>
+    <td>{fmt.Sprintf("%v", incident.State)}</td>
+    <td>{incident.ShortDescription}</td>
+    <td>{incident.AssignedToName}</td>
+    <td>{incident.ConfigurationItemName}</td>
+    <td>{incident.Description}</td>
+    <td>
+        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
+    </td>
+</tr>
 }
+
 
 templ IncidentsList(page string,
 fromProtected, isError bool,
@@ -207,16 +151,5 @@ username string,
 cmp templ.Component) {
 @Layout(page, fromProtected, isError, msg, username) {
 @cmp
-}
-}
-
-templ IncidentsSearch(incidents []models.Incident) {
-for i, incident := range incidents{
-<a href={templ.SafeURL("/incidents/"+incident.ID.String()+"/edit")}>
-    <li class="cursor-pointer select-none px-4 py-2" id={"option-"+fmt.Sprintf("%d",i)} x-data="{ isActive: false }"
-        @mouseenter="isActive = !isActive" @mouseleave="isActive = !isActive"
-        :class="{'bg-indigo-600 text-white': isActive }" role="option" tabindex="-1">
-        {incident.ShortDescription} </li>
-</a>
 }
 }

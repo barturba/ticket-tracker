@@ -39,7 +39,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	}
 
-	iIndex := views.IncidentsIndexTest(incidents)
+	iIndex := views.IncidentsIndex(incidents)
 	iList := views.IncidentsList("Incidents List",
 		fromProtected,
 		false,
