@@ -12,11 +12,6 @@ import (
 )
 
 func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
 	type parameters struct {
 		ShortDescription    string    `json:"short_description"`
 		Description         string    `json:"description"`
@@ -25,7 +20,7 @@ func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err = decoder.Decode(&params)
+	err := decoder.Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
 		return
@@ -60,7 +55,6 @@ func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 		ShortDescription:    params.ShortDescription,
 		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
 		State:               database.StateEnumNew,
-		OrganizationID:      organization.ID,
 		ConfigurationItemID: configurationItem.ID,
 		CompanyID:           company.ID,
 	})
@@ -76,18 +70,13 @@ func (cfg *ApiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u dat
 	// Get the organization -- should this be a part of the authentication
 	// process? I mean we're using the organization quite a bit.
 	//
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
 
-	incidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	incidents, err := cfg.DB.GetIncidents(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, models.DatabaseIncidentsByOrganizationIDRowToIncidents(incidents))
+	respondWithJSON(w, http.StatusOK, models.DatabaseIncidentsRowToIncidents(incidents))
 
 }

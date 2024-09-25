@@ -13,18 +13,17 @@ import (
 )
 
 const createConfigurationItem = `-- name: CreateConfigurationItem :one
-INSERT INTO configuration_items (id, created_at, updated_at, name, organization_id, company_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO configuration_items (id, created_at, updated_at, name, company_id)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, created_at, updated_at, name, organization_id, company_id
 `
 
 type CreateConfigurationItemParams struct {
-	ID             uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Name           string
-	OrganizationID uuid.UUID
-	CompanyID      uuid.UUID
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	CompanyID uuid.UUID
 }
 
 func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigurationItemParams) (ConfigurationItem, error) {
@@ -33,7 +32,6 @@ func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigu
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Name,
-		arg.OrganizationID,
 		arg.CompanyID,
 	)
 	var i ConfigurationItem
@@ -65,6 +63,40 @@ func (q *Queries) GetConfigurationItemByID(ctx context.Context, id uuid.UUID) (C
 		&i.CompanyID,
 	)
 	return i, err
+}
+
+const getConfigurationItems = `-- name: GetConfigurationItems :many
+SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+`
+
+func (q *Queries) GetConfigurationItems(ctx context.Context) ([]ConfigurationItem, error) {
+	rows, err := q.db.QueryContext(ctx, getConfigurationItems)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ConfigurationItem
+	for rows.Next() {
+		var i ConfigurationItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.OrganizationID,
+			&i.CompanyID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getConfigurationItemsByCompanyID = `-- name: GetConfigurationItemsByCompanyID :many
@@ -102,63 +134,22 @@ func (q *Queries) GetConfigurationItemsByCompanyID(ctx context.Context, companyI
 	return items, nil
 }
 
-const getConfigurationItemsByOrganizationID = `-- name: GetConfigurationItemsByOrganizationID :many
-SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
-WHERE organization_id = $1
-`
-
-func (q *Queries) GetConfigurationItemsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getConfigurationItemsByOrganizationID, organizationID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ConfigurationItem
-	for rows.Next() {
-		var i ConfigurationItem
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.Name,
-			&i.OrganizationID,
-			&i.CompanyID,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updateConfigurationItem = `-- name: UpdateConfigurationItem :one
 UPDATE configuration_items
-SET name = $3,
-updated_at = $4
-WHERE id = $1 AND organization_id = $2
+SET name = $2,
+updated_at = $3
+WHERE id = $1
 RETURNING id, created_at, updated_at, name, organization_id, company_id
 `
 
 type UpdateConfigurationItemParams struct {
-	ID             uuid.UUID
-	OrganizationID uuid.UUID
-	Name           string
-	UpdatedAt      time.Time
+	ID        uuid.UUID
+	Name      string
+	UpdatedAt time.Time
 }
 
 func (q *Queries) UpdateConfigurationItem(ctx context.Context, arg UpdateConfigurationItemParams) (ConfigurationItem, error) {
-	row := q.db.QueryRowContext(ctx, updateConfigurationItem,
-		arg.ID,
-		arg.OrganizationID,
-		arg.Name,
-		arg.UpdatedAt,
-	)
+	row := q.db.QueryRowContext(ctx, updateConfigurationItem, arg.ID, arg.Name, arg.UpdatedAt)
 	var i ConfigurationItem
 	err := row.Scan(
 		&i.ID,

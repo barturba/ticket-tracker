@@ -1,30 +1,29 @@
 -- name: CreateIncident :one
-INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, organization_id, configuration_item_id, company_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, configuration_item_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
--- name: GetIncidentsByOrganizationID :many
+-- name: GetIncidents :many
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1
 ORDER BY incidents.updated_at DESC;
 
--- name: GetIncidentsByOrganizationIDAndSearchTerm :many
+-- name: GetIncidentsBySearchTerm :many
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1 AND short_description like $2
+WHERE short_description like $1
 ORDER BY incidents.updated_at DESC;
 
--- name: GetIncidentsByOrganizationIDAndSearchTermLimitOffset :many
+-- name: GetIncidentsBySearchTermLimitOffset :many
 SELECT *, count(*) OVER() AS full_count 
 FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1 AND short_description like $2 or short_description is NULL
+WHERE short_description like $1 or short_description is NULL
 ORDER BY incidents.updated_at DESC
-LIMIT $3 OFFSET $4;
+LIMIT $2 OFFSET $3;
 
 -- name: GetIncidentByID :one
 SELECT * FROM incidents WHERE id = $1;

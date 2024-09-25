@@ -44,27 +44,12 @@ func (cfg *ApiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	organization, err := cfg.DB.CreateOrganization(r.Context(),
-		database.CreateOrganizationParams{
-			ID:        uuid.New(),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Name:      params.OrganizationName,
-			UserID:    user.ID,
-		},
-	)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create organization")
-	}
-
 	type response struct {
-		User         models.User         `json:"user"`
-		Organization models.Organization `json:"organization"`
+		User models.User `json:"user"`
 	}
 
 	resp := response{
-		User:         models.DatabaseUserToUser(user),
-		Organization: models.DatabaseOrganizationToOrganization(organization),
+		User: models.DatabaseUserToUser(user),
 	}
 
 	respondWithJSON(w, http.StatusCreated, resp)

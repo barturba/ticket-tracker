@@ -22,18 +22,12 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		fromProtected = true
 	}
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
-	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationID(r.Context(), organization.ID)
+	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	incidents := models.DatabaseIncidentsByOrganizationIDRowToIncidents(databaseIncidents)
+	incidents := models.DatabaseIncidentsRowToIncidents(databaseIncidents)
 
 	for n, i := range incidents {
 		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
@@ -80,14 +74,7 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
-	databaseIncidents, err := cfg.DB.GetIncidentsByOrganizationIDAndSearchTermLimitOffset(r.Context(), database.GetIncidentsByOrganizationIDAndSearchTermLimitOffsetParams{
-		OrganizationID:   organization.ID,
+	databaseIncidents, err := cfg.DB.GetIncidentsBySearchTermLimitOffset(r.Context(), database.GetIncidentsBySearchTermLimitOffsetParams{
 		ShortDescription: fmt.Sprintf("%%%s%%", search),
 		Limit:            int32(limit),
 		Offset:           int32(offset),
@@ -100,7 +87,7 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 	if len(databaseIncidents) > 0 {
 		fullCount = int(databaseIncidents[0].FullCount)
 	}
-	incidents := models.DatabaseIncidentsByOrganizationIDRowAndSearchTermLimitOffsetToIncidents(databaseIncidents)
+	incidents := models.DatabaseIncidentsBySearchTermLimitOffsetRowToIncidents(databaseIncidents)
 
 	for n, i := range incidents {
 		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
@@ -134,12 +121,6 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
 	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "can't find incident")
@@ -147,7 +128,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	}
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
 		return
@@ -237,13 +218,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		fromProtected = true
 	}
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
-	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
 		return
@@ -270,12 +245,6 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
 	type parameters struct {
 		ShortDescription    string    `json:"short_description"`
 		Description         string    `json:"description"`
@@ -284,7 +253,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err = decoder.Decode(&params)
+	err := decoder.Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
 		return
@@ -315,7 +284,6 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		ShortDescription:    params.ShortDescription,
 		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
 		State:               "New",
-		OrganizationID:      organization.ID,
 		ConfigurationItemID: params.ConfigurationItemID,
 		CompanyID:           params.CompanyID,
 	})

@@ -11,17 +11,12 @@ import (
 )
 
 func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
 	type parameters struct {
 		Name string `json:"name"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err = decoder.Decode(&params)
+	err := decoder.Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "error decoding parameters")
 		return
@@ -32,11 +27,10 @@ func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 	}
 
 	configurationItem, err := cfg.DB.CreateConfigurationItem(r.Context(), database.CreateConfigurationItemParams{
-		ID:             uuid.New(),
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
-		Name:           params.Name,
-		OrganizationID: organization.ID,
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      params.Name,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "error creating configuration item")
@@ -47,13 +41,8 @@ func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 }
 
 func (cfg *ApiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
 
-	configurationItems, err := cfg.DB.GetConfigurationItemsByOrganizationID(r.Context(), organization.ID)
+	configurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
 		return

@@ -14,9 +14,9 @@ import (
 )
 
 const createIncident = `-- name: CreateIncident :one
-INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, organization_id, configuration_item_id, company_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to
+INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, configuration_item_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to
 `
 
 type CreateIncidentParams struct {
@@ -26,7 +26,6 @@ type CreateIncidentParams struct {
 	ShortDescription    string
 	Description         sql.NullString
 	State               StateEnum
-	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
 }
@@ -39,7 +38,6 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		arg.ShortDescription,
 		arg.Description,
 		arg.State,
-		arg.OrganizationID,
 		arg.ConfigurationItemID,
 		arg.CompanyID,
 	)
@@ -50,7 +48,6 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 		&i.UpdatedAt,
 		&i.ShortDescription,
 		&i.Description,
-		&i.OrganizationID,
 		&i.ConfigurationItemID,
 		&i.CompanyID,
 		&i.State,
@@ -60,7 +57,7 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 }
 
 const getIncidentByID = `-- name: GetIncidentByID :one
-SELECT id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
+SELECT id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
 `
 
 func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
@@ -72,7 +69,6 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 		&i.UpdatedAt,
 		&i.ShortDescription,
 		&i.Description,
-		&i.OrganizationID,
 		&i.ConfigurationItemID,
 		&i.CompanyID,
 		&i.State,
@@ -81,21 +77,19 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 	return i, err
 }
 
-const getIncidentsByOrganizationID = `-- name: GetIncidentsByOrganizationID :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+const getIncidents = `-- name: GetIncidents :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1
 ORDER BY incidents.updated_at DESC
 `
 
-type GetIncidentsByOrganizationIDRow struct {
+type GetIncidentsRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	ShortDescription    string
 	Description         sql.NullString
-	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
 	State               StateEnum
@@ -109,22 +103,21 @@ type GetIncidentsByOrganizationIDRow struct {
 	Password            sql.NullString
 }
 
-func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]GetIncidentsByOrganizationIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsByOrganizationID, organizationID)
+func (q *Queries) GetIncidents(ctx context.Context) ([]GetIncidentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidents)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsByOrganizationIDRow
+	var items []GetIncidentsRow
 	for rows.Next() {
-		var i GetIncidentsByOrganizationIDRow
+		var i GetIncidentsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ShortDescription,
 			&i.Description,
-			&i.OrganizationID,
 			&i.ConfigurationItemID,
 			&i.CompanyID,
 			&i.State,
@@ -150,26 +143,20 @@ func (q *Queries) GetIncidentsByOrganizationID(ctx context.Context, organization
 	return items, nil
 }
 
-const getIncidentsByOrganizationIDAndSearchTerm = `-- name: GetIncidentsByOrganizationIDAndSearchTerm :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+const getIncidentsBySearchTerm = `-- name: GetIncidentsBySearchTerm :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1 AND short_description like $2
+WHERE short_description like $1
 ORDER BY incidents.updated_at DESC
 `
 
-type GetIncidentsByOrganizationIDAndSearchTermParams struct {
-	OrganizationID   uuid.UUID
-	ShortDescription string
-}
-
-type GetIncidentsByOrganizationIDAndSearchTermRow struct {
+type GetIncidentsBySearchTermRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	ShortDescription    string
 	Description         sql.NullString
-	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
 	State               StateEnum
@@ -183,22 +170,21 @@ type GetIncidentsByOrganizationIDAndSearchTermRow struct {
 	Password            sql.NullString
 }
 
-func (q *Queries) GetIncidentsByOrganizationIDAndSearchTerm(ctx context.Context, arg GetIncidentsByOrganizationIDAndSearchTermParams) ([]GetIncidentsByOrganizationIDAndSearchTermRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsByOrganizationIDAndSearchTerm, arg.OrganizationID, arg.ShortDescription)
+func (q *Queries) GetIncidentsBySearchTerm(ctx context.Context, shortDescription string) ([]GetIncidentsBySearchTermRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsBySearchTerm, shortDescription)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsByOrganizationIDAndSearchTermRow
+	var items []GetIncidentsBySearchTermRow
 	for rows.Next() {
-		var i GetIncidentsByOrganizationIDAndSearchTermRow
+		var i GetIncidentsBySearchTermRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ShortDescription,
 			&i.Description,
-			&i.OrganizationID,
 			&i.ConfigurationItemID,
 			&i.CompanyID,
 			&i.State,
@@ -224,30 +210,28 @@ func (q *Queries) GetIncidentsByOrganizationIDAndSearchTerm(ctx context.Context,
 	return items, nil
 }
 
-const getIncidentsByOrganizationIDAndSearchTermLimitOffset = `-- name: GetIncidentsByOrganizationIDAndSearchTermLimitOffset :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password, count(*) OVER() AS full_count 
+const getIncidentsBySearchTermLimitOffset = `-- name: GetIncidentsBySearchTermLimitOffset :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password, count(*) OVER() AS full_count 
 FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE organization_id = $1 AND short_description like $2 or short_description is NULL
+WHERE short_description like $1 or short_description is NULL
 ORDER BY incidents.updated_at DESC
-LIMIT $3 OFFSET $4
+LIMIT $2 OFFSET $3
 `
 
-type GetIncidentsByOrganizationIDAndSearchTermLimitOffsetParams struct {
-	OrganizationID   uuid.UUID
+type GetIncidentsBySearchTermLimitOffsetParams struct {
 	ShortDescription string
 	Limit            int32
 	Offset           int32
 }
 
-type GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow struct {
+type GetIncidentsBySearchTermLimitOffsetRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	ShortDescription    string
 	Description         sql.NullString
-	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
 	State               StateEnum
@@ -262,27 +246,21 @@ type GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow struct {
 	FullCount           int64
 }
 
-func (q *Queries) GetIncidentsByOrganizationIDAndSearchTermLimitOffset(ctx context.Context, arg GetIncidentsByOrganizationIDAndSearchTermLimitOffsetParams) ([]GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsByOrganizationIDAndSearchTermLimitOffset,
-		arg.OrganizationID,
-		arg.ShortDescription,
-		arg.Limit,
-		arg.Offset,
-	)
+func (q *Queries) GetIncidentsBySearchTermLimitOffset(ctx context.Context, arg GetIncidentsBySearchTermLimitOffsetParams) ([]GetIncidentsBySearchTermLimitOffsetRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsBySearchTermLimitOffset, arg.ShortDescription, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow
+	var items []GetIncidentsBySearchTermLimitOffsetRow
 	for rows.Next() {
-		var i GetIncidentsByOrganizationIDAndSearchTermLimitOffsetRow
+		var i GetIncidentsBySearchTermLimitOffsetRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ShortDescription,
 			&i.Description,
-			&i.OrganizationID,
 			&i.ConfigurationItemID,
 			&i.CompanyID,
 			&i.State,
@@ -313,7 +291,7 @@ const updateIncident = `-- name: UpdateIncident :one
 UPDATE incidents
 SET updated_at = $2, description = $3, short_description = $4
 WHERE ID = $1
-RETURNING id, created_at, updated_at, short_description, description, organization_id, configuration_item_id, company_id, state, assigned_to
+RETURNING id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to
 `
 
 type UpdateIncidentParams struct {
@@ -337,7 +315,6 @@ func (q *Queries) UpdateIncident(ctx context.Context, arg UpdateIncidentParams) 
 		&i.UpdatedAt,
 		&i.ShortDescription,
 		&i.Description,
-		&i.OrganizationID,
 		&i.ConfigurationItemID,
 		&i.CompanyID,
 		&i.State,

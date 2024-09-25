@@ -59,11 +59,10 @@ func (ns NullStateEnum) Value() (driver.Value, error) {
 }
 
 type Company struct {
-	ID             uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Name           string
-	OrganizationID uuid.UUID
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
 }
 
 type ConfigurationItem struct {
@@ -81,20 +80,10 @@ type Incident struct {
 	UpdatedAt           time.Time
 	ShortDescription    string
 	Description         sql.NullString
-	OrganizationID      uuid.UUID
 	ConfigurationItemID uuid.UUID
 	CompanyID           uuid.UUID
 	State               StateEnum
 	AssignedTo          uuid.NullUUID
-}
-
-type Organization struct {
-	ID                uuid.UUID
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
-	Name              string
-	UserID            uuid.UUID
-	IncidentsSequence int64
 }
 
 type User struct {

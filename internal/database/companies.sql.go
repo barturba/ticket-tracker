@@ -13,17 +13,16 @@ import (
 )
 
 const createCompany = `-- name: CreateCompany :one
-INSERT INTO companies (id, created_at, updated_at, name, organization_id)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, name, organization_id
+INSERT INTO companies (id, created_at, updated_at, name)
+VALUES ($1, $2, $3, $4)
+RETURNING id, created_at, updated_at, name
 `
 
 type CreateCompanyParams struct {
-	ID             uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Name           string
-	OrganizationID uuid.UUID
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
 }
 
 func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (Company, error) {
@@ -32,7 +31,6 @@ func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (C
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Name,
-		arg.OrganizationID,
 	)
 	var i Company
 	err := row.Scan(
@@ -40,18 +38,16 @@ func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (C
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.OrganizationID,
 	)
 	return i, err
 }
 
-const getCompaniesByOrganizationID = `-- name: GetCompaniesByOrganizationID :many
-SELECT id, created_at, updated_at, name, organization_id from companies
-WHERE organization_id = $1
+const getCompanies = `-- name: GetCompanies :many
+SELECT id, created_at, updated_at, name from companies
 `
 
-func (q *Queries) GetCompaniesByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]Company, error) {
-	rows, err := q.db.QueryContext(ctx, getCompaniesByOrganizationID, organizationID)
+func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
+	rows, err := q.db.QueryContext(ctx, getCompanies)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +60,6 @@ func (q *Queries) GetCompaniesByOrganizationID(ctx context.Context, organization
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Name,
-			&i.OrganizationID,
 		); err != nil {
 			return nil, err
 		}
@@ -80,7 +75,7 @@ func (q *Queries) GetCompaniesByOrganizationID(ctx context.Context, organization
 }
 
 const getCompanyByID = `-- name: GetCompanyByID :one
-SELECT id, created_at, updated_at, name, organization_id from companies
+SELECT id, created_at, updated_at, name from companies
 WHERE id = $1
 `
 
@@ -92,7 +87,6 @@ func (q *Queries) GetCompanyByID(ctx context.Context, id uuid.UUID) (Company, er
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.OrganizationID,
 	)
 	return i, err
 }

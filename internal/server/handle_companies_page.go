@@ -11,13 +11,7 @@ import (
 
 func (cfg *ApiConfig) handleCompaniesPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
-	organization, err := cfg.DB.GetOrganizationByUserID(r.Context(), u.ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find organization")
-		return
-	}
-
-	databaseCompanies, err := cfg.DB.GetCompaniesByOrganizationID(r.Context(), organization.ID)
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
 		return
