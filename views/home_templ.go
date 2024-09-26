@@ -8,6 +8,10 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"github.com/barturba/ticket-tracker/models"
+)
+
 func HomeIndex(fromProtected bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,12 +33,12 @@ func HomeIndex(fromProtected bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"mx-auto w-fit flex flex-col gap-8 text-center\"><section class=\"text-5xl font-bold\"><h1>Welcome to TicketTracker</h1></section><p class=\"text-2xl font-thin\">Here you can keep track of all your incidents.</p>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex flex-col gap-8 mx-auto text-center w-fit\"><section class=\"text-5xl font-bold\"><h1>Welcome to TicketTracker</h1></section><p class=\"text-2xl font-thin\">Here you can keep track of all your incidents.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !fromProtected {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<hr class=\"my-4 w-4/5 mx-auto opacity-25\"><p class=\"text-base font-thin\">You have an account?</p><footer class=\"flex gap-4 justify-center\"><a hx-swap=\"transition:true\" href=\"/login\" class=\"badge badge-primary px-6 py-4 hover:scale-[1.1] text-lg font-thin\">Log In</a> <a hx-swap=\"transition:true\" href=\"/register\" class=\"badge badge-neutral px-6 py-4 hover:scale-[1.1] text-lg font-thin\">Sign Up</a></footer>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<hr class=\"w-4/5 mx-auto my-4 opacity-25\"><p class=\"text-base font-thin\">You have an account?</p><footer class=\"flex justify-center gap-4\"><a hx-swap=\"transition:true\" href=\"/login\" class=\"badge badge-primary px-6 py-4 hover:scale-[1.1] text-lg font-thin\">Log In</a> <a hx-swap=\"transition:true\" href=\"/register\" class=\"badge badge-neutral px-6 py-4 hover:scale-[1.1] text-lg font-thin\">Sign Up</a></footer>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -49,8 +53,11 @@ func HomeIndex(fromProtected bool) templ.Component {
 
 func Home(page string,
 	fromProtected, isError bool,
-	msg string,
-	username string,
+	msg,
+	username,
+	email string,
+	menuItems models.MenuItems,
+	profileItems models.MenuItems,
 	cmp templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -90,7 +97,7 @@ func Home(page string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, username).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

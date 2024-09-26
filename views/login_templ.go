@@ -8,6 +8,8 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "github.com/barturba/ticket-tracker/models"
+
 func LoginIndex(fromProtected bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +31,7 @@ func LoginIndex(fromProtected bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n    html,\n    body {\n        height: 100%;\n    }\n\n    .form-signin {\n        max-width: 330px;\n        padding: 1rem;\n    }\n\n    .form-signin .form-floating:focus-within {\n        z-index: 2;\n    }\n\n    .form-signin input[type=\"email\"] {\n        margin-bottom: -1px;\n        border-bottom-right-radius: 0;\n        border-bottom-left-radius: 0;\n    }\n\n    .form-signin input[type=\"password\"] {\n        margin-bottom: 10px;\n        border-top-left-radius: 0;\n        border-top-right-radius: 0;\n    }\n</style><main class=\"form-signin w-100 m-auto\"><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"form-group\"><label for=\"exampleInputEmail1\">Email address</label> <input class=\"input input-bordered w-full max-w-xs\" name=\"email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail1\" aria-describedby=\"emailHelp\" placeholder=\"Enter email\"></div><div class=\"form-group\"><label for=\"exampleInputPassword1\">Password</label> <input class=\"input input-bordered w-full max-w-xs\" name=\"password\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword1\" placeholder=\"Password\"></div><button type=\"submit\" class=\"btn btn-primary\">Submit</button></form></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n    html,\n    body {\n        height: 100%;\n    }\n\n    .form-signin {\n        max-width: 330px;\n        padding: 1rem;\n    }\n\n    .form-signin .form-floating:focus-within {\n        z-index: 2;\n    }\n\n    .form-signin input[type=\"email\"] {\n        margin-bottom: -1px;\n        border-bottom-right-radius: 0;\n        border-bottom-left-radius: 0;\n    }\n\n    .form-signin input[type=\"password\"] {\n        margin-bottom: 10px;\n        border-top-left-radius: 0;\n        border-top-right-radius: 0;\n    }\n</style><main class=\"m-auto form-signin w-100\"><form hx-swap=\"innerHTML\" hx-post=\"/v1/login\" hx-ext=\"json-enc\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"form-group\"><label for=\"exampleInputEmail1\">Email address</label> <input class=\"w-full max-w-xs input input-bordered\" name=\"email\" type=\"email\" class=\"form-control\" id=\"exampleInputEmail1\" aria-describedby=\"emailHelp\" placeholder=\"Enter email\"></div><div class=\"form-group\"><label for=\"exampleInputPassword1\">Password</label> <input class=\"w-full max-w-xs input input-bordered\" name=\"password\" type=\"password\" class=\"form-control\" id=\"exampleInputPassword1\" placeholder=\"Password\"></div><button type=\"submit\" class=\"btn btn-primary\">Submit</button></form></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -40,7 +42,10 @@ func LoginIndex(fromProtected bool) templ.Component {
 func Login(
 	page string,
 	fromProtected, isError bool,
-	msg string,
+	msg,
+	email string,
+	menuItems models.MenuItems,
+	profileItems models.MenuItems,
 	cmp templ.Component,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -81,7 +86,7 @@ func Login(
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, "").Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, "", "", menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

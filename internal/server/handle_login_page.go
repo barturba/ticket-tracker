@@ -10,6 +10,6 @@ import (
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	fromProtected := false
 	lIndex := views.LoginIndex(fromProtected)
-	login := views.Login("", fromProtected, false, "msg", lIndex)
+	login := views.Login("", fromProtected, false, "msg", "", cfg.MenuItems, cfg.ProfileItems, lIndex)
 	templ.Handler(login).ServeHTTP(w, r)
 }

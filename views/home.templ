@@ -1,7 +1,11 @@
 package views
+import (
+"github.com/barturba/ticket-tracker/models"
+)
+
 
 templ HomeIndex(fromProtected bool) {
-<section class="mx-auto w-fit flex flex-col gap-8 text-center">
+<section class="flex flex-col gap-8 mx-auto text-center w-fit">
     <section class="text-5xl font-bold">
         <h1>Welcome to TicketTracker</h1>
     </section>
@@ -9,9 +13,9 @@ templ HomeIndex(fromProtected bool) {
         Here you can keep track of all your incidents.
     </p>
     if !fromProtected {
-    <hr class="my-4 w-4/5 mx-auto opacity-25" />
+    <hr class="w-4/5 mx-auto my-4 opacity-25" />
     <p class="text-base font-thin">You have an account?</p>
-    <footer class="flex gap-4 justify-center">
+    <footer class="flex justify-center gap-4">
         <a hx-swap="transition:true" href="/login"
             class="badge badge-primary px-6 py-4 hover:scale-[1.1] text-lg font-thin">
             Log In
@@ -27,10 +31,14 @@ templ HomeIndex(fromProtected bool) {
 
 templ Home(page string,
 fromProtected, isError bool,
-msg string,
-username string,
+msg,
+username,
+email string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, fromProtected, isError, msg, username) {
+
+@Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems) {
 @cmp
 }
 }

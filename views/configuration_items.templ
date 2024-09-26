@@ -2,10 +2,90 @@ package views
 
 import (
 "github.com/barturba/ticket-tracker/models"
+"fmt"
 )
 
-templ ConfigurationItems(configurationItems []models.ConfigurationItem) {
-for _, configurationItem := range configurationItems{
-<option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
+templ ConfigurationItemsIndex(incidents []models.ConfigurationItem) {
+<div id="wrapper"></div>
+<script>
+    const css = window.emotion.css;
+    new gridjs.Grid({
+        sort: true,
+        columns: [{ name: "ID", sort: false }, "Name"],
+        server: {
+            url: '/search-',
+            then: data => data.results.map(incident =>
+                [gridjs.html(`<a href="/incidents/${incident.id}/edit">${incident.id}</a>`),
+                incident.state,
+                incident.short_description,
+                incident.assigned_to_name,
+                incident.configuration_item,
+                ]
+            ),
+            total: data => data.count
+        },
+        sort: {
+            multiColumn: false,
+            server: {
+                url: (prev, columns) => {
+                    if (!columns.length) return prev;
+
+                    const col = columns[0];
+                    const dir = col.direction === 1 ? 'asc' : 'desc';
+                    let colName = ['state', 'short_description'][col.index];
+
+                    return `${prev}&order=${colName}&dir=${dir}`;
+                }
+            }
+        },
+        search: {
+            enabled: true,
+            server: {
+                url: (prev, keyword, page) => `${prev}?search=${keyword}`
+            }
+        },
+        pagination: {
+            enabled: true,
+            limit: 10,
+            server: {
+                url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}limit=${limit}&offset=${page * limit}`
+            }
+        },
+        className: {
+            table: css`
+              tr:hover td {
+                background-color: rgba(0, 0, 0, 0.1);
+              }
+            `,
+        },
+    }).render(document.getElementById("wrapper"));
+</script>
+}
+
+templ ConfigurationItemRow(incident models.Incident) {
+<tr>
+    <td>{incident.ID.String()}</td>
+    <td>{fmt.Sprintf("%v", incident.State)}</td>
+    <td>{incident.ShortDescription}</td>
+    <td>{incident.AssignedToName}</td>
+    <td>{incident.ConfigurationItemName}</td>
+    <td>{incident.Description}</td>
+    <td>
+        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
+    </td>
+</tr>
+}
+
+
+templ ConfigurationItemsList(page string,
+fromProtected, isError bool,
+msg,
+username,
+email string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems) {
+@cmp
 }
 }

@@ -1,4 +1,5 @@
 package views
+import "github.com/barturba/ticket-tracker/models"
 
 templ LoginIndex(fromProtected bool) {
 <style>
@@ -28,16 +29,16 @@ templ LoginIndex(fromProtected bool) {
         border-top-right-radius: 0;
     }
 </style>
-<main class="form-signin w-100 m-auto">
+<main class="m-auto form-signin w-100">
     <form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
         <div class="form-group">
             <label for="exampleInputEmail1">Email address</label>
-            <input class="input input-bordered w-full max-w-xs" name="email" type="email" class="form-control"
+            <input class="w-full max-w-xs input input-bordered" name="email" type="email" class="form-control"
                 id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
         </div>
         <div class="form-group">
             <label for="exampleInputPassword1">Password</label>
-            <input class="input input-bordered w-full max-w-xs" name="password" type="password" class="form-control"
+            <input class="w-full max-w-xs input input-bordered" name="password" type="password" class="form-control"
                 id="exampleInputPassword1" placeholder="Password">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -49,10 +50,13 @@ templ LoginIndex(fromProtected bool) {
 templ Login(
 page string,
 fromProtected, isError bool,
-msg string,
+msg,
+email string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
 cmp templ.Component,
 ) {
-@Layout(page, fromProtected, isError, msg, "") {
+@Layout(page, fromProtected, isError, msg, "", "", menuItems, profileItems) {
 @cmp
 }
 }

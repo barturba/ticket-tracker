@@ -2,11 +2,10 @@ package views
 
 import (
 "github.com/barturba/ticket-tracker/views/partials"
+"github.com/barturba/ticket-tracker/models"
 )
 
-templ Layout(
-title string, fromProtected, isError bool, msg string, username string,
-) {
+templ Layout(title string, fp, isError bool, msg, username, email string, menuItems, profileItems models.MenuItems) {
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
 @HeaderComponent(title)
@@ -14,7 +13,8 @@ title string, fromProtected, isError bool, msg string, username string,
 <body class="h-full">
     <div class="min-h-full">
         if !isError {
-        @partials.NavbarNew(fromProtected, username)
+        @partials.NavbarNew(fp, username, email, title,
+        "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500", "TicketTracker", menuItems, profileItems)
         }
 
         <main class="-mt-32">

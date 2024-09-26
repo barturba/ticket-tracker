@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/joho/godotenv"
 )
 
@@ -22,8 +23,10 @@ const (
 )
 
 type ApiConfig struct {
-	DB        *database.Queries
-	JWTSecret string
+	DB           *database.Queries
+	JWTSecret    string
+	MenuItems    models.MenuItems
+	ProfileItems models.MenuItems
 }
 
 func NewServer() *http.Server {
@@ -54,9 +57,39 @@ func NewServer() *http.Server {
 	}
 	dbQueries := database.New(db)
 
+	menuItems := models.MenuItems{
+		models.MenuItem{
+			Name: "Incidents List",
+			Link: "/incidents",
+		},
+		models.MenuItem{
+			Name: "Configuration Items List",
+			Link: "/configuration-items",
+		},
+		models.MenuItem{
+			Name: "Companies List",
+			Link: "/companies",
+		},
+		models.MenuItem{
+			Name: "Users List",
+			Link: "/users",
+		}}
+
+	profileItems := models.MenuItems{
+		models.MenuItem{
+			Name: "Settings",
+			Link: "/settings",
+		},
+		models.MenuItem{
+			Name: "Sign Out",
+			Link: "/sign-out",
+		}}
+
 	apiCfg := ApiConfig{
-		DB:        dbQueries,
-		JWTSecret: jwtSecret,
+		DB:           dbQueries,
+		JWTSecret:    jwtSecret,
+		MenuItems:    menuItems,
+		ProfileItems: profileItems,
 	}
 
 	mux := http.NewServeMux()
@@ -76,9 +109,9 @@ func NewServer() *http.Server {
 	// Page Endpoints
 
 	mux.HandleFunc("GET /companies", apiCfg.middlewareAuthPage(apiCfg.handleCompaniesPage))
-	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleConfigurationItemsPage))
 
 	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleViewIncidents))
+	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleViewConfigurationItems))
 	mux.HandleFunc("GET /search-incidents", apiCfg.middlewareAuthPage(apiCfg.handleSearchIncidents))
 	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
 	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))

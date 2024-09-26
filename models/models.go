@@ -178,5 +178,19 @@ func DatabaseIncidentsBySearchTermLimitOffsetRowToIncidents(incidents []database
 	return items
 }
 
+type MenuItem struct {
+	Name string
+	Link string
+}
+
+type MenuItems []MenuItem
+
+func NewMenuItem(name, link string) MenuItem {
+	return MenuItem{
+		Name: name,
+		Link: link,
+	}
+}
+
 type Page struct {
 }

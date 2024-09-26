@@ -10,7 +10,7 @@ templ IncidentFormIndex(incident models.Incident, companies []models.Company, ci
     <form>
         <div class="form-group">
             <label for="companies">Companies</label>
-            <select class="select select-bordered w-full" name="company_id" hx-get="/configuration-items"
+            <select class="w-full select select-bordered" name="company_id" hx-get="/configuration-items"
                 aria-describedby="companiesHelp" hx-target="#configurationItems" hx-push-url="false">
                 for _, company := range companies{
                 <option value={company.ID.String()}>{ company.Name }</option>
@@ -19,7 +19,7 @@ templ IncidentFormIndex(incident models.Incident, companies []models.Company, ci
         </div>
         <div class="form-group">
             <label for="configurationItems">Configuration Items</label>
-            <select id="configurationItems" class="select select-bordered w-full" name="configuration_item_id"
+            <select id="configurationItems" class="w-full select select-bordered" name="configuration_item_id"
                 aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
                 for _, configurationItem := range cis{
                 <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
@@ -28,14 +28,14 @@ templ IncidentFormIndex(incident models.Incident, companies []models.Company, ci
         </div>
         <div class="form-group">
             <label for="shortDescription">Short Description</label>
-            <input name="short_description" type="text" class="input input-bordered w-full" id="shortDescription"
+            <input name="short_description" type="text" class="w-full input input-bordered" id="shortDescription"
                 aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
                 value={incident.ShortDescription}>
             <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
         </div>
         <div class="form-group">
             <label for="description">Description</label>
-            <textarea name="description" class="input input-bordered w-full" id="description"
+            <textarea name="description" class="w-full input input-bordered" id="description"
                 rows="3">{incident.Description}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -44,7 +44,7 @@ templ IncidentFormIndex(incident models.Incident, companies []models.Company, ci
 }
 
 templ IncidentsNewIndex(companies []models.Company, cis []models.ConfigurationItem) {
-<h1 class="text-2xl font-bold text-center mb-8">
+<h1 class="mb-8 text-2xl font-bold text-center">
     New Incident
 </h1>
 <form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
@@ -53,7 +53,7 @@ templ IncidentsNewIndex(companies []models.Company, cis []models.ConfigurationIt
 }
 
 templ IncidentsEditIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
-<h1 class="text-2xl font-bold text-center mb-8">
+<h1 class="mb-8 text-2xl font-bold text-center">
     Edit Incident
 </h1>
 <form hx-put={"/incidents/"+incident.ID.String()} hx-ext="json-enc" hx-push-url="true" hx-target="body"
@@ -64,10 +64,13 @@ templ IncidentsEditIndex(incident models.Incident, companies []models.Company, c
 
 templ IncidentsEdit(page string,
 fromProtected, isError bool,
-msg string,
-username string,
+msg,
+username,
+email string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, fromProtected, isError, msg, username) {
+@Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems) {
 @cmp
 }
 }
@@ -146,10 +149,13 @@ templ IncidentRow(incident models.Incident) {
 
 templ IncidentsList(page string,
 fromProtected, isError bool,
-msg string,
-username string,
+msg,
+username,
+email string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, fromProtected, isError, msg, username) {
+@Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems) {
 @cmp
 }
 }

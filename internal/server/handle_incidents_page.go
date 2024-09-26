@@ -45,6 +45,9 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		false,
 		"",
 		u.Name,
+		u.Email,
+		cfg.MenuItems,
+		cfg.ProfileItems,
 		iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
 }
@@ -148,6 +151,9 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		false,
 		"",
 		u.Name,
+		u.Email,
+		cfg.MenuItems,
+		cfg.ProfileItems,
 		iEIndex)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
@@ -238,6 +244,9 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		false,
 		"",
 		u.Name,
+		u.Email,
+		cfg.MenuItems,
+		cfg.ProfileItems,
 		iNIndex)
 	templ.Handler(iNew).ServeHTTP(w, r)
 
