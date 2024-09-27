@@ -192,5 +192,19 @@ func NewMenuItem(name, link string) MenuItem {
 	}
 }
 
+type SelectOption struct {
+	Name string
+	Link string
+}
+
+type SelectOptions []SelectOption
+
+func NewSelectOption(name, link string) SelectOption {
+	return SelectOption{
+		Name: name,
+		Link: link,
+	}
+}
+
 type Page struct {
 }
