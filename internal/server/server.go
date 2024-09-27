@@ -84,8 +84,8 @@ func NewServer() *http.Server {
 			Link: "/settings",
 		},
 		models.MenuItem{
-			Name: "Sign Out",
-			Link: "/sign-out",
+			Name: "Log Out",
+			Link: "/logout",
 		}}
 
 	logo := "/static/images/logo.png"
@@ -124,7 +124,6 @@ func NewServer() *http.Server {
 	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
 	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
-	mux.HandleFunc("GET /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsGetPage))
 	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPutPage))
 
 	// Login Endpoints

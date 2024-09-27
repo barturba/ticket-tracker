@@ -119,35 +119,36 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		fromProtected = true
 	}
 
-	idString := r.PathValue("id")
-	id, err := uuid.Parse(idString)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
-		return
-	}
+	// idString := r.PathValue("id")
+	// id, err := uuid.Parse(idString)
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+	// 	return
+	// }
 
-	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't find incident")
-		return
-	}
-	incident := models.DatabaseIncidentToIncident(databaseIncident)
+	// databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "can't find incident")
+	// 	return
+	// }
+	// incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
-		return
-	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+	// databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+	// 	return
+	// }
+	// companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
 
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
-		return
-	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+	// databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
+	// if err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+	// 	return
+	// }
+	// configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
-	iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
+	// iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
+	iEIndexNew := views.FormNew()
 	iEdit := views.IncidentsEdit("Incidents - Edit",
 		cfg.Logo,
 		fromProtected,
@@ -158,27 +159,8 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems,
 		cfg.ProfileItems,
-		iEIndex)
+		iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
-}
-
-func (cfg *ApiConfig) handleIncidentsGetPage(w http.ResponseWriter, r *http.Request, u database.User) {
-	idString := r.PathValue("id")
-	id, err := uuid.Parse(idString)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
-		return
-	}
-
-	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't find incident")
-		return
-	}
-
-	incident := models.DatabaseIncidentToIncident(databaseIncident)
-
-	templ.Handler(views.IncidentRow(incident)).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {

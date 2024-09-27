@@ -21,40 +21,6 @@ templ IncidentSearch() {
 </div>
 }
 
-
-templ Navbar(fromProtected bool, username string) {
-<nav class="navbar ">
-    <div class="navbar-start">
-        <a hx-swap="transition:true" class="text-xl btn btn-ghost" href="/">
-            TicketTracker
-        </a>
-    </div>
-    <div class="navbar-end">
-        if fromProtected {
-        <span class="mr-8 font-bold">
-            @IncidentSearch()
-        </span>
-        <span class="mr-8 font-bold">
-            { username }
-        </span>
-        <a hx-swap="transition:true" class="text-lg btn btn-ghost" href="/incidents">
-            Incidents
-        </a>
-        <button hx-swap="transition:true" hx-get="/logout" hx-target="body" hx-push-url="true"
-            class="text-lg btn btn-ghost">
-            Logout
-        </button>
-        } else {
-        <a hx-swap="transition:true" class="text-lg btn btn-ghost" href="/register">
-            Register
-        </a>
-        <a hx-swap="transition:true" class="text-lg btn btn-ghost" href="/login">
-            Login
-        </a>
-        }
-    </div>
-</nav>
-}
 templ NavbarTitle(title string) {
 <header class="py-10">
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -131,11 +97,13 @@ templ NavbarNotificationsAndProfile(title, profilePicture string, profileItems m
                 role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
                 for _, item := range profileItems{
                 if (item.Name == title) {
-                <a href={templ.SafeURL(item.Link)} class="block px-4 py-2 text-sm text-gray-700 bg-gray-100"
-                    role="menuitem" tabindex="-1" id="user-menu-item-0">{item.Name}</a>
+                <a hx-swap="transition:true" hx-get={item.Link} hx-target="body" hx-push-url="true"
+                    class="block px-4 py-2 text-sm text-gray-700 bg-gray-100" role="menuitem" tabindex="-1"
+                    id="user-menu-item-0">{item.Name}</a>
                 } else {
-                <a href={templ.SafeURL(item.Link)} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem" tabindex="-1" id="user-menu-item-0">{item.Name}</a>
+                <a hx-swap="transition:true" hx-get={item.Link} hx-target="body" hx-push-url="true"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1"
+                    id="user-menu-item-0">{item.Name}</a>
                 }
                 }
             </div>
@@ -206,7 +174,7 @@ templ NavbarShowMobileMenu(title, username, email, profilePicture string, menuIt
         </div>
         <div class="px-2 mt-3 space-y-1">
             for _, item := range profileItems{
-            <a href={templ.SafeURL(item.Link)}
+            <a hx-swap="transition:true" hx-get={item.Link} hx-target="body" hx-push-url="true"
                 class="block px-3 py-2 text-base font-medium text-gray-400 rounded-md hover:bg-gray-700 hover:text-white">
                 {item.Name}</a>
             }
