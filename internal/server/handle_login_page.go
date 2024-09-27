@@ -9,7 +9,7 @@ import (
 
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	fromProtected := false
-	lIndex := views.LoginIndex(fromProtected)
-	login := views.Login("Login", cfg.Logo, fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndex)
+	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
+	login := views.Login("Login", cfg.Logo, fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndexNew)
 	templ.Handler(login).ServeHTTP(w, r)
 }
