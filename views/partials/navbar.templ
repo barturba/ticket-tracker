@@ -28,26 +28,31 @@ templ NavbarTitle(title string) {
     </div>
 </header>
 }
+templ NavbarLogoMenu(title string, menuItems models.MenuItems) {
+<div class="hidden md:block">
+    <div class="flex items-baseline ml-10 space-x-4">
+        for _, item := range menuItems {
+        if (item.Name == title) {
+        <a href={templ.SafeURL(item.Link)} class="px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-md"
+            aria-current="page">{item.Name}</a>
 
-templ NavbarLogo(title, logo, logoText string, menuItems models.MenuItems) {
+        } else {
+        <a href={templ.SafeURL(item.Link)}
+            class="px-3 py-2 text-sm font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</a>
+        }
+        }
+    </div>
+</div>
+}
+
+templ NavbarLogo(fp bool, title, logo, logoText string, menuItems models.MenuItems) {
 <div class="flex items-center">
     <div class="flex-shrink-0">
         <img class="w-8 h-8" src={logo} alt={logoText}>
     </div>
-    <div class="hidden md:block">
-        <div class="flex items-baseline ml-10 space-x-4">
-            for _, item := range menuItems {
-            if (item.Name == title) {
-            <a href={templ.SafeURL(item.Link)} class="px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-md"
-                aria-current="page">{item.Name}</a>
-
-            } else {
-            <a href={templ.SafeURL(item.Link)}
-                class="px-3 py-2 text-sm font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</a>
-            }
-            }
-        </div>
-    </div>
+    if fp {
+    @NavbarLogoMenu(title, menuItems)
+    }
 </div>
 }
 
@@ -183,13 +188,17 @@ templ NavbarShowMobileMenu(title, username, email, profilePicture string, menuIt
 </div>
 }
 
-templ NavbarLeft(title, logo, logoText, profilePicture string, profileItems, menuItems models.MenuItems) {
+templ NavbarLeft(fp bool, title, logo, logoText, profilePicture string, profileItems, menuItems models.MenuItems) {
 <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="border-b border-gray-700">
         <div class="flex items-center justify-between h-16 px-4 sm:px-0">
-            @NavbarLogo(title, logo, logoText, menuItems)
+            if fp {
+            @NavbarLogo(fp, title, logo, logoText, menuItems)
             @NavbarNotificationsAndProfile(title, profilePicture, profileItems)
             @NavbarMobileMenu()
+            } else {
+            @NavbarLogo(fp, title, logo, logoText, menuItems)
+            }
         </div>
     </div>
 </div>
@@ -200,8 +209,10 @@ templ NavbarNew(fp bool, un, email, profPic, title, logo, logoText string, menuI
 
 <div class="pb-32 bg-gray-800">
     <nav x-data="{ isOpen: false }" class="bg-gray-800">
-        @NavbarLeft(title, logo, logoText, profPic, profileItems, menuItems)
+        @NavbarLeft(fp, title, logo, logoText, profPic, profileItems, menuItems)
+        if fp {
         @NavbarShowMobileMenu(title, un, email, profPic, menuItems, profileItems)
+        }
     </nav>
     @NavbarTitle(title)
 </div>
