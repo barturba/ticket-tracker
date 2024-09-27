@@ -30,6 +30,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 		"",
 		u.Name,
 		u.Email,
+		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems,
 		cfg.ProfileItems,
 		cIIndex)

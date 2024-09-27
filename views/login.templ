@@ -51,12 +51,13 @@ templ Login(
 page, logo string,
 fromProtected, isError bool,
 msg,
-email string,
+email,
+profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component,
 ) {
-@Layout(page, logo, fromProtected, isError, msg, "", "", menuItems, profileItems) {
+@Layout(page, logo, fromProtected, isError, msg, "", "", profilePic, menuItems, profileItems) {
 @cmp
 }
 }

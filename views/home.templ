@@ -33,12 +33,13 @@ templ Home(page, logo string,
 fromProtected, isError bool,
 msg,
 username,
-email string,
+email,
+profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
 
-@Layout(page, logo, fromProtected, isError, msg, username, email, menuItems, profileItems) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

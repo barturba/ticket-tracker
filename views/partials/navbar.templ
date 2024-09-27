@@ -85,7 +85,7 @@ templ NavbarLogo(title, logo, logoText string, menuItems models.MenuItems) {
 </div>
 }
 
-templ NavbarNotificationsAndProfile(title string, profileItems models.MenuItems) {
+templ NavbarNotificationsAndProfile(title, profilePicture string, profileItems models.MenuItems) {
 <div class="hidden md:block">
     <div class="flex items-center ml-4 md:ml-6">
         <button type="button"
@@ -100,16 +100,14 @@ templ NavbarNotificationsAndProfile(title string, profileItems models.MenuItems)
         </button>
 
         <!-- Profile dropdown -->
-        <div class="relative ml-3" x-data="{ isOpen: false }">
+        <div class="relative ml-3" x-data="{ isOpenProfile: false }">
             <div>
-                <button type="button" @click="isOpen = !isOpen"
+                <button type="button" @click="isOpenProfile = !isOpenProfile"
                     class="relative flex items-center max-w-xs text-sm bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                     id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="absolute -inset-1.5"></span>
                     <span class="sr-only">Open user menu</span>
-                    <img class="w-8 h-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt="">
+                    <img class="w-8 h-8 rounded-full" src={profilePicture} alt="">
                 </button>
             </div>
 
@@ -123,7 +121,7 @@ templ NavbarNotificationsAndProfile(title string, profileItems models.MenuItems)
                       From: "transform opacity-100 scale-100"
                       To: "transform opacity-0 scale-95"
                   -->
-            <div x-show="isOpen" x-transition:enter="transition ease-out duration-100"
+            <div x-show="isOpenProfile" x-transition:enter="transition ease-out duration-100"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-75"
@@ -136,8 +134,8 @@ templ NavbarNotificationsAndProfile(title string, profileItems models.MenuItems)
                 <a href={templ.SafeURL(item.Link)} class="block px-4 py-2 text-sm text-gray-700 bg-gray-100"
                     role="menuitem" tabindex="-1" id="user-menu-item-0">{item.Name}</a>
                 } else {
-                <a href={templ.SafeURL(item.Link)} class="block px-4 py-2 text-sm text-gray-700" role="menuitem"
-                    tabindex="-1" id="user-menu-item-0">{item.Name}</a>
+                <a href={templ.SafeURL(item.Link)} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem" tabindex="-1" id="user-menu-item-0">{item.Name}</a>
                 }
                 }
             </div>
@@ -149,19 +147,19 @@ templ NavbarNotificationsAndProfile(title string, profileItems models.MenuItems)
 templ NavbarMobileMenu() {
 <div class="flex -mr-2 md:hidden">
     <!-- Mobile menu button -->
-    <button type="button"
+    <button type="button" @click="isOpen = !isOpen"
         class="relative inline-flex items-center justify-center p-2 text-gray-400 bg-gray-800 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
         aria-controls="mobile-menu" aria-expanded="false">
         <span class="absolute -inset-0.5"></span>
         <span class="sr-only">Open main menu</span>
         <!-- Menu open: "hidden", Menu closed: "block" -->
-        <svg class="block w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            aria-hidden="true">
+        <svg :class="{'hidden': isOpen, 'block': !isOpen}" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
         <!-- Menu open: "block", Menu closed: "hidden" -->
-        <svg class="hidden w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            aria-hidden="true">
+        <svg :class="{'block': isOpen, 'hidden': !isOpen}" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
     </button>
@@ -169,9 +167,9 @@ templ NavbarMobileMenu() {
 
 }
 
-templ NavbarShowMobileMenu(title, username, email string, menuItems, profileItems models.MenuItems) {
+templ NavbarShowMobileMenu(title, username, email, profilePicture string, menuItems, profileItems models.MenuItems) {
 <!-- Mobile menu, show/hide based on menu state. -->
-<div class="border-b border-gray-700 md:hidden" id="mobile-menu">
+<div x-show="isOpen" class="border-b border-gray-700 md:hidden" id="mobile-menu">
     <div class="px-2 py-3 space-y-1 sm:px-3">
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
         for _, item := range menuItems{
@@ -189,9 +187,7 @@ templ NavbarShowMobileMenu(title, username, email string, menuItems, profileItem
     <div class="pt-4 pb-3 border-t border-gray-700">
         <div class="flex items-center px-5">
             <div class="flex-shrink-0">
-                <img class="w-10 h-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt="">
+                <img class="w-10 h-10 rounded-full" src={profilePicture} alt="">
             </div>
             <div class="ml-3">
                 <div class="text-base font-medium leading-none text-white">{username}</div>
@@ -219,20 +215,25 @@ templ NavbarShowMobileMenu(title, username, email string, menuItems, profileItem
 </div>
 }
 
-templ NavbarNew(fp bool, username, email, title, logo, logoText string, menuItems, profileItems models.MenuItems) {
+templ NavbarLeft(title, logo, logoText, profilePicture string, profileItems, menuItems models.MenuItems) {
+<div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="border-b border-gray-700">
+        <div class="flex items-center justify-between h-16 px-4 sm:px-0">
+            @NavbarLogo(title, logo, logoText, menuItems)
+            @NavbarNotificationsAndProfile(title, profilePicture, profileItems)
+            @NavbarMobileMenu()
+        </div>
+    </div>
+</div>
+
+}
+
+templ NavbarNew(fp bool, un, email, profPic, title, logo, logoText string, menuItems, profileItems models.MenuItems) {
 
 <div class="pb-32 bg-gray-800">
-    <nav class="bg-gray-800">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="border-b border-gray-700">
-                <div class="flex items-center justify-between h-16 px-4 sm:px-0">
-                    @NavbarLogo(title, logo, logoText, menuItems)
-                    @NavbarNotificationsAndProfile(title, profileItems)
-                    @NavbarMobileMenu()
-                </div>
-            </div>
-        </div>
-        @NavbarShowMobileMenu(title, username, email, menuItems, profileItems)
+    <nav x-data="{ isOpen: false }" class="bg-gray-800">
+        @NavbarLeft(title, logo, logoText, profPic, profileItems, menuItems)
+        @NavbarShowMobileMenu(title, un, email, profPic, menuItems, profileItems)
     </nav>
     @NavbarTitle(title)
 </div>

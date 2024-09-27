@@ -47,6 +47,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		"",
 		u.Name,
 		u.Email,
+		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems,
 		cfg.ProfileItems,
 		iIndex)
@@ -154,6 +155,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		"",
 		u.Name,
 		u.Email,
+		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems,
 		cfg.ProfileItems,
 		iEIndex)
@@ -248,6 +250,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		"",
 		u.Name,
 		u.Email,
+		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems,
 		cfg.ProfileItems,
 		iNIndex)

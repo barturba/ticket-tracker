@@ -23,11 +23,12 @@ const (
 )
 
 type ApiConfig struct {
-	DB           *database.Queries
-	JWTSecret    string
-	MenuItems    models.MenuItems
-	ProfileItems models.MenuItems
-	Logo         string
+	DB                    *database.Queries
+	JWTSecret             string
+	MenuItems             models.MenuItems
+	ProfileItems          models.MenuItems
+	Logo                  string
+	ProfilePicPlaceholder string
 }
 
 func NewServer() *http.Server {
@@ -88,13 +89,15 @@ func NewServer() *http.Server {
 		}}
 
 	logo := "/static/images/logo.png"
+	ProfilePicPlaceholder := "/static/images/profile_placeholder.webp"
 
 	apiCfg := ApiConfig{
-		DB:           dbQueries,
-		JWTSecret:    jwtSecret,
-		MenuItems:    menuItems,
-		ProfileItems: profileItems,
-		Logo:         logo,
+		DB:                    dbQueries,
+		JWTSecret:             jwtSecret,
+		MenuItems:             menuItems,
+		ProfileItems:          profileItems,
+		Logo:                  logo,
+		ProfilePicPlaceholder: ProfilePicPlaceholder,
 	}
 
 	mux := http.NewServeMux()
