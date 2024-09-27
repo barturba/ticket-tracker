@@ -48,7 +48,7 @@ templ LoginIndex(fromProtected bool) {
 }
 
 templ Login(
-page string,
+page, logo string,
 fromProtected, isError bool,
 msg,
 email string,
@@ -56,7 +56,7 @@ menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component,
 ) {
-@Layout(page, fromProtected, isError, msg, "", "", menuItems, profileItems) {
+@Layout(page, logo, fromProtected, isError, msg, "", "", menuItems, profileItems) {
 @cmp
 }
 }

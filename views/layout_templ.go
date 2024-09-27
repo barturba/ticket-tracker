@@ -13,7 +13,7 @@ import (
 	"github.com/barturba/ticket-tracker/views/partials"
 )
 
-func Layout(title string, fp, isError bool, msg, username, email string, menuItems, profileItems models.MenuItems) templ.Component {
+func Layout(title, logo string, fp, isError bool, msg, user, email string, menuItems, profileItems models.MenuItems) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -47,8 +47,8 @@ func Layout(title string, fp, isError bool, msg, username, email string, menuIte
 			return templ_7745c5c3_Err
 		}
 		if !isError {
-			templ_7745c5c3_Err = partials.NavbarNew(fp, username, email, title,
-				"https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500", "TicketTracker", menuItems, profileItems).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = partials.NavbarNew(fp, user, email, title,
+				logo, "TicketTracker", menuItems, profileItems).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

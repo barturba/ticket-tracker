@@ -240,7 +240,7 @@ func IncidentsEditIndex(incident models.Incident, companies []models.Company, ci
 	})
 }
 
-func IncidentsEdit(page string,
+func IncidentsEdit(page, logo string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -286,7 +286,7 @@ func IncidentsEdit(page string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var13), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -439,7 +439,7 @@ func IncidentRow(incident models.Incident) templ.Component {
 	})
 }
 
-func IncidentsList(page string,
+func IncidentsList(page, logo string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -485,7 +485,7 @@ func IncidentsList(page string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var24), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var24), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -77,7 +77,7 @@ templ ConfigurationItemRow(incident models.Incident) {
 }
 
 
-templ ConfigurationItemsList(page string,
+templ ConfigurationItemsList(page, logo string,
 fromProtected, isError bool,
 msg,
 username,
@@ -85,7 +85,7 @@ email string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, menuItems, profileItems) {
 @cmp
 }
 }

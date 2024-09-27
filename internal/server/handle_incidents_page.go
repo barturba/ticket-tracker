@@ -41,6 +41,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	iIndex := views.IncidentsIndex(incidents)
 	iList := views.IncidentsList("Incidents List",
+		cfg.Logo,
 		fromProtected,
 		false,
 		"",
@@ -147,6 +148,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 
 	iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
 	iEdit := views.IncidentsEdit("Incidents - Edit",
+		cfg.Logo,
 		fromProtected,
 		false,
 		"",
@@ -240,6 +242,7 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 
 	iNIndex := views.IncidentsNewIndex(companies, configurationItems)
 	iNew := views.IncidentsEdit("Incidents - New",
+		cfg.Logo,
 		fromProtected,
 		false,
 		"",

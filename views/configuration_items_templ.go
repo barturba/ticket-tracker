@@ -158,7 +158,7 @@ func ConfigurationItemRow(incident models.Incident) templ.Component {
 	})
 }
 
-func ConfigurationItemsList(page string,
+func ConfigurationItemsList(page, logo string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -204,7 +204,7 @@ func ConfigurationItemsList(page string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var11), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

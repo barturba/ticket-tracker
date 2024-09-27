@@ -24,6 +24,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 
 	cIIndex := views.ConfigurationItemsIndex(configurationItems)
 	iList := views.ConfigurationItemsList("Configuration Items List",
+		cfg.Logo,
 		fromProtected,
 		false,
 		"",

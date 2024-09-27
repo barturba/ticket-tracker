@@ -27,6 +27,7 @@ type ApiConfig struct {
 	JWTSecret    string
 	MenuItems    models.MenuItems
 	ProfileItems models.MenuItems
+	Logo         string
 }
 
 func NewServer() *http.Server {
@@ -72,6 +73,7 @@ func NewServer() *http.Server {
 		},
 		models.MenuItem{
 			Name: "Users List",
+
 			Link: "/users",
 		}}
 
@@ -85,11 +87,14 @@ func NewServer() *http.Server {
 			Link: "/sign-out",
 		}}
 
+	logo := "/static/images/logo.png"
+
 	apiCfg := ApiConfig{
 		DB:           dbQueries,
 		JWTSecret:    jwtSecret,
 		MenuItems:    menuItems,
 		ProfileItems: profileItems,
+		Logo:         logo,
 	}
 
 	mux := http.NewServeMux()
