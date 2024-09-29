@@ -16,6 +16,54 @@ import (
 	"github.com/google/uuid"
 )
 
+func (cfg *ApiConfig) handleCompaniesPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
+
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+
+	templ.Handler(views.Companies(companies)).ServeHTTP(w, r)
+}
+
+func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
+	fromProtected := false
+	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
+	login := views.Login("Login", cfg.Logo, fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndexNew)
+	templ.Handler(login).ServeHTTP(w, r)
+}
+
+func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		return
+	}
+	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
+	cIIndex := views.ConfigurationItemsIndex(configurationItems)
+	iList := views.ConfigurationItemsList("Configuration Items List",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		cIIndex)
+	templ.Handler(iList).ServeHTTP(w, r)
+}
+
 func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 	fromProtected := false
 	if (u != database.User{}) {
@@ -301,4 +349,16 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 	w.Header().Set("HX-Redirect", "/incidents")
 	http.Redirect(w, r, "/incidents", http.StatusFound)
+}
+
+func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+	hindex := views.HomeIndex(fromProtected)
+	home := views.Home("TicketTracker", cfg.Logo, fromProtected, false, "msg", u.Name, u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems, cfg.ProfileItems, hindex)
+	templ.Handler(home).ServeHTTP(w, r)
 }

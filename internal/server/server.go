@@ -100,42 +100,8 @@ func NewServer() *http.Server {
 		ProfilePicPlaceholder: ProfilePicPlaceholder,
 	}
 
-	mux := http.NewServeMux()
-
-	// assuming you have a net/http#ServeMux called `mux`
-	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
-
-	// API Endpoints
-
-	mux.HandleFunc("POST /v1/users", apiCfg.handleUsers)
-	mux.HandleFunc("POST /v1/configuration-items", apiCfg.middlewareAuth(apiCfg.handleConfigurationItems))
-	mux.HandleFunc("GET /v1/configuration-items", apiCfg.middlewareAuth(apiCfg.getConfigurationItems))
-	mux.HandleFunc("POST /v1/companies", apiCfg.middlewareAuth(apiCfg.handleCompanies))
-	mux.HandleFunc("POST /v1/incidents", apiCfg.middlewareAuth(apiCfg.handleIncidents))
-	mux.HandleFunc("GET /v1/incidents", apiCfg.middlewareAuth(apiCfg.getIncidents))
-
-	// Page Endpoints
-
-	mux.HandleFunc("GET /companies", apiCfg.middlewareAuthPage(apiCfg.handleCompaniesPage))
-
-	mux.HandleFunc("GET /incidents", apiCfg.middlewareAuthPage(apiCfg.handleViewIncidents))
-	mux.HandleFunc("GET /configuration-items", apiCfg.middlewareAuthPage(apiCfg.handleViewConfigurationItems))
-	mux.HandleFunc("GET /search-incidents", apiCfg.middlewareAuthPage(apiCfg.handleSearchIncidents))
-	mux.HandleFunc("GET /incidents/new", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsNewPage))
-	mux.HandleFunc("POST /incidents", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPostPage))
-	mux.HandleFunc("GET /incidents/{id}/edit", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsEditPage))
-	mux.HandleFunc("PUT /incidents/{id}", apiCfg.middlewareAuthPage(apiCfg.handleIncidentsPutPage))
-
-	// Login Endpoints
-
-	mux.HandleFunc("GET /", apiCfg.middlewareAuthPageNoRedirect(apiCfg.handlePageIndex))
-	mux.HandleFunc("POST /v1/login", apiCfg.handleLogin)
-	mux.HandleFunc("GET /login", apiCfg.handleLoginPage)
-	mux.HandleFunc("GET /logout", apiCfg.handleLogout)
-	mux.HandleFunc("GET /get", apiCfg.getCookieHandler)
-
 	srv := &http.Server{
-		Handler:      mux,
+		Handler:      apiCfg.Routes(),
 		Addr:         ":" + port,
 		WriteTimeout: 30 * time.Second,
 		ReadTimeout:  30 * time.Second,
