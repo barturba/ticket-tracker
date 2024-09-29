@@ -16,11 +16,9 @@ templ Layout(title, logo string, fp, isError bool, msg, user, email, pPic string
         @partials.NavbarNew(fp, user, email, pPic, title,
         logo, "TicketTracker", mItems, pItems)
         }
-
         <main class="-mt-32">
             <div class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="px-5 py-6 bg-white rounded-lg shadow sm:px-6">
-
                     {children...}
                 </div>
             </div>
@@ -29,4 +27,10 @@ templ Layout(title, logo string, fp, isError bool, msg, user, email, pPic string
 </body>
 
 </html>
+}
+
+templ InnerLayout(title string) {
+<title hx-swap-oob>{title}</title>
+<div hx-swap-oob="#navbar-title">{title}</div>
+{children...}
 }
