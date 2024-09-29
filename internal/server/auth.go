@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -107,4 +108,21 @@ func (cfg *ApiConfig) getCookieHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Echo out the cookie value in the response body.
 	w.Write([]byte(fmt.Sprintf("%v", token)))
+}
+
+func (cfg *ApiConfig) handleLogout(w http.ResponseWriter, r *http.Request) {
+
+	cookie := http.Cookie{
+		Name:     "jwtCookie",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, &cookie)
+
+	w.Header().Set("HX-Redirect", "/login")
+	http.Redirect(w, r, "/login", http.StatusOK)
 }
