@@ -6,7 +6,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux := http.NewServeMux()
 
-	// assuming you have a net/http#ServeMux called `mux`
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
 	// API Endpoints
