@@ -86,7 +86,15 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		incidents[n].ConfigurationItemName = ci.Name
 
 	}
-
+	// iCols := []string{"ID", "State", "Short Description", "Assigned To", "Configuration Item"}
+	// iRows := make([][]string, len(incidents))
+	// for n, i := range incidents {
+	// 	iRows[n][0] = i.ID.String()
+	// 	iRows[n][1] = string(i.State)
+	// 	iRows[n][2] = i.ShortDescription
+	// 	iRows[n][3] = i.AssignedToName
+	// 	iRows[n][4] = i.ConfigurationItemName
+	// }
 	iIndex := views.IncidentsIndex(incidents)
 	iList := views.IncidentsList("Incidents List",
 		cfg.Logo,
