@@ -71,7 +71,7 @@ templ NavbarNotificationsAndProfile(title, profilePicture string, profileItems m
         </button>
 
         <!-- Profile dropdown -->
-        <div class="relative ml-3" x-data="{ isOpenProfile: false }" x-cloak>
+        <div class="relative ml-3" x-data="{ isOpenProfile: false }">
             <div>
                 <button type="button" @click="isOpenProfile = !isOpenProfile"
                     class="relative flex items-center max-w-xs text-sm bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -92,7 +92,7 @@ templ NavbarNotificationsAndProfile(title, profilePicture string, profileItems m
                       From: "transform opacity-100 scale-100"
                       To: "transform opacity-0 scale-95"
                   -->
-            <div x-show="isOpenProfile" x-transition:enter="transition ease-out duration-100"
+            <div x-cloak x-show="isOpenProfile" x-transition:enter="transition ease-out duration-100"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-75"
@@ -131,7 +131,7 @@ templ NavbarMobileMenu() {
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
         <!-- Menu open: "block", Menu closed: "hidden" -->
-        <svg :class="{'block': isOpen, 'hidden': !isOpen}" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+        <svg x-cloak :class="{'block': isOpen, 'hidden': !isOpen}" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -142,7 +142,7 @@ templ NavbarMobileMenu() {
 
 templ NavbarShowMobileMenu(title, username, email, profilePicture string, menuItems, profileItems models.MenuItems) {
 <!-- Mobile menu, show/hide based on menu state. -->
-<div x-cloak x-show="isOpen" class="border-b border-gray-700 md:hidden" id="mobile-menu">
+<div x-show="isOpen" class="border-b border-gray-700 md:hidden" id="mobile-menu">
     <div class="px-2 py-3 space-y-1 sm:px-3">
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
         for _, item := range menuItems{
