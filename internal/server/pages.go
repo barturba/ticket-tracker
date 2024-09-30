@@ -36,6 +36,31 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	templ.Handler(login).ServeHTTP(w, r)
 }
 
+// Configuration Items
+
+func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, r *http.Request, u database.User) {
+	companyID := r.URL.Query().Get("company_id")
+	if companyID == "" {
+		respondWithError(w, http.StatusInternalServerError, "the 'company_id' parameter can't be blank")
+		return
+	}
+
+	companyUUID, err := uuid.Parse(companyID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "invalid 'company_id' parameter")
+		return
+	}
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companyUUID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		return
+	}
+	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
+	cISelect := views.ConfigurationItems(configurationItems)
+	templ.Handler(cISelect).ServeHTTP(w, r)
+}
+
 func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
 	companyID := r.URL.Query().Get("company_id")
 	if companyID == "" {
@@ -58,6 +83,8 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	cISelect := views.ConfigurationItems(configurationItems)
 	templ.Handler(cISelect).ServeHTTP(w, r)
 }
+
+// Incidents
 
 func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 	fromProtected := false
@@ -223,6 +250,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
@@ -313,43 +341,6 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 
 	w.Header().Set("HX-Redirect", "/incidents")
 	http.Redirect(w, r, "/incidents", http.StatusOK)
-}
-
-func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Request, u database.User) {
-
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
-
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
-		return
-	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
-		return
-	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
-
-	iNIndex := views.IncidentsNewIndex(companies, configurationItems)
-	iNew := views.IncidentsEdit("Incidents - New",
-		cfg.Logo,
-		fromProtected,
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		iNIndex)
-	templ.Handler(iNew).ServeHTTP(w, r)
-
 }
 
 func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u database.User) {

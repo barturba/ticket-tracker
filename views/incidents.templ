@@ -6,75 +6,16 @@ import (
 "github.com/barturba/ticket-tracker/views/partials"
 )
 
-templ IncidentFormIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
-<div class="max-w-[100vw] px-6 pb-16">
-    <form>
-        <div class="form-group">
-            <label for="companies">Companies</label>
-            <select class="w-full select select-bordered" name="company_id" hx-get="/configuration-items"
-                aria-describedby="companiesHelp" hx-target="#configurationItems" hx-push-url="false">
-                for _, company := range companies{
-                <option value={company.ID.String()}>{ company.Name }</option>
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="configurationItems">Configuration Items</label>
-            <select id="configurationItems" class="w-full select select-bordered" name="configuration_item_id"
-                aria-describedby="configurationItemsHelp" hx-target="#configurationItems">
-                for _, configurationItem := range cis{
-                <option value={configurationItem.ID.String()}>{ configurationItem.Name }</option>
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="shortDescription">Short Description</label>
-            <input name="short_description" type="text" class="w-full input input-bordered" id="shortDescription"
-                aria-describedby="shortDescriptionHelp" placeholder="Enter short description"
-                value={incident.ShortDescription}>
-            <small id="shortDescriptionHelp" class="form-text text-muted">Enter the short description here.</small>
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea name="description" class="w-full input input-bordered" id="description"
-                rows="3">{incident.Description}</textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
-}
-
-templ IncidentsNewIndex(companies []models.Company, cis []models.ConfigurationItem) {
-<h1 class="mb-8 text-2xl font-bold text-center">
-    New Incident
-</h1>
-<form hx-post={"/incidents"} hx-ext="json-enc" hx-push-url="true" hx-target="body" hx-swap="innerHTML">
-    @IncidentFormIndex(models.Incident{}, companies, cis)
-</form>
-}
-
-templ IncidentsEditIndex(incident models.Incident, companies []models.Company, cis []models.ConfigurationItem) {
-<h1 class="mb-8 text-2xl font-bold text-center">
-    Edit Incident
-</h1>
-<form hx-put={"/incidents/"+incident.ID.String()} hx-ext="json-enc" hx-push-url="true" hx-target="body"
-    hx-swap="innerHTML">
-    @IncidentFormIndex(incident, companies, cis)
-</form>
-}
-
 templ IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions, incident models.Incident) {
 @partials.FormNew("/incidents") {
 @partials.FormSection("Incident", "Incident information") {
 
 @partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", incident.ID.String())
 @partials.FormSelect3("company_id", "Company", "company-name",
-incident.CompanyID.String(),"/configuration-items","#configuration_item_id",
+incident.CompanyID.String(),"/configuration-items-select","#configuration_item_id",
 selectOptionsCompany, )
 @partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-incident.ConfigurationItemID.String(), "","",
-
-selectOptionsCI )
+incident.ConfigurationItemID.String(), "","", selectOptionsCI )
 @partials.FormInput4("short_description", "Short Description", "", "text", incident.ShortDescription)
 @partials.FormTextAreaFull("description", "Description", "Write a description here", incident.Description)
 }

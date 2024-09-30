@@ -829,10 +829,6 @@ select {
   margin-top: -8rem;
 }
 
-.mb-8 {
-  margin-bottom: 2rem;
-}
-
 .ml-10 {
   margin-left: 2.5rem;
 }
@@ -992,10 +988,6 @@ select {
 
 .max-w-7xl {
   max-width: 80rem;
-}
-
-.max-w-\[100vw\] {
-  max-width: 100vw;
 }
 
 .max-w-xs {
@@ -1297,10 +1289,6 @@ select {
 
 .pb-12 {
   padding-bottom: 3rem;
-}
-
-.pb-16 {
-  padding-bottom: 4rem;
 }
 
 .pb-3 {
