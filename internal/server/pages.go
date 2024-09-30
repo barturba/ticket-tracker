@@ -223,6 +223,57 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
+func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	type parameters struct {
+		ShortDescription    string    `json:"short_description"`
+		Description         string    `json:"description"`
+		CompanyID           uuid.UUID `json:"company_id"`
+		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
+		return
+	}
+	if (params.ConfigurationItemID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
+		return
+	}
+
+	if (params.CompanyID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
+		return
+	}
+
+	if params.Description == "" {
+		respondWithError(w, http.StatusInternalServerError, "description can't be blank")
+		return
+	}
+
+	if params.ShortDescription == "" {
+		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
+		return
+	}
+	_, err = cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+		ID:                  uuid.New(),
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
+		ShortDescription:    params.ShortDescription,
+		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
+		State:               "New",
+		ConfigurationItemID: params.ConfigurationItemID,
+		CompanyID:           params.CompanyID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		return
+	}
+
+	w.Header().Set("HX-Location", "/incidents")
+}
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
@@ -299,59 +350,6 @@ func (cfg *ApiConfig) handleIncidentsNewPage(w http.ResponseWriter, r *http.Requ
 		iNIndex)
 	templ.Handler(iNew).ServeHTTP(w, r)
 
-}
-
-func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
-
-	type parameters struct {
-		ShortDescription    string    `json:"short_description"`
-		Description         string    `json:"description"`
-		CompanyID           uuid.UUID `json:"company_id"`
-		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
-	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
-		return
-	}
-	if (params.ConfigurationItemID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
-		return
-	}
-
-	if (params.CompanyID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
-		return
-	}
-
-	if params.Description == "" {
-		respondWithError(w, http.StatusInternalServerError, "description can't be blank")
-		return
-	}
-
-	if params.ShortDescription == "" {
-		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
-		return
-	}
-	_, err = cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
-		ID:                  uuid.New(),
-		CreatedAt:           time.Now(),
-		UpdatedAt:           time.Now(),
-		ShortDescription:    params.ShortDescription,
-		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
-		State:               "New",
-		ConfigurationItemID: params.ConfigurationItemID,
-		CompanyID:           params.CompanyID,
-	})
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
-		return
-	}
-
-	w.Header().Set("HX-Redirect", "/incidents")
-	http.Redirect(w, r, "/incidents", http.StatusFound)
 }
 
 func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u database.User) {

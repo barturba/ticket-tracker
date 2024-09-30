@@ -44,7 +44,7 @@ func FormNew(postURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\" hx-push-url=\"true\" hx-swap=\"innerHTML\"><div class=\"space-y-12\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-ext=\"json-enc\" hx-swap=\"transition:true\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"space-y-12\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

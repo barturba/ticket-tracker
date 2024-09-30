@@ -80,6 +80,19 @@ selectOptionsCI )
 }
 }
 }
+templ IncidentFormNewIndex(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
+}
+}
 
 
 templ IncidentsEdit(page, logo string,
@@ -91,8 +104,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-// @InnerLayout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
-@InnerLayout(page) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

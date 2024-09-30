@@ -424,7 +424,7 @@ func TableDataLink(text, link string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#incident-wrapper\" hx-push-url=\"true\" hx-swap=\"outerHTML\" class=\"text-indigo-600 hover:text-indigo-900\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"transition:true\" hx-target=\"body\" hx-push-url=\"true\" class=\"text-indigo-600 hover:text-indigo-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
