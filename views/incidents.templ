@@ -6,16 +6,16 @@ import (
 "github.com/barturba/ticket-tracker/views/partials"
 )
 
-templ IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions, incident models.Incident) {
-@partials.FormNew("/incidents") {
+templ IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident) {
+@partials.FormNew(action, path) {
 @partials.FormSection("Incident", "Incident information") {
 
 @partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", incident.ID.String())
 @partials.FormSelect3("company_id", "Company", "company-name",
-incident.CompanyID.String(),"/configuration-items-select","#configuration_item_id",
-selectOptionsCompany, )
+incident.CompanyID.String(),"/configuration-items-select","#configuration_item_id", optsCompany, )
 @partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-incident.ConfigurationItemID.String(), "","", selectOptionsCI )
+incident.ConfigurationItemID.String(), "","", optsCI)
+@partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), "", "", optsState)
 @partials.FormInput4("short_description", "Short Description", "", "text", incident.ShortDescription)
 @partials.FormTextAreaFull("description", "Description", "Write a description here", incident.Description)
 }

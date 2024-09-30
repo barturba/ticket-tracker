@@ -216,3 +216,11 @@ func NewSelectOption(name, link string) SelectOption {
 
 type Page struct {
 }
+
+var StateOptionsEnum = []database.StateEnum{
+	database.StateEnumNew,
+	database.StateEnumAssigned,
+	database.StateEnumInProgress,
+	database.StateEnumOnHold,
+	database.StateEnumResolved,
+}

@@ -14,7 +14,7 @@ import (
 	"github.com/barturba/ticket-tracker/views/partials"
 )
 
-func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions, incident models.Incident) templ.Component {
+func IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -68,8 +68,7 @@ func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions,
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = partials.FormSelect3("company_id", "Company", "company-name",
-					incident.CompanyID.String(), "/configuration-items-select", "#configuration_item_id",
-					selectOptionsCompany).Render(ctx, templ_7745c5c3_Buffer)
+					incident.CompanyID.String(), "/configuration-items-select", "#configuration_item_id", optsCompany).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -78,7 +77,15 @@ func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions,
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-					incident.ConfigurationItemID.String(), "", "", selectOptionsCI).Render(ctx, templ_7745c5c3_Buffer)
+					incident.ConfigurationItemID.String(), "", "", optsCI).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), "", "", optsState).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -106,7 +113,7 @@ func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = partials.FormNew("/incidents").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = partials.FormNew(action, path).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

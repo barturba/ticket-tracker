@@ -299,8 +299,13 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
 	}
 
-	// iEIndex := views.IncidentsEditIndex(incident, companies, configurationItems)
-	iEIndexNew := views.IncidentFormNew(selectOptionsCompany, selectOptionsCI, incident)
+	stateOptions := models.SelectOptions{}
+	for _, so := range models.StateOptionsEnum {
+		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
+	}
+
+	iEPath := fmt.Sprintf("/incidents/%s", incident.ID)
+	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
 	iEdit := views.IncidentsEdit("Incidents - Edit",
 		cfg.Logo,
 		fromProtected,
@@ -317,10 +322,11 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
-		ShortDescription    string    `json:"short_description"`
-		Description         string    `json:"description"`
-		CompanyID           uuid.UUID `json:"company_id"`
-		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
+		ShortDescription    string             `json:"short_description"`
+		Description         string             `json:"description"`
+		CompanyID           uuid.UUID          `json:"company_id"`
+		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+		State               database.StateEnum `json:"state"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -354,7 +360,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		UpdatedAt:           time.Now(),
 		ShortDescription:    params.ShortDescription,
 		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
-		State:               "New",
+		State:               params.State,
 		ConfigurationItemID: params.ConfigurationItemID,
 		CompanyID:           params.CompanyID,
 	})
@@ -409,7 +415,13 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
 	}
 
-	iIndexNew := views.IncidentFormNew(selectOptionsCompany, selectOptionsCI, incident)
+	stateOptions := models.SelectOptions{}
+	for _, so := range models.StateOptionsEnum {
+		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
+	}
+
+	iIPath := "/incidents"
+	iIndexNew := views.IncidentForm("POST", iIPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
 	iNew := views.IncidentsEdit("Incidents - Add",
 		cfg.Logo,
 		fromProtected,
@@ -427,8 +439,11 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
-		ShortDescription string `json:"short_description"`
-		Description      string `json:"description"`
+		ShortDescription    string             `json:"short_description"`
+		Description         string             `json:"description"`
+		CompanyID           uuid.UUID          `json:"company_id"`
+		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+		State               database.StateEnum `json:"state"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
@@ -454,6 +469,7 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		UpdatedAt:        time.Now(),
 		Description:      sql.NullString{String: params.Description, Valid: params.Description != ""},
 		ShortDescription: params.ShortDescription,
+		State:            params.State,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't update incident")

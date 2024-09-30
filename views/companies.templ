@@ -67,7 +67,7 @@ cmp templ.Component) {
 }
 
 templ CompanyFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
-@partials.FormNew("/configuration-items") {
+@partials.FormNew("POST", "/configuration-items") {
 @partials.FormSection("Configuration Item", "Configuration Item information") {
 
 @partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())
