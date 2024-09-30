@@ -93,85 +93,29 @@ cmp templ.Component) {
 }
 }
 
-templ TableHeader() {
-<div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title,
-            email and role.</p>
-    </div>
-    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-        <button type="button"
-            class="block px-3 py-2 text-sm font-semibold text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add
-            user</button>
-    </div>
-</div>
-}
-
-templ TableRowHeadFirst(text string) {
-<th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">{text}</th>
-}
-
-templ TableRowHead(text string) {
-<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{text}</th>
-}
-
-templ TableHead() {
-<thead>
-    <tr>
-        {children...}
-    </tr>
-</thead>
-
-}
-templ TableBody() {
-<tbody class="divide-y divide-gray-200">
-    {children...}
-</tbody>
-}
-templ TableWrapper() {
-<div class="px-4 sm:px-6 lg:px-8">
-    {children...}
-</div>
-}
-
-
-templ TableDataFirst(text string) {
-<td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-0">{text}</td>
-}
-templ TableData(text string) {
-<td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{text}</td>
-}
-
-templ TableDataLink(text, link string) {
-<td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
-    <button hx-get={"/incidents/"+link+"/edit"} hx-target="#incident-wrapper" hx-push-url="true" hx-swap="outerHTML"
-        class="text-indigo-600 hover:text-indigo-900">{text}</button>
-</td>
-}
 templ IncidentTable(incidents []models.Incident) {
-@TableWrapper(){
-@TableHeader()
+@partials.TableWrapper(){
+@partials.TableHeader()
 <div class="flow-root mt-8">
     <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <table class="min-w-full divide-y divide-gray-300">
-                @TableHead(){
-                @TableRowHeadFirst("ID")
-                @TableRowHead("State")
-                @TableRowHead("Short Description")
-                @TableRowHead("Assigned To")
-                @TableRowHead("Configuration Item")
+                @partials.TableHead(){
+                @partials.TableRowHeadFirst("ID")
+                @partials.TableRowHead("State")
+                @partials.TableRowHead("Short Description")
+                @partials.TableRowHead("Assigned To")
+                @partials.TableRowHead("Configuration Item")
                 }
-                @TableBody() {
+                @partials.TableBody() {
                 for _, incident := range incidents{
                 <tr>
-                    @TableDataFirst(incident.ID.String())
-                    @TableData(fmt.Sprintf("%s", incident.State))
-                    @TableData(incident.ShortDescription)
-                    @TableData(incident.AssignedToName)
-                    @TableData(incident.ConfigurationItemName)
-                    @TableDataLink("Edit", incident.ID.String())
+                    @partials.TableDataFirst(incident.ID.String())
+                    @partials.TableData(fmt.Sprintf("%s", incident.State))
+                    @partials.TableData(incident.ShortDescription)
+                    @partials.TableData(incident.AssignedToName)
+                    @partials.TableData(incident.ConfigurationItemName)
+                    @partials.TableDataLink("Edit", incident.ID.String())
                 </tr>
                 }
                 }
@@ -188,10 +132,7 @@ templ IncidentsIndex(incidents []models.Incident) {
 </div>
 }
 
-
 templ IncidentsIndexOption1(incidents []models.Incident) {
-
-
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -268,7 +209,6 @@ templ IncidentsIndexOption1(incidents []models.Incident) {
         </tbody>
     </table>
 </div>
-
 }
 
 templ IncidentsIndexOld(incidents []models.Incident) {
