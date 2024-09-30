@@ -1,11 +1,10 @@
 package partials
 
-templ TableHeader() {
+templ TableHeader(title, description string) {
 <div class="sm:flex sm:items-center">
     <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title,
-            email and role.</p>
+        <h1 class="text-base font-semibold leading-6 text-gray-900">{title}</h1>
+        <p class="mt-2 text-sm text-gray-700">{description}</p>
     </div>
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <button type="button"
@@ -70,7 +69,7 @@ templ TableData(text string) {
 
 templ TableDataLink(text, link string) {
 <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-0">
-    <button hx-get={"/incidents/"+link+"/edit"} hx-swap="transition:true" hx-target="body" hx-push-url="true"
+    <button hx-get={link} hx-swap="transition:true" hx-target="body" hx-push-url="true"
         class="text-indigo-600 hover:text-indigo-900">{text}</button>
 </td>
 }

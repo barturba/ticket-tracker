@@ -16,19 +16,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *ApiConfig) handleCompaniesPage(w http.ResponseWriter, r *http.Request, u database.User) {
-
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
-		return
-	}
-
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-
-	templ.Handler(views.Companies(companies)).ServeHTTP(w, r)
-}
-
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	fromProtected := false
 	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
@@ -60,28 +47,116 @@ func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, 
 	cISelect := views.ConfigurationItems(configurationItems)
 	templ.Handler(cISelect).ServeHTTP(w, r)
 }
-
 func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
-	companyID := r.URL.Query().Get("company_id")
-	if companyID == "" {
-		respondWithError(w, http.StatusInternalServerError, "the 'company_id' parameter can't be blank")
-		return
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
 	}
 
-	companyUUID, err := uuid.Parse(companyID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "invalid 'company_id' parameter")
-		return
-	}
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companyUUID)
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
-	cISelect := views.ConfigurationItems(configurationItems)
-	templ.Handler(cISelect).ServeHTTP(w, r)
+	cIIndex := views.ConfigurationItemsIndex(cis)
+	cIList := views.IncidentsList("Configuration Items List",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		cIIndex)
+	templ.Handler(cIList).ServeHTTP(w, r)
+}
+func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+
+	databaseConfigurationItem, err := cfg.DB.GetConfigurationItemByID(r.Context(), id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't find incident")
+		return
+	}
+	ci := models.DatabaseConfigurationItemToConfigurationItem(databaseConfigurationItem)
+
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+	selectOptionsCompany := models.SelectOptions{}
+
+	for _, company := range companies {
+		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
+	}
+
+	cEIndexNew := views.ConfigurationItemFormNew(selectOptionsCompany, ci)
+	cEdit := views.ConfigurationItemsEdit("Configuration Items - Edit",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		cEIndexNew)
+	templ.Handler(cEdit).ServeHTTP(w, r)
+}
+func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	type parameters struct {
+		Name                string    `json:"name"`
+		CompanyID           uuid.UUID `json:"company_id"`
+		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
+		return
+	}
+	if (params.ConfigurationItemID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
+		return
+	}
+
+	if (params.CompanyID == uuid.UUID{}) {
+		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
+		return
+	}
+
+	_, err = cfg.DB.CreateConfigurationItem(r.Context(), database.CreateConfigurationItemParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      params.Name,
+		CompanyID: params.CompanyID,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		return
+	}
+
+	w.Header().Set("HX-Location", "/configuration-items")
 }
 
 // Incidents
@@ -108,15 +183,6 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		incidents[n].ConfigurationItemName = ci.Name
 
 	}
-	// iCols := []string{"ID", "State", "Short Description", "Assigned To", "Configuration Item"}
-	// iRows := make([][]string, len(incidents))
-	// for n, i := range incidents {
-	// 	iRows[n][0] = i.ID.String()
-	// 	iRows[n][1] = string(i.State)
-	// 	iRows[n][2] = i.ShortDescription
-	// 	iRows[n][3] = i.AssignedToName
-	// 	iRows[n][4] = i.ConfigurationItemName
-	// }
 	iIndex := views.IncidentsIndex(incidents)
 	iList := views.IncidentsList("Incidents List",
 		cfg.Logo,
@@ -131,7 +197,6 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
 }
-
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	var err error
@@ -190,7 +255,6 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		Results: incidents,
 	})
 }
-
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
 	fromProtected := false
 	if (u != database.User{}) {
@@ -250,7 +314,6 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
-
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
@@ -302,7 +365,6 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 	w.Header().Set("HX-Location", "/incidents")
 }
-
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
@@ -341,6 +403,35 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 
 	w.Header().Set("HX-Redirect", "/incidents")
 	http.Redirect(w, r, "/incidents", http.StatusOK)
+}
+
+// Companies
+func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find comanies")
+		return
+	}
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+
+	cIndex := views.CompaniesIndex(companies)
+	cList := views.CompaniesList("Companies List",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		cIndex)
+	templ.Handler(cList).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u database.User) {

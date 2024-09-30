@@ -21,6 +21,7 @@ incident.ConfigurationItemID.String(), "","", selectOptionsCI )
 }
 }
 }
+
 templ IncidentFormNewIndex(page, logo string,
 fromProtected, isError bool,
 msg,
@@ -52,7 +53,7 @@ cmp templ.Component) {
 
 templ IncidentTable(incidents []models.Incident) {
 @partials.TableWrapper(){
-@partials.TableHeader()
+@partials.TableHeader("Incidents", "A listing of all incidents.")
 @partials.TableHeaderWrapper() {
 @partials.TableHead(){
 @partials.TableRowHeadFirst("ID")
@@ -69,7 +70,7 @@ for _, incident := range incidents{
 @partials.TableData(incident.ShortDescription)
 @partials.TableData(incident.AssignedToName)
 @partials.TableData(incident.ConfigurationItemName)
-@partials.TableDataLink("Edit", incident.ID.String())
+@partials.TableDataLink("Edit", "/incidents/"+incident.ID.String()+"/edit")
 }
 }
 }

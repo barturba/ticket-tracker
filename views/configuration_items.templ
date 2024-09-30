@@ -2,7 +2,7 @@ package views
 
 import (
 "github.com/barturba/ticket-tracker/models"
-"fmt"
+"github.com/barturba/ticket-tracker/views/partials"
 )
 templ ConfigurationItems(configurationItems []models.ConfigurationItem) {
 for _, ci := range configurationItems{
@@ -10,79 +10,71 @@ for _, ci := range configurationItems{
 }
 }
 
-templ ConfigurationItemsIndex(incidents []models.ConfigurationItem) {
-<div id="wrapper"></div>
-<script>
-    const css = window.emotion.css;
-    new gridjs.Grid({
-        sort: true,
-        columns: [{ name: "ID", sort: false }, "Name"],
-        server: {
-            url: '/search-',
-            then: data => data.results.map(incident =>
-                [gridjs.html(`<a href="/incidents/${incident.id}/edit">${incident.id}</a>`),
-                incident.state,
-                incident.short_description,
-                incident.assigned_to_name,
-                incident.configuration_item,
-                ]
-            ),
-            total: data => data.count
-        },
-        sort: {
-            multiColumn: false,
-            server: {
-                url: (prev, columns) => {
-                    if (!columns.length) return prev;
-
-                    const col = columns[0];
-                    const dir = col.direction === 1 ? 'asc' : 'desc';
-                    let colName = ['state', 'short_description'][col.index];
-
-                    return `${prev}&order=${colName}&dir=${dir}`;
-                }
-            }
-        },
-        search: {
-            enabled: true,
-            server: {
-                url: (prev, keyword, page) => `${prev}?search=${keyword}`
-            }
-        },
-        pagination: {
-            enabled: true,
-            limit: 10,
-            server: {
-                url: (prev, page, limit) => `${prev}${prev.includes('?') ? '&' : '?'}limit=${limit}&offset=${page * limit}`
-            }
-        },
-        className: {
-            table: css`
-              tr:hover td {
-                background-color: rgba(0, 0, 0, 0.1);
-              }
-            `,
-        },
-    }).render(document.getElementById("wrapper"));
-</script>
+templ ConfigurationItemsTable(configurationItems []models.ConfigurationItem) {
+@partials.TableWrapper(){
+@partials.TableHeader("Configuration Items", "A listing of all configuration items.")
+@partials.TableHeaderWrapper() {
+@partials.TableHead(){
+@partials.TableRowHeadFirst("ID")
+@partials.TableRowHead("Name")
+}
+@partials.TableBody() {
+for _, ci := range configurationItems{
+@partials.TableRowWrapper() {
+@partials.TableDataFirst(ci.ID.String())
+@partials.TableData(ci.Name)
+@partials.TableDataLink("Edit", "/configuration-items/"+ci.ID.String()+"/edit")
+}
+}
+}
+}
+}
 }
 
-templ ConfigurationItemRow(incident models.Incident) {
-<tr>
-    <td>{incident.ID.String()}</td>
-    <td>{fmt.Sprintf("%v", incident.State)}</td>
-    <td>{incident.ShortDescription}</td>
-    <td>{incident.AssignedToName}</td>
-    <td>{incident.ConfigurationItemName}</td>
-    <td>{incident.Description}</td>
-    <td>
-        <a class="btn danger" href={templ.SafeURL("/incidents/" + incident.ID.String() + "/edit" )}>Edit</a>
-    </td>
-</tr>
-}
 
+templ ConfigurationItemsIndex(configurationItems []models.ConfigurationItem) {
+@ConfigurationItemsTable(configurationItems)
+}
 
 templ ConfigurationItemsList(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
+}
+}
+
+templ ConfigurationItemsEdit(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
+}
+}
+
+templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.ConfigurationItem) {
+@partials.FormNew("/configuration-items") {
+@partials.FormSection("Configuration Item", "Configuration Item information") {
+
+@partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())
+@partials.FormInput4("name", "Name", "", "text", ci.Name)
+}
+}
+}
+
+templ ConfigurationItemFormNewIndex(page, logo string,
 fromProtected, isError bool,
 msg,
 username,

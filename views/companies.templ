@@ -2,10 +2,90 @@ package views
 
 import (
 "github.com/barturba/ticket-tracker/models"
+"github.com/barturba/ticket-tracker/views/partials"
 )
 
 templ Companies(companies []models.Company) {
 for _, company := range companies {
 <option value={company.ID.String()}>{ company.Name }</option>
+}
+}
+
+
+templ CompaniesTable(companies []models.Company) {
+@partials.TableWrapper(){
+@partials.TableHeader("Companies", "A listing of all companies.")
+@partials.TableHeaderWrapper() {
+@partials.TableHead(){
+@partials.TableRowHeadFirst("ID")
+@partials.TableRowHead("Name")
+}
+@partials.TableBody() {
+for _, ci := range companies{
+@partials.TableRowWrapper() {
+@partials.TableDataFirst(ci.ID.String())
+@partials.TableData(ci.Name)
+@partials.TableDataLink("Edit", "/configuration-items/"+ci.ID.String()+"/edit")
+}
+}
+}
+}
+}
+}
+
+
+templ CompaniesIndex(companies []models.Company) {
+@CompaniesTable(companies)
+}
+
+templ CompaniesList(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
+}
+}
+
+templ CompaniesEdit(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
+}
+}
+
+templ CompanyFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
+@partials.FormNew("/configuration-items") {
+@partials.FormSection("Configuration Item", "Configuration Item information") {
+
+@partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())
+@partials.FormInput4("name", "Name", "", "text", ci.Name)
+}
+}
+}
+
+templ CompanyFormNewIndex(page, logo string,
+fromProtected, isError bool,
+msg,
+username,
+email,
+profilePic string,
+menuItems models.MenuItems,
+profileItems models.MenuItems,
+cmp templ.Component) {
+@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@cmp
 }
 }
