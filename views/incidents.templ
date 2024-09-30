@@ -96,33 +96,27 @@ cmp templ.Component) {
 templ IncidentTable(incidents []models.Incident) {
 @partials.TableWrapper(){
 @partials.TableHeader()
-<div class="flow-root mt-8">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table class="min-w-full divide-y divide-gray-300">
-                @partials.TableHead(){
-                @partials.TableRowHeadFirst("ID")
-                @partials.TableRowHead("State")
-                @partials.TableRowHead("Short Description")
-                @partials.TableRowHead("Assigned To")
-                @partials.TableRowHead("Configuration Item")
-                }
-                @partials.TableBody() {
-                for _, incident := range incidents{
-                <tr>
-                    @partials.TableDataFirst(incident.ID.String())
-                    @partials.TableData(fmt.Sprintf("%s", incident.State))
-                    @partials.TableData(incident.ShortDescription)
-                    @partials.TableData(incident.AssignedToName)
-                    @partials.TableData(incident.ConfigurationItemName)
-                    @partials.TableDataLink("Edit", incident.ID.String())
-                </tr>
-                }
-                }
-            </table>
-        </div>
-    </div>
-</div>
+@partials.TableHeaderWrapper() {
+@partials.TableHead(){
+@partials.TableRowHeadFirst("ID")
+@partials.TableRowHead("State")
+@partials.TableRowHead("Short Description")
+@partials.TableRowHead("Assigned To")
+@partials.TableRowHead("Configuration Item")
+}
+@partials.TableBody() {
+for _, incident := range incidents{
+@partials.TableRowWrapper() {
+@partials.TableDataFirst(incident.ID.String())
+@partials.TableData(fmt.Sprintf("%s", incident.State))
+@partials.TableData(incident.ShortDescription)
+@partials.TableData(incident.AssignedToName)
+@partials.TableData(incident.ConfigurationItemName)
+@partials.TableDataLink("Edit", incident.ID.String())
+}
+}
+}
+}
 }
 }
 
