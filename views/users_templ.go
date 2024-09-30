@@ -103,7 +103,7 @@ func UsersTable(users []models.User) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = partials.TableHeader("Users", "A listing of all users.").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = partials.TableHeader("Users", "A listing of all users.", "Add User", "/users/new").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

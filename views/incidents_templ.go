@@ -257,7 +257,7 @@ func IncidentTable(incidents []models.Incident) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = partials.TableHeader("Incidents", "A listing of all incidents.").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = partials.TableHeader("Incidents", "A listing of all incidents.", "Add Incident", "/incidents/add").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

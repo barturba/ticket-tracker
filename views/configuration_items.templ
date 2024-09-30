@@ -12,7 +12,8 @@ for _, ci := range configurationItems{
 
 templ ConfigurationItemsTable(configurationItems []models.ConfigurationItem) {
 @partials.TableWrapper(){
-@partials.TableHeader("Configuration Items", "A listing of all configuration items.")
+@partials.TableHeader("Configuration Items", "A listing of all configuration items.", "Add Configuration Item",
+"/configuration-items/add")
 @partials.TableHeaderWrapper() {
 @partials.TableHead(){
 @partials.TableRowHeadFirst("ID")

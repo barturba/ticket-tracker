@@ -103,7 +103,7 @@ func CompaniesTable(companies []models.Company) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = partials.TableHeader("Companies", "A listing of all companies.").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = partials.TableHeader("Companies", "A listing of all companies.", "Add Company", "/companies/add").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

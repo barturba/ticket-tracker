@@ -53,7 +53,7 @@ cmp templ.Component) {
 
 templ IncidentTable(incidents []models.Incident) {
 @partials.TableWrapper(){
-@partials.TableHeader("Incidents", "A listing of all incidents.")
+@partials.TableHeader("Incidents", "A listing of all incidents.", "Add Incident", "/incidents/add")
 @partials.TableHeaderWrapper() {
 @partials.TableHead(){
 @partials.TableRowHeadFirst("ID")

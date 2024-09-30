@@ -14,7 +14,7 @@ for _, company := range companies {
 
 templ CompaniesTable(companies []models.Company) {
 @partials.TableWrapper(){
-@partials.TableHeader("Companies", "A listing of all companies.")
+@partials.TableHeader("Companies", "A listing of all companies.", "Add Company", "/companies/add")
 @partials.TableHeaderWrapper() {
 @partials.TableHead(){
 @partials.TableRowHeadFirst("ID")

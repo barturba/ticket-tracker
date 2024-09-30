@@ -1,6 +1,8 @@
 package partials
 
-templ TableHeader(title, description string) {
+
+// Fix the add button here
+templ TableHeader(title, description, buttonText, buttonLink string) {
 <div class="sm:flex sm:items-center">
     <div class="sm:flex-auto">
         <h1 class="text-base font-semibold leading-6 text-gray-900">{title}</h1>
@@ -8,8 +10,9 @@ templ TableHeader(title, description string) {
     </div>
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <button type="button"
-            class="block px-3 py-2 text-sm font-semibold text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add
-            user</button>
+            class="block px-3 py-2 text-sm font-semibold text-center text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            hx-get={buttonLink} hx-swap="transition:true" hx-target="body" hx-push-url="true">
+            {buttonText}</button>
     </div>
 </div>
 }

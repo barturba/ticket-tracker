@@ -14,7 +14,7 @@ for _, company := range users {
 
 templ UsersTable(users []models.User) {
 @partials.TableWrapper(){
-@partials.TableHeader("Users", "A listing of all users.")
+@partials.TableHeader("Users", "A listing of all users.", "Add User", "/users/new")
 @partials.TableHeaderWrapper() {
 @partials.TableHead(){
 @partials.TableRowHeadFirst("ID")

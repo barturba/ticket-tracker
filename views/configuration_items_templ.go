@@ -103,7 +103,8 @@ func ConfigurationItemsTable(configurationItems []models.ConfigurationItem) temp
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = partials.TableHeader("Configuration Items", "A listing of all configuration items.").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = partials.TableHeader("Configuration Items", "A listing of all configuration items.", "Add Configuration Item",
+				"/configuration-items/add").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
