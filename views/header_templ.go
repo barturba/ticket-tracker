@@ -42,7 +42,7 @@ func HeaderComponent(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"stylesheet\" href=\"/static/css/tailwind.css\"><script src=\"/static/htmx.min.js\"></script><script src=\"/static/ext/json-enc.js\"></script><script src=\"/static/hyperscript.min.js\"></script><script src=\"/static/alpinejs.min.js\" defer></script><script>\n        const css = window.emotion.css;\n    </script><style>\n        [x-cloak] {\n            display: none !important;\n        }\n    </style></head>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"stylesheet\" href=\"/static/css/tailwind.css\"><script src=\"/static/htmx.min.js\"></script><script src=\"/static/ext/json-enc.js\"></script><script src=\"/static/hyperscript.min.js\"></script><script src=\"/static/alpinejs.min.js\" defer></script><style>\n        [x-cloak] {\n            display: none !important;\n        }\n    </style></head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
