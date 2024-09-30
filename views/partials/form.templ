@@ -1,0 +1,94 @@
+package partials
+
+import "github.com/barturba/ticket-tracker/models"
+
+templ FormNew(postURL string) {
+<form hx-post={postURL} hx-ext="json-enc" hx-push-url="true" hx-swap="innerHTML">
+    <div class="space-y-12">
+        {children...}
+    </div>
+    @ButtonsCancelSave()
+</form>
+}
+
+templ FormSection(title, description string) {
+<div class="pb-12 border-b border-gray-900/10">
+    <h2 class="text-base font-semibold leading-7 text-gray-900">{title}</h2>
+    <p class="mt-1 text-sm leading-6 text-gray-600">{description}</p>
+
+    <div class="grid grid-cols-1 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6">
+        {children...}
+    </div>
+</div>
+}
+
+templ FormInput3(id, title, autocomplete, inputType string ) {
+<div class="sm:col-span-3">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        <input type={inputType} name={id} id={id} autocomplete={autocomplete}
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm sm:leading-6">
+    </div>
+</div>
+}
+
+templ FormInput3Disabled(id, title, autocomplete, inputType, placeholder string) {
+<div class="sm:col-span-3">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        <input type={inputType} name={id} id={id} autocomplete={autocomplete} disabled
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
+            placeholder={placeholder}>
+    </div>
+</div>
+}
+
+templ FormInput4(id, title, autocomplete, inputType, value string) {
+
+<div class="sm:col-span-4">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        <input id={id} name={id} type={inputType} autocomplete={inputType}
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm sm:leading-6"
+            value={value}>
+    </div>
+</div>
+}
+
+templ FormSelect3(id, title, autocomplete, selected string, selectOptions models.SelectOptions) {
+<div class="sm:col-span-3">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        <select id={id} name={id} autocomplete={autocomplete}
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:max-w-xs sm:text-sm sm:leading-6">
+            for _, option := range selectOptions {
+            if selected == option.Link {
+            <option value={option.Link} selected={option.Link}>{ option.Name }</option>
+            } else {
+            <option value={option.Link}>{ option.Name }</option>
+            }
+            }
+        </select>
+    </div>
+</div>
+}
+
+templ FormTextAreaFull(id, title, description, value string) {
+<div class="col-span-full">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        <textarea id={id} name={id} rows="3"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">{value}</textarea>
+    </div>
+    <p class="mt-3 text-sm leading-6 text-gray-600">{description}</p>
+</div>
+}
+
+
+templ ButtonsCancelSave() {
+<div class="flex items-center justify-end mt-6 gap-x-6">
+    <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+    <button type="submit"
+        class="px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+</div>
+}
