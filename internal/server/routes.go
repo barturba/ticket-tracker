@@ -22,7 +22,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux.HandleFunc("GET /incidents", cfg.middlewareAuthPage(cfg.handleViewIncidents))
 	mux.HandleFunc("GET /search-incidents", cfg.middlewareAuthPage(cfg.handleSearchIncidents))
-	// mux.HandleFunc("GET /incidents/new", cfg.middlewareAuthPage(cfg.handleIncidentsNewPage))
+	mux.HandleFunc("GET /incidents/add", cfg.middlewareAuthPage(cfg.handleIncidentsAddPage))
 	mux.HandleFunc("POST /incidents", cfg.middlewareAuthPage(cfg.handleIncidentsPostPage))
 	mux.HandleFunc("GET /incidents/{id}/edit", cfg.middlewareAuthPage(cfg.handleIncidentsEditPage))
 	mux.HandleFunc("PUT /incidents/{id}", cfg.middlewareAuthPage(cfg.handleIncidentsPutPage))

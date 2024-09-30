@@ -365,6 +365,65 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 	w.Header().Set("HX-Location", "/incidents")
 }
+func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
+	incident := models.Incident{
+		ID:                    uuid.New(),
+		CreatedAt:             time.Now(),
+		UpdatedAt:             time.Now(),
+		ShortDescription:      "",
+		Description:           "",
+		State:                 "",
+		AssignedTo:            [16]byte{},
+		AssignedToName:        "",
+		ConfigurationItemID:   [16]byte{},
+		ConfigurationItemName: "",
+		CompanyID:             [16]byte{},
+	}
+
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		return
+	}
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+	selectOptionsCompany := models.SelectOptions{}
+
+	for _, company := range companies {
+		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
+	}
+
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+		return
+	}
+	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
+	selectOptionsCI := models.SelectOptions{}
+	for _, ci := range configurationItems {
+		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
+	}
+
+	iIndexNew := views.IncidentFormNew(selectOptionsCompany, selectOptionsCI, incident)
+	iNew := views.IncidentsEdit("Incidents - Add",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		iIndexNew)
+	templ.Handler(iNew).ServeHTTP(w, r)
+}
+
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u database.User) {
 
 	type parameters struct {
