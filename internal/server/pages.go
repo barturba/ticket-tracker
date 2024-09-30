@@ -434,6 +434,35 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 	templ.Handler(cList).ServeHTTP(w, r)
 }
 
+// Users
+func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u database.User) {
+	fromProtected := false
+	if (u != database.User{}) {
+		fromProtected = true
+	}
+
+	databaseUsers, err := cfg.DB.GetUsers(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't find comanies")
+		return
+	}
+	users := models.DatabaseUsersToUsers(databaseUsers)
+
+	cIndex := views.UsersIndex(users)
+	cList := views.UsersList("Users List",
+		cfg.Logo,
+		fromProtected,
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		cIndex)
+	templ.Handler(cList).ServeHTTP(w, r)
+}
+
 func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u database.User) {
 	fromProtected := false
 	if (u != database.User{}) {

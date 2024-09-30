@@ -39,6 +39,9 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("POST /v1/companies", cfg.middlewareAuth(cfg.handleCompanies))
 	mux.HandleFunc("GET /companies", cfg.middlewareAuthPage(cfg.handleViewCompanies))
 
+	// - Users
+	mux.HandleFunc("GET /users", cfg.middlewareAuthPage(cfg.handleViewUsers))
+
 	// Login Endpoints
 
 	mux.HandleFunc("GET /", cfg.middlewareAuthPageNoRedirect(cfg.handlePageIndex))

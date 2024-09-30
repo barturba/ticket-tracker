@@ -55,6 +55,14 @@ func DatabaseUserToUser(user database.User) User {
 	}
 }
 
+func DatabaseUsersToUsers(users []database.User) []User {
+	var items []User
+	for _, item := range users {
+		items = append(items, DatabaseUserToUser(item))
+	}
+	return items
+}
+
 func DatabaseConfigurationItemToConfigurationItem(configurationItem database.ConfigurationItem) ConfigurationItem {
 	return ConfigurationItem{
 		ID:        configurationItem.ID,
