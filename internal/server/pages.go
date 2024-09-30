@@ -37,31 +37,26 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
+	companyID := r.URL.Query().Get("company_id")
+	if companyID == "" {
+		respondWithError(w, http.StatusInternalServerError, "the 'company_id' parameter can't be blank")
+		return
 	}
 
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
+	companyUUID, err := uuid.Parse(companyID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "invalid 'company_id' parameter")
+		return
+	}
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companyUUID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
 		return
 	}
 	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
-	cIIndex := views.ConfigurationItemsIndex(configurationItems)
-	iList := views.ConfigurationItemsList("Configuration Items List",
-		cfg.Logo,
-		fromProtected,
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		cIIndex)
-	templ.Handler(iList).ServeHTTP(w, r)
+	cISelect := views.ConfigurationItems(configurationItems)
+	templ.Handler(cISelect).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u database.User) {

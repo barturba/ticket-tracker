@@ -4,6 +4,11 @@ import (
 "github.com/barturba/ticket-tracker/models"
 "fmt"
 )
+templ ConfigurationItems(configurationItems []models.ConfigurationItem) {
+for _, ci := range configurationItems{
+<option value={ci.ID.String()}>{ ci.Name}</option>
+}
+}
 
 templ ConfigurationItemsIndex(incidents []models.ConfigurationItem) {
 <div id="wrapper"></div>

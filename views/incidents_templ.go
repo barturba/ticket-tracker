@@ -294,7 +294,8 @@ func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions,
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = partials.FormSelect3("company_id", "Company", "company-name", incident.CompanyID.String(), "/configuration-items",
+				templ_7745c5c3_Err = partials.FormSelect3("company_id", "Company", "company-name",
+					incident.CompanyID.String(), "/configuration-items", "#configuration_item_id",
 					selectOptionsCompany).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -304,7 +305,7 @@ func IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions,
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-					incident.ConfigurationItemID.String(), "",
+					incident.ConfigurationItemID.String(), "", "",
 
 					selectOptionsCI).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {

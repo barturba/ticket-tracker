@@ -68,10 +68,11 @@ templ IncidentFormNew(selectOptionsCompany, selectOptionsCI models.SelectOptions
 @partials.FormSection("Incident", "Incident information") {
 
 @partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", incident.ID.String())
-@partials.FormSelect3("company_id", "Company", "company-name", incident.CompanyID.String(),"/configuration-items",
+@partials.FormSelect3("company_id", "Company", "company-name",
+incident.CompanyID.String(),"/configuration-items","#configuration_item_id",
 selectOptionsCompany, )
 @partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-incident.ConfigurationItemID.String(), "",
+incident.ConfigurationItemID.String(), "","",
 
 selectOptionsCI )
 @partials.FormInput4("short_description", "Short Description", "", "text", incident.ShortDescription)
