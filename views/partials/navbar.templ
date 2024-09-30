@@ -33,12 +33,13 @@ templ NavbarLogoMenu(title string, menuItems models.MenuItems) {
     <div class="flex items-baseline ml-10 space-x-4">
         for _, item := range menuItems {
         if (item.Name == title) {
-        <a href={templ.SafeURL(item.Link)} class="px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-md"
-            aria-current="page">{item.Name}</a>
+        <button hx-get={item.Link} hx-swap="transition:true" hx-target="body" hx-push-url="true"
+            class="px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-md"
+            aria-current="page">{item.Name}</button>
 
         } else {
-        <a href={templ.SafeURL(item.Link)}
-            class="px-3 py-2 text-sm font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</a>
+        <button hx-get={item.Link} hx-swap="transition:true" hx-target="body" hx-push-url="true"
+            class="px-3 py-2 text-sm font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</button>
         }
         }
     </div>
@@ -147,13 +148,13 @@ templ NavbarShowMobileMenu(title, username, email, profilePicture string, menuIt
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
         for _, item := range menuItems{
         if (item.Name == title) {
-        <a href={templ.SafeURL(item.Link)}
+        <button hx-get={item.Link} hx-swap="transition:true" hx-target="body" hx-push-url="true"
             class="block px-3 py-2 text-base font-medium text-white bg-gray-900 rounded-md"
-            aria-current="page">{item.Name}</a>
+            aria-current="page">{item.Name}</button>
 
         } else {
-        <a href={templ.SafeURL(item.Link)}
-            class="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</a>
+        <button hx-get={item.Link} hx-swap="transition:true" hx-target="body" hx-push-url="true"
+            class="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white">{item.Name}</button>
         }
         }
     </div>
