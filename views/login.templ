@@ -13,7 +13,7 @@ templ LoginIndexNew(fromProtected bool, logo string) {
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
         <div class="px-6 py-12 bg-white shadow sm:rounded-lg sm:px-12">
             <form class="space-y-6" hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body"
-                hx-push-url="true">
+                hx-swap="transition:true" hx-push-url="true">
                 <div>
                     <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                     <div class="mt-2">
@@ -134,7 +134,8 @@ templ LoginIndex(fromProtected bool) {
     }
 </style>
 <main class="m-auto form-signin w-100">
-    <form hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body" hx-push-url="true">
+    <form hx-swap="transition:true" hx-swap="innerHTML" hx-post="/v1/login" hx-ext="json-enc" hx-target="body"
+        hx-push-url="true">
         <div class="form-group">
             <label for="exampleInputEmail1">Email address</label>
             <input class="w-full max-w-xs input input-bordered" name="email" type="email" class="form-control"
