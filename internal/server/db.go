@@ -25,12 +25,76 @@ func (cfg *ApiConfig) GetCompaniesSelection(r *http.Request, dst any) error {
 }
 
 func (cfg *ApiConfig) GetStateSelection(dst any) {
-
 	stateOptions := models.SelectOptions{}
 	for _, so := range models.StateOptionsEnum {
 		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
 	}
 	*dst.(*models.SelectOptions) = stateOptions
+}
+
+func (cfg *ApiConfig) GetCIs(r *http.Request) ([]models.ConfigurationItem, error) {
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
+	if err != nil {
+		return nil, err
+	}
+	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+	return cis, nil
+}
+
+func (cfg *ApiConfig) GetCIsByCompanyID(r *http.Request, id uuid.UUID) ([]models.ConfigurationItem, error) {
+	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), id)
+	if err != nil {
+		return nil, err
+	}
+	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+	return cis, nil
+}
+
+func (cfg *ApiConfig) GetCIByID(r *http.Request, id uuid.UUID) (models.ConfigurationItem, error) {
+	databaseConfigurationItem, err := cfg.DB.GetConfigurationItemByID(r.Context(), id)
+	if err != nil {
+		return models.ConfigurationItem{}, errors.New("can't find incident")
+	}
+	ci := models.DatabaseConfigurationItemToConfigurationItem(databaseConfigurationItem)
+	return ci, nil
+}
+
+func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
+	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
+	if err != nil {
+		return nil, errors.New("couldn't find incidents")
+	}
+	incidents := models.DatabaseIncidentsRowToIncidents(databaseIncidents)
+
+	for n, i := range incidents {
+		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
+		if err != nil {
+			return nil, errors.New("couldn't find configuration item name")
+		}
+		incidents[n].ConfigurationItemName = ci.Name
+
+	}
+	return incidents, nil
+}
+
+func (cfg *ApiConfig) GetCompanies(r *http.Request) ([]models.Company, error) {
+	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	if err != nil {
+		return nil, errors.New("couldn't find companiess")
+	}
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+
+	return companies, nil
+}
+
+func (cfg *ApiConfig) GetUsers(r *http.Request) ([]models.User, error) {
+	databaseUsers, err := cfg.DB.GetUsers(r.Context())
+	if err != nil {
+		return nil, errors.New("couldn't find users")
+	}
+	users := models.DatabaseUsersToUsers(databaseUsers)
+
+	return users, nil
 }
 
 func NewIncident() models.Incident {

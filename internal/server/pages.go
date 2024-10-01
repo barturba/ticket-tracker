@@ -2,9 +2,7 @@ package server
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -63,20 +61,19 @@ func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, 
 	cISelect := views.ConfigurationItems(configurationItems)
 	templ.Handler(cISelect).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
+	cis, err := cfg.GetCIs(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
 	cIIndex := views.ConfigurationItemsIndex(cis)
-
 	page := NewPage("Configuration Items List", cfg, u)
-
 	cIList := views.BuildLayout(page, cIIndex)
+
 	templ.Handler(cIList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u models.User) {
@@ -88,23 +85,17 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 		return
 	}
 
-	databaseConfigurationItem, err := cfg.DB.GetConfigurationItemByID(r.Context(), id)
+	ci, err := cfg.GetCIByID(r, id)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't find incident")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	ci := models.DatabaseConfigurationItemToConfigurationItem(databaseConfigurationItem)
 
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	var selectOptionsCompany models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
-	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	selectOptionsCompany := models.SelectOptions{}
-
-	for _, company := range companies {
-		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
 	}
 
 	page := NewPage("Configuration Items - Edit", cfg, u)
@@ -115,25 +106,24 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 }
 func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	type parameters struct {
+	var input struct {
 		Name                string    `json:"name"`
 		CompanyID           uuid.UUID `json:"company_id"`
 		ConfigurationItemID uuid.UUID `json:"configuration_item_id"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
+
+	err := cfg.readJSON(w, r, &input)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
-		return
-	}
-	if (params.ConfigurationItemID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if (params.CompanyID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
+	v := validator.New()
+	v.Check(input.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
+	v.Check(input.CompanyID != uuid.UUID{}, "company_id", "must be provided")
+
+	if !v.Valid() {
+		respondToFailedValidation(w, r, v.Errors)
 		return
 	}
 
@@ -141,11 +131,12 @@ func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r 
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name:      params.Name,
-		CompanyID: params.CompanyID,
+		Name:      input.Name,
+		CompanyID: input.CompanyID,
 	})
+
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		respondWithError(w, http.StatusInternalServerError, "couldn't create configuration item")
 		return
 	}
 
@@ -156,22 +147,12 @@ func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r 
 
 func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
+	incidents, err := cfg.GetIncidents(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	incidents := models.DatabaseIncidentsRowToIncidents(databaseIncidents)
 
-	for n, i := range incidents {
-		ci, err := cfg.DB.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "couldn't find configuration item name")
-			return
-		}
-		incidents[n].ConfigurationItemName = ci.Name
-
-	}
 	iIndex := views.IncidentsIndex(incidents)
 
 	page := NewPage("Incidents List", cfg, u)
@@ -179,29 +160,32 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 	iList := views.BuildLayout(page, iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	var err error
 	search := r.URL.Query().Get("search")
-
 	limitString := r.URL.Query().Get("limit")
-	log.Println("limitString: ", limitString)
+	offsetString := r.URL.Query().Get("offset")
+
 	limit := 0
-	if limitString != "" {
-		if limit, err = strconv.Atoi(limitString); err != nil {
-			respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
-			return
-		}
+	offset := 0
+
+	v := validator.New()
+	v.Check(limitString != "", "limit_string", "must be provided")
+	v.Check(offsetString != "", "offset_string", "must be provided")
+	if !v.Valid() {
+		respondToFailedValidation(w, r, v.Errors)
+		return
 	}
 
-	offsetString := r.URL.Query().Get("offset")
-	log.Println("offsetString: ", offsetString)
-	offset := 0
-	if offsetString != "" {
-		if offset, err = strconv.Atoi(offsetString); err != nil {
-			respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
-			return
-		}
+	if limit, err = strconv.Atoi(limitString); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+		return
+	}
+	if offset, err = strconv.Atoi(offsetString); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
+		return
 	}
 
 	databaseIncidents, err := cfg.DB.GetIncidentsBySearchTermLimitOffset(r.Context(), database.GetIncidentsBySearchTermLimitOffsetParams{
@@ -253,27 +237,27 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	}
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	companies, err := cfg.GetCompanies(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	selectOptionsCompany := models.SelectOptions{}
 
-	for _, company := range companies {
-		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
-	}
-
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
+	var selectOptionsCompany models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
+	cis, err := cfg.GetCIsByCompanyID(r, companies[0].ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	selectOptionsCI := models.SelectOptions{}
-	for _, ci := range configurationItems {
+	for _, ci := range cis {
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
 	}
 
@@ -331,7 +315,6 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	// Add helpers for these functions:
 	var selectOptionsCompany models.SelectOptions
 	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
 	if err != nil {
@@ -339,17 +322,11 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	companies, err := cfg.GetCompanies(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find companies")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	// selectOptionsCompany := models.SelectOptions{}
-
-	// for _, company := range companies {
-	// 	selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
-	// }
 
 	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
 	if err != nil {
@@ -357,6 +334,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
+
 	selectOptionsCI := models.SelectOptions{}
 	for _, ci := range configurationItems {
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
@@ -367,7 +345,6 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
 	}
 
-	// w.Header().Set("HX-Location", "/incidents")
 	formData := models.NewFormData()
 	iEPath := fmt.Sprintf("/incidents/%s/edit", incident.ID)
 	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
@@ -405,23 +382,28 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 }
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
-
-	type parameters struct {
+	var input struct {
 		ShortDescription    string             `json:"short_description"`
 		Description         string             `json:"description"`
 		CompanyID           uuid.UUID          `json:"company_id"`
 		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
 		State               database.StateEnum `json:"state"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
+
+	err := cfg.readJSON(w, r, &input)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	if params.ShortDescription == "" {
-		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
+
+	v := validator.New()
+	v.Check(input.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
+	v.Check(input.CompanyID != uuid.UUID{}, "company_id", "must be provided")
+	v.Check(input.Description != "", "description", "must be provided")
+	v.Check(input.ShortDescription != "", "short_description", "must be provided")
+
+	if !v.Valid() {
+		respondToFailedValidation(w, r, v.Errors)
 		return
 	}
 
@@ -435,9 +417,9 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 	_, err = cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:               id,
 		UpdatedAt:        time.Now(),
-		Description:      sql.NullString{String: params.Description, Valid: params.Description != ""},
-		ShortDescription: params.ShortDescription,
-		State:            params.State,
+		Description:      sql.NullString{String: input.Description, Valid: input.Description != ""},
+		ShortDescription: input.ShortDescription,
+		State:            input.State,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't update incident")
@@ -451,12 +433,11 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 // Companies
 func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
+	companies, err := cfg.GetCompanies(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find comanies")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
 
 	page := NewPage("Companies List", cfg, u)
 
@@ -468,12 +449,11 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 // Users
 func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	databaseUsers, err := cfg.DB.GetUsers(r.Context())
+	users, err := cfg.GetUsers(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find comanies")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	users := models.DatabaseUsersToUsers(databaseUsers)
 
 	page := NewPage("Users List", cfg, u)
 
