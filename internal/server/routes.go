@@ -40,7 +40,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("POST /v1/login", cfg.handleLogin)
 	mux.HandleFunc("GET /login", cfg.handleLoginPage)
 	mux.HandleFunc("GET /logout", cfg.handleLogout)
-	mux.HandleFunc("GET /get", cfg.getCookieHandler)
 
 	return mux
 }
