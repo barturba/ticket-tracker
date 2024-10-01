@@ -25,34 +25,12 @@ optsState)
 }
 }
 
-templ IncidentFormNewIndex(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ IncidentsEdit(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }
 
-
-templ IncidentsEdit(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
-@cmp
-}
-}
 
 templ IncidentTable(incidents []models.Incident) {
 @partials.TableWrapper(){
@@ -85,16 +63,8 @@ templ IncidentsIndex(incidents []models.Incident) {
 @IncidentTable(incidents)
 }
 
-templ IncidentsList(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ IncidentsList(p models.Page, cmp templ.Component) {
+@LayoutNew(p) {
 @cmp
 }
 }

@@ -233,3 +233,17 @@ func NewFormData() FormData {
 		Values: map[string]string{},
 	}
 }
+
+type Page struct {
+	Title            string
+	Logo             string
+	FlashMessage     string
+	IsLoggedIn       bool
+	IsError          bool
+	Msg              string
+	User             string
+	Email            string
+	ProfilePicture   string
+	MenuItems        MenuItems
+	ProfileMenuItems MenuItems
+}

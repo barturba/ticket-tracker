@@ -38,30 +38,14 @@ templ UsersIndex(users []models.User) {
 @UsersTable(users)
 }
 
-templ UsersList(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ UsersList(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }
 
-templ UsersEdit(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ UsersEdit(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }
@@ -73,19 +57,5 @@ templ UserFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
 @partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())
 @partials.FormInput4("name", "Name", "", "text", ci.Name)
 }
-}
-}
-
-templ UserFormNewIndex(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
-@cmp
 }
 }

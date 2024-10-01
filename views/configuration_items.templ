@@ -37,33 +37,19 @@ templ ConfigurationItemsIndex(configurationItems []models.ConfigurationItem) {
 @ConfigurationItemsTable(configurationItems)
 }
 
-templ ConfigurationItemsList(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ ConfigurationItemsList(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }
 
-templ ConfigurationItemsEdit(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+
+templ ConfigurationItemsEdit(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }
+
 
 templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.ConfigurationItem) {
 @partials.FormNew("POST", "/configuration-items") {
@@ -75,16 +61,8 @@ templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.C
 }
 }
 
-templ ConfigurationItemFormNewIndex(page, logo, fl string,
-isError bool,
-msg,
-username,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component) {
-@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
+templ ConfigurationItemFormNewIndex(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }

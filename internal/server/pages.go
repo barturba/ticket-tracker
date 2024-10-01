@@ -19,8 +19,27 @@ import (
 
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	fromProtected := false
+	menuItems := models.MenuItems{
+		{
+			Name: "Login",
+			Link: "/login",
+		},
+	}
+	page := models.Page{
+		Title:            "Login",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             "",
+		Email:            "",
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        menuItems,
+		ProfileMenuItems: nil,
+	}
 	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
-	login := views.Login("Login", cfg.Logo, "", fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndexNew)
+	login := views.Login(page, lIndexNew)
 	templ.Handler(login).ServeHTTP(w, r)
 }
 
@@ -63,17 +82,20 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
 
 	cIIndex := views.ConfigurationItemsIndex(cis)
-	cIList := views.IncidentsList("Configuration Items List",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		cIIndex)
+	page := models.Page{
+		Title:            "Configuration Items List",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+	cIList := views.IncidentsList(page, cIIndex)
 	templ.Handler(cIList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -104,18 +126,22 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
 	}
 
+	page := models.Page{
+		Title:            "Configuration Items - Edit",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+
 	cEIndexNew := views.ConfigurationItemFormNew(selectOptionsCompany, ci)
-	cEdit := views.ConfigurationItemsEdit("Configuration Items - Edit",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		cEIndexNew)
+	cEdit := views.ConfigurationItemsEdit(page, cEIndexNew)
 	templ.Handler(cEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -178,18 +204,20 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	}
 	iIndex := views.IncidentsIndex(incidents)
-	iFlash := ""
-	iList := views.IncidentsList("Incidents List",
-		cfg.Logo,
-		iFlash,
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		iIndex)
+	page := models.Page{
+		Title:            "Incidents List",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+	iList := views.IncidentsList(page, iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -298,17 +326,20 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	formData := models.NewFormData()
 	iEPath := fmt.Sprintf("/incidents/%s", incident.ID)
 	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
-	iEdit := views.IncidentsEdit("Incidents - Edit",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		iEIndexNew)
+	page := models.Page{
+		Title:            "Incidents - Edit",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+	iEdit := views.IncidentsEdit(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -391,17 +422,20 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	formData := models.NewFormData()
 	iEPath := fmt.Sprintf("/incidents/%s/edit", incident.ID)
 	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
-	iEdit := views.IncidentsEdit("Incidents - Edit",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		iEIndexNew)
+	page := models.Page{
+		Title:            "Incidents - Edit",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+	iEdit := views.IncidentsEdit(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -424,17 +458,20 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	formData.Errors["company_id"] = "Wrong company ID"
 	iIPath := "/incidents"
 	iIndexNew := views.IncidentForm("POST", iIPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, incident, formData)
-	iNew := views.IncidentsEdit("Incidents - Add",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		iIndexNew)
+	page := models.Page{
+		Title:            "Incidents - Add",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+	iNew := views.IncidentsEdit(page, iIndexNew)
 	templ.Handler(iNew).ServeHTTP(w, r)
 }
 
@@ -491,19 +528,22 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 		return
 	}
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+	page := models.Page{
+		Title:            "Companies List",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
 
 	cIndex := views.CompaniesIndex(companies)
-	cList := views.CompaniesList("Companies List",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		cIndex)
+	cList := views.CompaniesList(page, cIndex)
 	templ.Handler(cList).ServeHTTP(w, r)
 }
 
@@ -517,18 +557,22 @@ func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u 
 	}
 	users := models.DatabaseUsersToUsers(databaseUsers)
 
+	page := models.Page{
+		Title:            "Users List",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
+
 	cIndex := views.UsersIndex(users)
-	cList := views.UsersList("Users List",
-		cfg.Logo,
-		"",
-		false,
-		"",
-		u.Name,
-		u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems,
-		cfg.ProfileItems,
-		cIndex)
+	cList := views.UsersList(page, cIndex)
 	templ.Handler(cList).ServeHTTP(w, r)
 }
 
@@ -537,9 +581,20 @@ func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u 
 	if (u != database.User{}) {
 		fromProtected = true
 	}
+	page := models.Page{
+		Title:            "TicketTracker",
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
 	hindex := views.HomeIndex(fromProtected)
-	home := views.Home("TicketTracker", cfg.Logo, "", fromProtected, false, "msg", u.Name, u.Email,
-		cfg.ProfilePicPlaceholder,
-		cfg.MenuItems, cfg.ProfileItems, hindex)
+	home := views.Home(page, hindex)
 	templ.Handler(home).ServeHTTP(w, r)
 }

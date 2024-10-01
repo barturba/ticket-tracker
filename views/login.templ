@@ -152,17 +152,8 @@ templ LoginIndex(fromProtected bool) {
 
 }
 
-templ Login(
-page, logo, fl string,
-fromProtected, isError bool,
-msg,
-email,
-profilePic string,
-menuItems models.MenuItems,
-profileItems models.MenuItems,
-cmp templ.Component,
-) {
-@Layout(page, logo, fl, fromProtected, isError, msg, "", "", profilePic, menuItems, profileItems) {
+templ Login(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
 @cmp
 }
 }

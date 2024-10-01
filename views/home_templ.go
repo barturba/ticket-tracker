@@ -51,15 +51,7 @@ func HomeIndex(fromProtected bool) templ.Component {
 	})
 }
 
-func Home(page, logo, fl string,
-	fromProtected, isError bool,
-	msg,
-	username,
-	email,
-	profilePic string,
-	menuItems models.MenuItems,
-	profileItems models.MenuItems,
-	cmp templ.Component) templ.Component {
+func Home(page models.Page, cmp templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -98,7 +90,7 @@ func Home(page, logo, fl string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = LayoutNew(page).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
