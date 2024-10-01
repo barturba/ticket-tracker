@@ -76,6 +76,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 
 	templ.Handler(cIList).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	idString := r.PathValue("id")
@@ -104,6 +105,7 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 	cEdit := views.BuildLayout(page, cEIndexNew)
 	templ.Handler(cEdit).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	var input struct {
@@ -221,6 +223,7 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 		Results: incidents,
 	})
 }
+
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	idString := r.PathValue("id")
@@ -275,6 +278,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	iEdit := views.BuildLayout(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
 	var input struct {
 		ShortDescription    string             `json:"short_description"`
@@ -354,6 +358,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	iEdit := views.BuildLayout(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
+
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	incident := NewIncident()
@@ -431,6 +436,7 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 }
 
 // Companies
+
 func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	companies, err := cfg.GetCompanies(r)
@@ -447,6 +453,7 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 }
 
 // Users
+
 func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	users, err := cfg.GetUsers(r)

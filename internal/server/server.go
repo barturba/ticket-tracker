@@ -59,43 +59,14 @@ func NewServer() *http.Server {
 	}
 	dbQueries := database.New(db)
 
-	menuItems := models.MenuItems{
-		models.MenuItem{
-			Name: "Incidents List",
-			Link: "/incidents",
-		},
-		models.MenuItem{
-			Name: "Configuration Items List",
-			Link: "/configuration-items",
-		},
-		models.MenuItem{
-			Name: "Companies List",
-			Link: "/companies",
-		},
-		models.MenuItem{
-			Name: "Users List",
-
-			Link: "/users",
-		}}
-
-	profileItems := models.MenuItems{
-		models.MenuItem{
-			Name: "Settings",
-			Link: "/settings",
-		},
-		models.MenuItem{
-			Name: "Log Out",
-			Link: "/logout",
-		}}
-
 	logo := "/static/images/logo.png"
 	ProfilePicPlaceholder := "/static/images/profile_placeholder.webp"
 
 	apiCfg := ApiConfig{
 		DB:                    dbQueries,
 		JWTSecret:             jwtSecret,
-		MenuItems:             menuItems,
-		ProfileItems:          profileItems,
+		MenuItems:             MenuItems,
+		ProfileItems:          ProfileItems,
 		Logo:                  logo,
 		ProfilePicPlaceholder: ProfilePicPlaceholder,
 	}
