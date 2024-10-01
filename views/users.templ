@@ -39,7 +39,7 @@ templ UsersIndex(users []models.User) {
 }
 
 templ UsersList(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -47,13 +47,13 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
 
 templ UsersEdit(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -61,7 +61,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
@@ -77,7 +77,7 @@ templ UserFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
 }
 
 templ UserFormNewIndex(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -85,7 +85,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

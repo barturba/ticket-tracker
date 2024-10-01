@@ -2,6 +2,8 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -13,6 +15,10 @@ import (
 
 func CheckHashPassword(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func respondToFailedValidation(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	respondWithError(w, http.StatusUnprocessableEntity, fmt.Sprintf("%v", errors))
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -60,4 +66,12 @@ func (cfg *ApiConfig) createJWT(expiresInSeconds int, userID uuid.UUID) (string,
 		})
 	s, err := t.SignedString(key)
 	return s, err
+}
+
+func (cfg *ApiConfig) readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
+	err := json.NewDecoder(r.Body).Decode(dst)
+	if err != nil {
+		return errors.New("Error decoding parameters")
+	}
+	return nil
 }

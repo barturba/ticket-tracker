@@ -6,16 +6,19 @@ import (
 "github.com/barturba/ticket-tracker/views/partials"
 )
 
-templ IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident) {
+templ IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident,
+formData models.FormData) {
 @partials.FormNew(action, path) {
 @partials.FormSection("Incident", "Incident information") {
 
 @partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", incident.ID.String())
 @partials.FormSelect3("company_id", "Company", "company-name",
-incident.CompanyID.String(),"/configuration-items-select","#configuration_item_id", optsCompany, )
+incident.CompanyID.String(), formData.Errors["company_id"], "/configuration-items-select","#configuration_item_id",
+optsCompany, )
 @partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-incident.ConfigurationItemID.String(), "","", optsCI)
-@partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), "", "", optsState)
+incident.ConfigurationItemID.String(), formData.Errors["configuration_item_id"], "","", optsCI)
+@partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), formData.Errors["state"], "", "",
+optsState)
 @partials.FormInput4("short_description", "Short Description", "", "text", incident.ShortDescription)
 @partials.FormTextAreaFull("description", "Description", "Write a description here", incident.Description)
 }
@@ -23,7 +26,7 @@ incident.ConfigurationItemID.String(), "","", optsCI)
 }
 
 templ IncidentFormNewIndex(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -31,14 +34,14 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
 
 
 templ IncidentsEdit(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -46,7 +49,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
@@ -83,7 +86,7 @@ templ IncidentsIndex(incidents []models.Incident) {
 }
 
 templ IncidentsList(page, logo, fl string,
-fromProtected, isError bool,
+isError bool,
 msg,
 username,
 email,
@@ -91,7 +94,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

@@ -407,7 +407,7 @@ func NavbarShowMobileMenu(title, username, email, profilePicture string, menuIte
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Mobile menu, show/hide based on menu state. --><div x-cloak x-show=\"isOpen\" class=\"border-b border-gray-700 md:hidden\" id=\"mobile-menu\"><div class=\"px-2 py-3 space-y-1 sm:px-3\"><!-- Current: \"bg-gray-900 text-white\", Default: \"text-gray-300 hover:bg-gray-700 hover:text-white\" -->")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Mobile menu, show/hide based on menu state. --><div x-cloak x-show=\"isOpen\" class=\"border-b border-gray-700 red md:hidden\" id=\"mobile-menu\"><div class=\"px-2 py-3 space-y-1 sm:px-3\"><!-- Current: \"bg-gray-900 text-white\", Default: \"text-gray-300 hover:bg-gray-700 hover:text-white\" -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

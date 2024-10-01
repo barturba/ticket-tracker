@@ -27,8 +27,6 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 // Configuration Items
 
 func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, r *http.Request, u database.User) {
-
-	v := validator.New()
 	companyID := r.URL.Query().Get("company_id")
 
 	companyUUID, err := uuid.Parse(companyID)
@@ -37,6 +35,7 @@ func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, 
 		return
 	}
 
+	v := validator.New()
 	v.Check(companyUUID != uuid.Nil, "company_id", "must be provided")
 
 	if !v.Valid() {
@@ -55,10 +54,6 @@ func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, 
 	templ.Handler(cISelect).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	databaseConfigurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
 	if err != nil {
@@ -71,7 +66,6 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	cIList := views.IncidentsList("Configuration Items List",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -83,10 +77,6 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	templ.Handler(cIList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	idString := r.PathValue("id")
 	id, err := uuid.Parse(idString)
@@ -118,7 +108,6 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 	cEdit := views.ConfigurationItemsEdit("Configuration Items - Edit",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -171,10 +160,6 @@ func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r 
 // Incidents
 
 func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
 	if err != nil {
@@ -197,7 +182,6 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 	iList := views.IncidentsList("Incidents List",
 		cfg.Logo,
 		iFlash,
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -267,10 +251,6 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 	})
 }
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	idString := r.PathValue("id")
 	id, err := uuid.Parse(idString)
@@ -315,12 +295,12 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
 	}
 
+	formData := models.NewFormData()
 	iEPath := fmt.Sprintf("/incidents/%s", incident.ID)
-	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
+	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
 	iEdit := views.IncidentsEdit("Incidents - Edit",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -332,75 +312,51 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
-
-	type parameters struct {
+	var input struct {
 		ShortDescription    string             `json:"short_description"`
 		Description         string             `json:"description"`
 		CompanyID           uuid.UUID          `json:"company_id"`
 		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
 		State               database.StateEnum `json:"state"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
+	err := cfg.readJSON(w, r, &input)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't decode parameters")
-		return
-	}
-	if (params.ConfigurationItemID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "configuration_item_id can't be blank")
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if (params.CompanyID == uuid.UUID{}) {
-		respondWithError(w, http.StatusInternalServerError, "company_id can't be blank")
+	v := validator.New()
+	v.Check(input.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
+	v.Check(input.CompanyID != uuid.UUID{}, "company_id", "must be provided")
+	v.Check(input.Description != "", "description", "must be provided")
+	v.Check(input.ShortDescription != "", "short_description", "must be provided")
+	if !v.Valid() {
+		respondToFailedValidation(w, r, v.Errors)
 		return
 	}
 
-	if params.Description == "" {
-		respondWithError(w, http.StatusInternalServerError, "description can't be blank")
-		return
-	}
-
-	if params.ShortDescription == "" {
-		respondWithError(w, http.StatusInternalServerError, "short_description can't be blank")
-		return
-	}
-	_, err = cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+	databaseIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
 		ID:                  uuid.New(),
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
-		ShortDescription:    params.ShortDescription,
-		Description:         sql.NullString{String: params.Description, Valid: params.Description != ""},
-		State:               params.State,
-		ConfigurationItemID: params.ConfigurationItemID,
-		CompanyID:           params.CompanyID,
+		ShortDescription:    input.ShortDescription,
+		Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
+		State:               input.State,
+		ConfigurationItemID: input.ConfigurationItemID,
+		CompanyID:           input.CompanyID,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
 		return
 	}
+	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	w.Header().Set("HX-Location", "/incidents")
-}
-func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
-
-	incident := models.Incident{
-		ID:                    uuid.New(),
-		CreatedAt:             time.Now(),
-		UpdatedAt:             time.Now(),
-		ShortDescription:      "",
-		Description:           "",
-		State:                 "",
-		AssignedTo:            [16]byte{},
-		AssignedToName:        "",
-		ConfigurationItemID:   [16]byte{},
-		ConfigurationItemName: "",
-		CompanyID:             [16]byte{},
+	// Add helpers for these functions:
+	var selectOptionsCompany models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
@@ -409,11 +365,11 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
-	selectOptionsCompany := models.SelectOptions{}
+	// selectOptionsCompany := models.SelectOptions{}
 
-	for _, company := range companies {
-		selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
-	}
+	// for _, company := range companies {
+	// 	selectOptionsCompany = append(selectOptionsCompany, models.NewSelectOption(company.Name, company.ID.String()))
+	// }
 
 	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
 	if err != nil {
@@ -421,7 +377,6 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
-
 	selectOptionsCI := models.SelectOptions{}
 	for _, ci := range configurationItems {
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
@@ -432,12 +387,46 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
 	}
 
+	// w.Header().Set("HX-Location", "/incidents")
+	formData := models.NewFormData()
+	iEPath := fmt.Sprintf("/incidents/%s/edit", incident.ID)
+	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
+	iEdit := views.IncidentsEdit("Incidents - Edit",
+		cfg.Logo,
+		"",
+		false,
+		"",
+		u.Name,
+		u.Email,
+		cfg.ProfilePicPlaceholder,
+		cfg.MenuItems,
+		cfg.ProfileItems,
+		iEIndexNew)
+	templ.Handler(iEdit).ServeHTTP(w, r)
+}
+func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	incident := NewIncident()
+
+	var selectOptionsCompany models.SelectOptions
+	err := cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var selectOptionsState models.SelectOptions
+	cfg.GetStateSelection(&selectOptionsState)
+
+	selectOptionsCI := models.SelectOptions{}
+
+	formData := models.NewFormData()
+	formData.Errors["company_id"] = "Wrong company ID"
 	iIPath := "/incidents"
-	iIndexNew := views.IncidentForm("POST", iIPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
+	iIndexNew := views.IncidentForm("POST", iIPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, incident, formData)
 	iNew := views.IncidentsEdit("Incidents - Add",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -495,10 +484,6 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 
 // Companies
 func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
@@ -511,7 +496,6 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 	cList := views.CompaniesList("Companies List",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,
@@ -525,10 +509,6 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 
 // Users
 func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u database.User) {
-	fromProtected := false
-	if (u != database.User{}) {
-		fromProtected = true
-	}
 
 	databaseUsers, err := cfg.DB.GetUsers(r.Context())
 	if err != nil {
@@ -541,7 +521,6 @@ func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u 
 	cList := views.UsersList("Users List",
 		cfg.Logo,
 		"",
-		fromProtected,
 		false,
 		"",
 		u.Name,

@@ -56,7 +56,7 @@ templ FormInput4(id, title, autocomplete, inputType, value string) {
 </div>
 }
 
-templ FormSelect3(id, title, autocomplete, selected, hxGet, hxTarget string, selectOptions models.SelectOptions) {
+templ FormSelect3(id, title, autocomplete, selected, err, hxGet, hxTarget string, selectOptions models.SelectOptions) {
 <div class="sm:col-span-3">
     <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
     <div class="mt-2">

@@ -14,7 +14,8 @@ import (
 	"github.com/barturba/ticket-tracker/views/partials"
 )
 
-func IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident) templ.Component {
+func IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident,
+	formData models.FormData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -68,7 +69,8 @@ func IncidentForm(action, path string, optsCompany, optsCI, optsState models.Sel
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = partials.FormSelect3("company_id", "Company", "company-name",
-					incident.CompanyID.String(), "/configuration-items-select", "#configuration_item_id", optsCompany).Render(ctx, templ_7745c5c3_Buffer)
+					incident.CompanyID.String(), formData.Errors["company_id"], "/configuration-items-select", "#configuration_item_id",
+					optsCompany).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -77,7 +79,7 @@ func IncidentForm(action, path string, optsCompany, optsCI, optsState models.Sel
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-					incident.ConfigurationItemID.String(), "", "", optsCI).Render(ctx, templ_7745c5c3_Buffer)
+					incident.ConfigurationItemID.String(), formData.Errors["configuration_item_id"], "", "", optsCI).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -85,7 +87,8 @@ func IncidentForm(action, path string, optsCompany, optsCI, optsState models.Sel
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), "", "", optsState).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), formData.Errors["state"], "", "",
+					optsState).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -122,7 +125,7 @@ func IncidentForm(action, path string, optsCompany, optsCI, optsState models.Sel
 }
 
 func IncidentFormNewIndex(page, logo, fl string,
-	fromProtected, isError bool,
+	isError bool,
 	msg,
 	username,
 	email,
@@ -168,7 +171,7 @@ func IncidentFormNewIndex(page, logo, fl string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -177,7 +180,7 @@ func IncidentFormNewIndex(page, logo, fl string,
 }
 
 func IncidentsEdit(page, logo, fl string,
-	fromProtected, isError bool,
+	isError bool,
 	msg,
 	username,
 	email,
@@ -223,7 +226,7 @@ func IncidentsEdit(page, logo, fl string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -470,7 +473,7 @@ func IncidentsIndex(incidents []models.Incident) templ.Component {
 }
 
 func IncidentsList(page, logo, fl string,
-	fromProtected, isError bool,
+	isError bool,
 	msg,
 	username,
 	email,
@@ -516,7 +519,7 @@ func IncidentsList(page, logo, fl string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, true, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
