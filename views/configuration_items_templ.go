@@ -261,7 +261,7 @@ func ConfigurationItemsIndex(configurationItems []models.ConfigurationItem) temp
 	})
 }
 
-func ConfigurationItemsList(page, logo string,
+func ConfigurationItemsList(page, logo, fl string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -308,7 +308,7 @@ func ConfigurationItemsList(page, logo string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var12), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var12), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -316,7 +316,7 @@ func ConfigurationItemsList(page, logo string,
 	})
 }
 
-func ConfigurationItemsEdit(page, logo string,
+func ConfigurationItemsEdit(page, logo, fl string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -363,7 +363,7 @@ func ConfigurationItemsEdit(page, logo string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var14), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var14), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -444,7 +444,7 @@ func ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.Co
 	})
 }
 
-func ConfigurationItemFormNewIndex(page, logo string,
+func ConfigurationItemFormNewIndex(page, logo, fl string,
 	fromProtected, isError bool,
 	msg,
 	username,
@@ -491,7 +491,7 @@ func ConfigurationItemFormNewIndex(page, logo string,
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

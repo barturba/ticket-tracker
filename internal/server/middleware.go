@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/auth"
@@ -165,4 +166,8 @@ func (cfg *ApiConfig) middlewareAuthPageNoRedirect(handler authedHandler) http.H
 
 	}
 
+}
+
+func (cfg *ApiConfig) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	respondWithError(w, http.StatusUnprocessableEntity, fmt.Sprintf("%v", errors))
 }

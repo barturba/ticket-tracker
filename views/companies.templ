@@ -38,7 +38,7 @@ templ CompaniesIndex(companies []models.Company) {
 @CompaniesTable(companies)
 }
 
-templ CompaniesList(page, logo string,
+templ CompaniesList(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -47,12 +47,12 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
 
-templ CompaniesEdit(page, logo string,
+templ CompaniesEdit(page, logo, flash string,
 fromProtected, isError bool,
 msg,
 username,
@@ -61,7 +61,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, flash, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
@@ -76,7 +76,7 @@ templ CompanyFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
 }
 }
 
-templ CompanyFormNewIndex(page, logo string,
+templ CompanyFormNewIndex(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -85,7 +85,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

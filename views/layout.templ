@@ -5,12 +5,15 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-templ Layout(title, logo string, fp, isError bool, msg, user, email, pPic string, mItems, pItems models.MenuItems) {
+templ Layout(title, logo, fl string, fp, isError bool, msg, user, email, pPic string, mItems, pItems models.MenuItems) {
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
 @HeaderComponent(title)
 
 <body class="h-full">
+    if fl != "" {
+    @partials.FlashMessage("Alert", fl)
+    }
     <div class="min-h-full">
         if !isError {
         @partials.NavbarNew(fp, user, email, pPic, title,

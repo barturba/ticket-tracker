@@ -102,7 +102,7 @@ func LoginIndex(fromProtected bool) templ.Component {
 }
 
 func Login(
-	page, logo string,
+	page, logo, fl string,
 	fromProtected, isError bool,
 	msg,
 	email,
@@ -149,7 +149,7 @@ func Login(
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Layout(page, logo, fromProtected, isError, msg, "", "", profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(page, logo, fl, fromProtected, isError, msg, "", "", profilePic, menuItems, profileItems).Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

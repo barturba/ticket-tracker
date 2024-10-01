@@ -29,7 +29,7 @@ templ HomeIndex(fromProtected bool) {
 </section>
 }
 
-templ Home(page, logo string,
+templ Home(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -39,7 +39,7 @@ menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
 
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

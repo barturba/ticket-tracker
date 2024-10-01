@@ -22,7 +22,7 @@ incident.ConfigurationItemID.String(), "","", optsCI)
 }
 }
 
-templ IncidentFormNewIndex(page, logo string,
+templ IncidentFormNewIndex(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -31,13 +31,13 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
 
 
-templ IncidentsEdit(page, logo string,
+templ IncidentsEdit(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -46,7 +46,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
@@ -82,7 +82,7 @@ templ IncidentsIndex(incidents []models.Incident) {
 @IncidentTable(incidents)
 }
 
-templ IncidentsList(page, logo string,
+templ IncidentsList(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -91,7 +91,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }

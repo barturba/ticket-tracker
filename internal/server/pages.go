@@ -12,6 +12,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/models"
+	"github.com/barturba/ticket-tracker/validator"
 	"github.com/barturba/ticket-tracker/views"
 	"github.com/google/uuid"
 )
@@ -19,24 +20,30 @@ import (
 func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 	fromProtected := false
 	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
-	login := views.Login("Login", cfg.Logo, fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndexNew)
+	login := views.Login("Login", cfg.Logo, "", fromProtected, false, "msg", "", cfg.ProfilePicPlaceholder, cfg.MenuItems, cfg.ProfileItems, lIndexNew)
 	templ.Handler(login).ServeHTTP(w, r)
 }
 
 // Configuration Items
 
 func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, r *http.Request, u database.User) {
+
+	v := validator.New()
 	companyID := r.URL.Query().Get("company_id")
-	if companyID == "" {
-		respondWithError(w, http.StatusInternalServerError, "the 'company_id' parameter can't be blank")
-		return
-	}
 
 	companyUUID, err := uuid.Parse(companyID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "invalid 'company_id' parameter")
 		return
 	}
+
+	v.Check(companyUUID != uuid.Nil, "company_id", "must be provided")
+
+	if !v.Valid() {
+		cfg.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
 	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companyUUID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't find incidents")
@@ -63,6 +70,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	cIIndex := views.ConfigurationItemsIndex(cis)
 	cIList := views.IncidentsList("Configuration Items List",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -109,6 +117,7 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 	cEIndexNew := views.ConfigurationItemFormNew(selectOptionsCompany, ci)
 	cEdit := views.ConfigurationItemsEdit("Configuration Items - Edit",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -184,8 +193,10 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	}
 	iIndex := views.IncidentsIndex(incidents)
+	iFlash := ""
 	iList := views.IncidentsList("Incidents List",
 		cfg.Logo,
+		iFlash,
 		fromProtected,
 		false,
 		"",
@@ -308,6 +319,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	iEIndexNew := views.IncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
 	iEdit := views.IncidentsEdit("Incidents - Edit",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -424,6 +436,7 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	iIndexNew := views.IncidentForm("POST", iIPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident)
 	iNew := views.IncidentsEdit("Incidents - Add",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -497,6 +510,7 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 	cIndex := views.CompaniesIndex(companies)
 	cList := views.CompaniesList("Companies List",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -526,6 +540,7 @@ func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u 
 	cIndex := views.UsersIndex(users)
 	cList := views.UsersList("Users List",
 		cfg.Logo,
+		"",
 		fromProtected,
 		false,
 		"",
@@ -544,7 +559,7 @@ func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u 
 		fromProtected = true
 	}
 	hindex := views.HomeIndex(fromProtected)
-	home := views.Home("TicketTracker", cfg.Logo, fromProtected, false, "msg", u.Name, u.Email,
+	home := views.Home("TicketTracker", cfg.Logo, "", fromProtected, false, "msg", u.Name, u.Email,
 		cfg.ProfilePicPlaceholder,
 		cfg.MenuItems, cfg.ProfileItems, hindex)
 	templ.Handler(home).ServeHTTP(w, r)

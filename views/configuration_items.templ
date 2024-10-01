@@ -37,7 +37,7 @@ templ ConfigurationItemsIndex(configurationItems []models.ConfigurationItem) {
 @ConfigurationItemsTable(configurationItems)
 }
 
-templ ConfigurationItemsList(page, logo string,
+templ ConfigurationItemsList(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -46,12 +46,12 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
 
-templ ConfigurationItemsEdit(page, logo string,
+templ ConfigurationItemsEdit(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -60,7 +60,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
@@ -75,7 +75,7 @@ templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.C
 }
 }
 
-templ ConfigurationItemFormNewIndex(page, logo string,
+templ ConfigurationItemFormNewIndex(page, logo, fl string,
 fromProtected, isError bool,
 msg,
 username,
@@ -84,7 +84,7 @@ profilePic string,
 menuItems models.MenuItems,
 profileItems models.MenuItems,
 cmp templ.Component) {
-@Layout(page, logo, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
+@Layout(page, logo, fl, fromProtected, isError, msg, username, email, profilePic, menuItems, profileItems) {
 @cmp
 }
 }
