@@ -37,20 +37,6 @@ templ ConfigurationItemsIndex(configurationItems []models.ConfigurationItem) {
 @ConfigurationItemsTable(configurationItems)
 }
 
-templ ConfigurationItemsList(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}
-
-
-templ ConfigurationItemsEdit(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}
-
-
 templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.ConfigurationItem) {
 @partials.FormNew("POST", "/configuration-items") {
 @partials.FormSection("Configuration Item", "Configuration Item information") {
@@ -58,11 +44,5 @@ templ ConfigurationItemFormNew(selectOptionsCI models.SelectOptions, ci models.C
 @partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())
 @partials.FormInput4("name", "Name", "", "text", ci.Name)
 }
-}
-}
-
-templ ConfigurationItemFormNewIndex(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
 }
 }

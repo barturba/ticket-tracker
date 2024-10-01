@@ -1,8 +1,4 @@
 package views
-import (
-"github.com/barturba/ticket-tracker/models"
-)
-
 
 templ HomeIndex(fromProtected bool) {
 <section class="flex flex-col gap-8 mx-auto text-center w-fit">
@@ -27,10 +23,4 @@ templ HomeIndex(fromProtected bool) {
     </footer>
     }
 </section>
-}
-
-templ Home(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
 }

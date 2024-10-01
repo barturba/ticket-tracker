@@ -38,17 +38,6 @@ templ UsersIndex(users []models.User) {
 @UsersTable(users)
 }
 
-templ UsersList(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}
-
-templ UsersEdit(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}
 
 templ UserFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
 @partials.FormNew("POST", "/configuration-items") {

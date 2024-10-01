@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -74,4 +75,20 @@ func (cfg *ApiConfig) readJSON(w http.ResponseWriter, r *http.Request, dst any) 
 		return errors.New("Error decoding parameters")
 	}
 	return nil
+}
+
+func NewPage(title string, cfg *ApiConfig, u models.User) models.Page {
+	return models.Page{
+		Title:            title,
+		Logo:             cfg.Logo,
+		FlashMessage:     "",
+		IsLoggedIn:       true,
+		IsError:          false,
+		Msg:              "",
+		User:             u.Name,
+		Email:            u.Email,
+		ProfilePicture:   cfg.ProfilePicPlaceholder,
+		MenuItems:        cfg.MenuItems,
+		ProfileMenuItems: cfg.ProfileItems,
+	}
 }

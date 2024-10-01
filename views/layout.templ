@@ -32,6 +32,12 @@ templ Layout(title, logo, fl string, fp, isError bool, msg, user, email, pPic st
 </html>
 }
 
+templ BuildLayout(page models.Page, cmp templ.Component) {
+@LayoutNew(page) {
+@cmp
+}
+}
+
 templ LayoutNew(p models.Page) {
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
@@ -58,15 +64,3 @@ templ LayoutNew(p models.Page) {
 
 </html>
 }
-
-// templ InnerLayout(title string) {
-// <title hx-swap-oob>{title}</title>
-// <div hx-swap-oob="#navbar-title">{title}</div>
-// {children...}
-// }
-
-// templ InnerLayout(title string) {
-// <title hx-swap-oob>{title}</title>
-// <div hx-swap-oob="#navbar-title">{title}</div>
-// {children...}
-// }

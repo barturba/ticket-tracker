@@ -37,15 +37,3 @@ for _, ci := range companies{
 templ CompaniesIndex(companies []models.Company) {
 @CompaniesTable(companies)
 }
-
-templ CompaniesList(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}
-
-templ CompaniesEdit(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
-}

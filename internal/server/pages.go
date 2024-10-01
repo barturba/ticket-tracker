@@ -25,21 +25,11 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 			Link: "/login",
 		},
 	}
-	page := models.Page{
-		Title:            "Login",
-		Logo:             cfg.Logo,
-		FlashMessage:     "",
-		IsLoggedIn:       true,
-		IsError:          false,
-		Msg:              "",
-		User:             "",
-		Email:            "",
-		ProfilePicture:   cfg.ProfilePicPlaceholder,
-		MenuItems:        menuItems,
-		ProfileMenuItems: nil,
-	}
+	page := NewPage("Login", cfg, models.User{})
+	page.MenuItems = menuItems
+
 	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
-	login := views.Login(page, lIndexNew)
+	login := views.BuildLayout(page, lIndexNew)
 	templ.Handler(login).ServeHTTP(w, r)
 }
 
@@ -95,7 +85,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 		MenuItems:        cfg.MenuItems,
 		ProfileMenuItems: cfg.ProfileItems,
 	}
-	cIList := views.IncidentsList(page, cIIndex)
+	cIList := views.BuildLayout(page, cIIndex)
 	templ.Handler(cIList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -141,7 +131,7 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 	}
 
 	cEIndexNew := views.ConfigurationItemFormNew(selectOptionsCompany, ci)
-	cEdit := views.ConfigurationItemsEdit(page, cEIndexNew)
+	cEdit := views.BuildLayout(page, cEIndexNew)
 	templ.Handler(cEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleConfigurationItemsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -217,7 +207,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 		MenuItems:        cfg.MenuItems,
 		ProfileMenuItems: cfg.ProfileItems,
 	}
-	iList := views.IncidentsList(page, iIndex)
+	iList := views.BuildLayout(page, iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -339,7 +329,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		MenuItems:        cfg.MenuItems,
 		ProfileMenuItems: cfg.ProfileItems,
 	}
-	iEdit := views.IncidentsEdit(page, iEIndexNew)
+	iEdit := views.BuildLayout(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -435,7 +425,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		MenuItems:        cfg.MenuItems,
 		ProfileMenuItems: cfg.ProfileItems,
 	}
-	iEdit := views.IncidentsEdit(page, iEIndexNew)
+	iEdit := views.BuildLayout(page, iEIndexNew)
 	templ.Handler(iEdit).ServeHTTP(w, r)
 }
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u database.User) {
@@ -471,7 +461,7 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		MenuItems:        cfg.MenuItems,
 		ProfileMenuItems: cfg.ProfileItems,
 	}
-	iNew := views.IncidentsEdit(page, iIndexNew)
+	iNew := views.BuildLayout(page, iIndexNew)
 	templ.Handler(iNew).ServeHTTP(w, r)
 }
 
@@ -543,7 +533,7 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 	}
 
 	cIndex := views.CompaniesIndex(companies)
-	cList := views.CompaniesList(page, cIndex)
+	cList := views.BuildLayout(page, cIndex)
 	templ.Handler(cList).ServeHTTP(w, r)
 }
 
@@ -572,7 +562,7 @@ func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u 
 	}
 
 	cIndex := views.UsersIndex(users)
-	cList := views.UsersList(page, cIndex)
+	cList := views.BuildLayout(page, cIndex)
 	templ.Handler(cList).ServeHTTP(w, r)
 }
 
@@ -595,6 +585,6 @@ func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u 
 		ProfileMenuItems: cfg.ProfileItems,
 	}
 	hindex := views.HomeIndex(fromProtected)
-	home := views.Home(page, hindex)
+	home := views.BuildLayout(page, hindex)
 	templ.Handler(home).ServeHTTP(w, r)
 }

@@ -1,5 +1,4 @@
 package views
-import "github.com/barturba/ticket-tracker/models"
 
 templ LoginIndexNew(fromProtected bool, logo string) {
 <!-- set html bg-gray-50 -->
@@ -150,10 +149,4 @@ templ LoginIndex(fromProtected bool) {
     </form>
 </main>
 
-}
-
-templ Login(page models.Page, cmp templ.Component) {
-@LayoutNew(page) {
-@cmp
-}
 }
