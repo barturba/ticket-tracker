@@ -6,17 +6,17 @@ import (
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/auth"
-	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
-type authedHandler func(http.ResponseWriter, *http.Request, database.User)
+type authedHandler func(http.ResponseWriter, *http.Request, models.User)
 
 func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// check for JWT authorization and API key authorization
-		user := database.User{}
+		user := models.User{}
 
 		// JWT authorization check
 		cookie, err := r.Cookie("jwtCookie")
@@ -32,12 +32,12 @@ func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 				return
 			}
 
-			user, err = cfg.DB.GetUserByAPIKey(r.Context(), authorization)
+			databaseUser, err := cfg.DB.GetUserByAPIKey(r.Context(), authorization)
 			if err != nil {
 				respondWithError(w, http.StatusInternalServerError, "error getting user")
 				return
 			}
-
+			user = models.DatabaseUserToUser(databaseUser)
 		} else {
 			tokenString := cookie.Value
 			claims := jwt.MapClaims{}
@@ -65,12 +65,12 @@ func (cfg *ApiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 				return
 			}
 
-			user, err = cfg.DB.GetUserByID(r.Context(), id)
+			databaseUser, err := cfg.DB.GetUserByID(r.Context(), id)
 			if err != nil {
 				respondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-
+			user = models.DatabaseUserToUser(databaseUser)
 		}
 
 		handler(w, r, user)
@@ -111,11 +111,12 @@ func (cfg *ApiConfig) middlewareAuthPage(handler authedHandler) http.HandlerFunc
 			return
 		}
 
-		user, err := cfg.DB.GetUserByID(r.Context(), id)
+		databaseUser, err := cfg.DB.GetUserByID(r.Context(), id)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		user := models.DatabaseUserToUser(databaseUser)
 		handler(w, r, user)
 
 	}
@@ -127,7 +128,7 @@ func (cfg *ApiConfig) middlewareAuthPageNoRedirect(handler authedHandler) http.H
 		// JWT authorization check
 		cookie, err := r.Cookie("jwtCookie")
 		if err != nil {
-			user := database.User{}
+			user := models.User{}
 			handler(w, r, user)
 			return
 		}
@@ -157,11 +158,13 @@ func (cfg *ApiConfig) middlewareAuthPageNoRedirect(handler authedHandler) http.H
 			return
 		}
 
-		user, err := cfg.DB.GetUserByID(r.Context(), id)
+		databaseUser, err := cfg.DB.GetUserByID(r.Context(), id)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		user := models.DatabaseUserToUser(databaseUser)
+
 		handler(w, r, user)
 
 	}

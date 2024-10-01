@@ -56,7 +56,7 @@ func (cfg *ApiConfig) handleUsers(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, resp)
 }
 
-func (cfg *ApiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u models.User) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -86,7 +86,7 @@ func (cfg *ApiConfig) handleCompanies(w http.ResponseWriter, r *http.Request, u 
 
 }
 
-func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Request, u models.User) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
@@ -116,7 +116,7 @@ func (cfg *ApiConfig) handleConfigurationItems(w http.ResponseWriter, r *http.Re
 	respondWithJSON(w, http.StatusOK, models.DatabaseConfigurationItemToConfigurationItem(configurationItem))
 }
 
-func (cfg *ApiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	configurationItems, err := cfg.DB.GetConfigurationItems(r.Context())
 	if err != nil {
@@ -127,7 +127,7 @@ func (cfg *ApiConfig) getConfigurationItems(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusOK, models.DatabaseConfigurationItemsToConfigurationItems(configurationItems))
 }
 
-func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u models.User) {
 	type parameters struct {
 		ShortDescription    string    `json:"short_description"`
 		Description         string    `json:"description"`
@@ -182,7 +182,7 @@ func (cfg *ApiConfig) handleIncidents(w http.ResponseWriter, r *http.Request, u 
 
 }
 
-func (cfg *ApiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u database.User) {
+func (cfg *ApiConfig) getIncidents(w http.ResponseWriter, r *http.Request, u models.User) {
 	// Get the organization -- should this be a part of the authentication
 	// process? I mean we're using the organization quite a bit.
 	//
