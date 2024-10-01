@@ -8,14 +8,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
-	// API Endpoints
-
-	mux.HandleFunc("POST /v1/users", cfg.handleUsers)
-	mux.HandleFunc("POST /v1/configuration-items", cfg.middlewareAuth(cfg.handleConfigurationItems))
-	mux.HandleFunc("GET /v1/configuration-items", cfg.middlewareAuth(cfg.getConfigurationItems))
-	mux.HandleFunc("POST /v1/incidents", cfg.middlewareAuth(cfg.handleIncidents))
-	mux.HandleFunc("GET /v1/incidents", cfg.middlewareAuth(cfg.getIncidents))
-
 	// Page Endpoints
 
 	// - Incidents
@@ -36,10 +28,10 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	// - Companies
 
-	mux.HandleFunc("POST /v1/companies", cfg.middlewareAuth(cfg.handleCompanies))
 	mux.HandleFunc("GET /companies", cfg.middlewareAuthPage(cfg.handleViewCompanies))
 
 	// - Users
+
 	mux.HandleFunc("GET /users", cfg.middlewareAuthPage(cfg.handleViewUsers))
 
 	// Login Endpoints
