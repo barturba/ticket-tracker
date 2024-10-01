@@ -62,12 +62,6 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("HX-Redirect", "/incidents")
 	http.Redirect(w, r, "/incidents", http.StatusFound)
-
-	// respondWithJSON(w, http.StatusOK, response{
-	// 	ID:    user.ID,
-	// 	Email: user.Email,
-	// 	Token: string(jwt),
-	// })
 }
 
 func (cfg *ApiConfig) handleLogout(w http.ResponseWriter, r *http.Request) {

@@ -13,8 +13,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:generate ./tailwindcss -o static/css/tailwind.css
-
 //go:embed static
 var static embed.FS
 

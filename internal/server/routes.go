@@ -34,9 +34,11 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux.HandleFunc("GET /users", cfg.middlewareAuthPage(cfg.handleViewUsers))
 
-	// Login Endpoints
+	// Home
 
 	mux.HandleFunc("GET /", cfg.middlewareAuthPageNoRedirect(cfg.handlePageIndex))
+
+	// Login Endpoints
 	mux.HandleFunc("POST /v1/login", cfg.handleLogin)
 	mux.HandleFunc("GET /login", cfg.handleLoginPage)
 	mux.HandleFunc("GET /logout", cfg.handleLogout)
