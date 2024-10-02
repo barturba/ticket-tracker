@@ -25,6 +25,7 @@ func (cfg *ApiConfig) GetCompaniesSelection(r *http.Request, dst any) error {
 	*dst.(*models.SelectOptions) = selectOptionsCompany
 	return nil
 }
+
 func (cfg *ApiConfig) GetCISelection(r *http.Request, dst any) error {
 	databaseCIs, err := cfg.DB.GetConfigurationItems(r.Context())
 	if err != nil {
@@ -93,10 +94,19 @@ func (cfg *ApiConfig) GetCIsByCompanyID(r *http.Request, id uuid.UUID) ([]models
 func (cfg *ApiConfig) GetCIByID(r *http.Request, id uuid.UUID) (models.ConfigurationItem, error) {
 	databaseConfigurationItem, err := cfg.DB.GetConfigurationItemByID(r.Context(), id)
 	if err != nil {
-		return models.ConfigurationItem{}, errors.New("can't find incident")
+		return models.ConfigurationItem{}, errors.New("can't find configuration item")
 	}
 	ci := models.DatabaseConfigurationItemToConfigurationItem(databaseConfigurationItem)
 	return ci, nil
+}
+
+func (cfg *ApiConfig) GetIncidentByID(r *http.Request, id uuid.UUID) (models.Incident, error) {
+	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
+	if err != nil {
+		return models.Incident{}, errors.New("can't find incident")
+	}
+	incident := models.DatabaseIncidentToIncident(databaseIncident)
+	return incident, nil
 }
 
 func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {

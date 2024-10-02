@@ -92,8 +92,8 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 		return
 	}
 
-	var selectOptionsCompany models.SelectOptions
-	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	var companies models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &companies)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -101,7 +101,7 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 
 	page := NewPage("Configuration Items - Edit", cfg, u)
 
-	cEIndexNew := views.ConfigurationItemFormNew(selectOptionsCompany, ci)
+	cEIndexNew := views.ConfigurationItemFormNew(companies, ci)
 	cEdit := views.BuildLayout(page, cEIndexNew)
 	templ.Handler(cEdit).ServeHTTP(w, r)
 }
@@ -233,12 +233,11 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), incidentId)
+	incident, err := cfg.GetIncidentByID(r, incidentId)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't find incident")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
 	var companies models.SelectOptions
 	err = cfg.GetCompaniesSelection(r, &companies)
@@ -313,53 +312,40 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	incident = models.DatabaseIncidentToIncident(databaseIncident)
 
-	var selectOptionsCompany models.SelectOptions
-	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	var companies models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &companies)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	companies, err := cfg.GetCompanies(r)
+	var cis models.SelectOptions
+	err = cfg.GetCISelection(r, &cis)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
-		return
-	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
-
-	users, err := cfg.GetUsers(r)
+	var users models.SelectOptions
+	err = cfg.GetUsersSelection(r, &users)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	selectOptionsCI := models.SelectOptions{}
-	for _, ci := range configurationItems {
-		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
+	var states models.SelectOptions
+	err = cfg.GetStatesSelection(r, &states)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	selectOptionsState := models.SelectOptions{}
-	for _, so := range models.StateOptionsEnum {
-		selectOptionsState = append(selectOptionsState, models.NewSelectOption(string(so), string(so)))
-	}
-
-	assignedToOptions := models.SelectOptions{}
-	for _, user := range users {
-		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
-	}
-
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
+	fields := MakeIncidentFields(incident, companies, cis, states, users)
 
 	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
 	cancelPath := "/incidents"
-	form := models.NewIncidentForm("PUT", path, cancelPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
+	form := models.NewIncidentForm("PUT", path, cancelPath, companies, cis, states, users, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)
@@ -371,52 +357,39 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 
 	incident := NewIncidentEmpty()
 
-	var selectOptionsCompany models.SelectOptions
-	err := cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	var companies models.SelectOptions
+	err := cfg.GetCompaniesSelection(r, &companies)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	var selectOptionsState models.SelectOptions
-	cfg.GetStateSelection(&selectOptionsState)
-
-	companies, err := cfg.GetCompanies(r)
+	var cis models.SelectOptions
+	err = cfg.GetCISelection(r, &cis)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	databaseConfigurationItems, err := cfg.DB.GetConfigurationItemsByCompanyID(r.Context(), companies[0].ID)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't find configuration items")
-		return
-	}
-	configurationItems := models.DatabaseConfigurationItemsToConfigurationItems(databaseConfigurationItems)
-	selectOptionsCI := models.SelectOptions{}
-	for _, ci := range configurationItems {
-		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
-	}
-	stateOptions := models.SelectOptions{}
-	for _, so := range models.StateOptionsEnum {
-		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
-	}
 
-	users, err := cfg.GetUsers(r)
+	var users models.SelectOptions
+	err = cfg.GetUsersSelection(r, &users)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	assignedToOptions := models.SelectOptions{}
-	for _, user := range users {
-		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
-	}
 
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
+	var states models.SelectOptions
+	err = cfg.GetStatesSelection(r, &states)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	fields := MakeIncidentFields(incident, companies, cis, states, users)
 
 	formData := models.NewFormData()
 	path := "/incidents"
 	cancelPath := "/incidents"
-	form := models.NewIncidentForm("POST", path, cancelPath, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
+	form := models.NewIncidentForm("POST", path, cancelPath, companies, cis, states, users, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Add", cfg, u)
