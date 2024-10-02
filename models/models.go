@@ -1,9 +1,12 @@
 package models
 
 import (
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/validator"
 	"github.com/google/uuid"
 )
 
@@ -28,7 +31,7 @@ type Incident struct {
 	ShortDescription      string             `json:"short_description"`
 	Description           string             `json:"description"`
 	State                 database.StateEnum `json:"state"`
-	AssignedTo            uuid.UUID          `json:"assigned_to"`
+	AssignedTo            uuid.UUID          `json:"assigned_to_id"`
 	AssignedToName        string             `json:"assigned_to_name"`
 	ConfigurationItemID   uuid.UUID          `json:"configuration_item_id"`
 	ConfigurationItemName string             `json:"configuration_item_name"`
@@ -111,6 +114,7 @@ func DatabaseIncidentToIncident(incident database.Incident) Incident {
 }
 
 func DatabaseIncidentRowToIncident(incident database.GetIncidentsRow) Incident {
+	log.Println("conversion: name: ", incident.Name)
 	return Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
@@ -363,3 +367,27 @@ func (i *Dropdown) GetID() string           { return i.ID }
 func (i *InputField) GetLabel() string         { return i.Label }
 func (i *InputFieldDisabled) GetLabel() string { return i.Label }
 func (i *Dropdown) GetLabel() string           { return i.Label }
+
+var IncidentInput struct {
+	ID                  uuid.UUID          `json:"id"`
+	ShortDescription    string             `json:"short_description"`
+	Description         string             `json:"description"`
+	CompanyID           uuid.UUID          `json:"company_id"`
+	AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+	State               database.StateEnum `json:"state"`
+}
+
+func CheckIncident(i Incident) error {
+	v := validator.New()
+	v.Check(i.ID != uuid.UUID{}, "id", "must be provided")
+	v.Check(i.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
+	v.Check(i.CompanyID != uuid.UUID{}, "company_id", "must be provided")
+	v.Check(i.AssignedTo != uuid.UUID{}, "assigned_to_id", "must be provided")
+	v.Check(i.Description != "", "description", "must be provided")
+	v.Check(i.ShortDescription != "", "short_description", "must be provided")
+	if !v.Valid() {
+		return fmt.Errorf("validation errors: %v", v.Errors)
+	}
+	return nil
+}

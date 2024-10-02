@@ -30,6 +30,10 @@ SELECT * FROM incidents WHERE id = $1;
 
 -- name: UpdateIncident :one
 UPDATE incidents
-SET updated_at = $2, description = $3, short_description = $4, state = $5
+SET updated_at = $2, 
+description = $3, 
+short_description = $4, 
+state = $5,
+assigned_to = $6
 WHERE ID = $1
 RETURNING *;

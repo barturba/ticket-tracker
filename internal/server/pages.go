@@ -293,23 +293,16 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 }
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
-	var input struct {
-		ID                  uuid.UUID          `json:"id"`
-		ShortDescription    string             `json:"short_description"`
-		Description         string             `json:"description"`
-		CompanyID           uuid.UUID          `json:"company_id"`
-		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
-		State               database.StateEnum `json:"state"`
-	}
+	input := models.IncidentInput
+
 	err := cfg.readJSON(w, r, &input)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.ShortDescription, input.Description, input.State)
+	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
-	err = CheckIncident(incident)
-
+	err = models.CheckIncident(incident)
 	if err != nil {
 		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
 		return
@@ -441,28 +434,19 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 }
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
-	var input struct {
-		ShortDescription    string             `json:"short_description"`
-		Description         string             `json:"description"`
-		CompanyID           uuid.UUID          `json:"company_id"`
-		ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
-		State               database.StateEnum `json:"state"`
-	}
+
+	input := models.IncidentInput
 
 	err := cfg.readJSON(w, r, &input)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
-	v := validator.New()
-	v.Check(input.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
-	v.Check(input.CompanyID != uuid.UUID{}, "company_id", "must be provided")
-	v.Check(input.Description != "", "description", "must be provided")
-	v.Check(input.ShortDescription != "", "short_description", "must be provided")
-
-	if !v.Valid() {
-		respondToFailedValidation(w, r, v.Errors)
+	err = models.CheckIncident(incident)
+	if err != nil {
+		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -472,16 +456,11 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
 		return
 	}
+	incident.ID = id
 
-	_, err = cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
-		ID:               id,
-		UpdatedAt:        time.Now(),
-		Description:      sql.NullString{String: input.Description, Valid: input.Description != ""},
-		ShortDescription: input.ShortDescription,
-		State:            input.State,
-	})
+	incident, err = cfg.UpdateIncident(r, incident)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't update incident")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

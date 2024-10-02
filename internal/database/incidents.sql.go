@@ -289,7 +289,11 @@ func (q *Queries) GetIncidentsBySearchTermLimitOffset(ctx context.Context, arg G
 
 const updateIncident = `-- name: UpdateIncident :one
 UPDATE incidents
-SET updated_at = $2, description = $3, short_description = $4, state = $5
+SET updated_at = $2, 
+description = $3, 
+short_description = $4, 
+state = $5,
+assigned_to = $6
 WHERE ID = $1
 RETURNING id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to
 `
@@ -300,6 +304,7 @@ type UpdateIncidentParams struct {
 	Description      sql.NullString
 	ShortDescription string
 	State            StateEnum
+	AssignedTo       uuid.NullUUID
 }
 
 func (q *Queries) UpdateIncident(ctx context.Context, arg UpdateIncidentParams) (Incident, error) {
@@ -309,6 +314,7 @@ func (q *Queries) UpdateIncident(ctx context.Context, arg UpdateIncidentParams) 
 		arg.Description,
 		arg.ShortDescription,
 		arg.State,
+		arg.AssignedTo,
 	)
 	var i Incident
 	err := row.Scan(

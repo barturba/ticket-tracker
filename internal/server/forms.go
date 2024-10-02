@@ -1,11 +1,7 @@
 package server
 
 import (
-	"fmt"
-
 	"github.com/barturba/ticket-tracker/models"
-	"github.com/barturba/ticket-tracker/validator"
-	"github.com/google/uuid"
 )
 
 func MakeIncidentFields(incident models.Incident, companies, cis, states, users models.SelectOptions) []models.Field {
@@ -14,7 +10,7 @@ func MakeIncidentFields(incident models.Incident, companies, cis, states, users 
 	company := models.NewDropdown("company_id", "Company", companies, string(companies[0].Name), "", "/configuration-items-select", "#configuration_item_id")
 	ci := models.NewDropdown("configuration_item_id", "Configuration Item", cis, string(cis[0].Name), "", "", "")
 	state := models.NewDropdown("state", "State", states, string(states[0].Name), "", "", "")
-	assignedTo := models.NewDropdown("assigned_to", "Assigned To", users, incident.AssignedTo.String(), "", "/configuration-items-select", "#configuration_item_id")
+	assignedTo := models.NewDropdown("assigned_to_id", "Assigned To", users, incident.AssignedTo.String(), "", "", "")
 	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
 	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
 
@@ -28,17 +24,4 @@ func MakeIncidentFields(incident models.Incident, companies, cis, states, users 
 		&desc,
 	}
 	return fields
-}
-
-func CheckIncident(i models.Incident) error {
-	v := validator.New()
-	v.Check(i.ID != uuid.UUID{}, "id", "must be provided")
-	v.Check(i.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
-	v.Check(i.CompanyID != uuid.UUID{}, "company_id", "must be provided")
-	v.Check(i.Description != "", "description", "must be provided")
-	v.Check(i.ShortDescription != "", "short_description", "must be provided")
-	if !v.Valid() {
-		return fmt.Errorf("validation errors: %v", v.Errors)
-	}
-	return nil
 }

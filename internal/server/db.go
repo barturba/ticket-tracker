@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 	"time"
@@ -78,6 +79,23 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 	return incidents, nil
 }
 
+func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models.Incident, error) {
+	dbIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
+		ID:               i.ID,
+		UpdatedAt:        time.Now(),
+		Description:      sql.NullString{String: i.Description, Valid: i.Description != ""},
+		ShortDescription: i.ShortDescription,
+		State:            i.State,
+		AssignedTo:       uuid.NullUUID{UUID: i.AssignedTo, Valid: true},
+	})
+	if err != nil {
+		return models.Incident{}, errors.New("couldn't update incident")
+	}
+	incident := models.DatabaseIncidentToIncident(dbIncident)
+
+	return incident, nil
+}
+
 func (cfg *ApiConfig) GetCompanies(r *http.Request) ([]models.Company, error) {
 	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
@@ -97,6 +115,7 @@ func (cfg *ApiConfig) GetUsers(r *http.Request) ([]models.User, error) {
 
 	return users, nil
 }
+
 func NewIncidentEmpty() models.Incident {
 	return models.Incident{
 		ID:                    uuid.New(),
@@ -113,15 +132,21 @@ func NewIncidentEmpty() models.Incident {
 	}
 }
 
-func NewIncident(id, companyID, configurationItemID uuid.UUID, shortDescription, description string, state database.StateEnum) models.Incident {
+func NewIncident(id uuid.UUID,
+	companyID,
+	configurationItemID,
+	assignedToID uuid.UUID,
+	shortDescription,
+	description string,
+	state database.StateEnum) models.Incident {
 	return models.Incident{
-		ID:                    uuid.New(),
-		CreatedAt:             time.Now(),
-		UpdatedAt:             time.Now(),
+		ID:                    id,
+		CreatedAt:             time.Time{},
+		UpdatedAt:             time.Time{},
 		ShortDescription:      shortDescription,
 		Description:           description,
 		State:                 state,
-		AssignedTo:            [16]byte{},
+		AssignedTo:            assignedToID,
 		AssignedToName:        "",
 		ConfigurationItemID:   configurationItemID,
 		ConfigurationItemName: "",
