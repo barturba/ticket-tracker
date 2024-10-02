@@ -2,13 +2,13 @@ package partials
 
 import "github.com/barturba/ticket-tracker/models"
 
-templ FormNew(action, postURL string) {
+templ FormNew(action, postURL, cancelURL string) {
 <form if ( action=="POST" ) { hx-post={postURL} } else { hx-put={postURL} } hx-ext="json-enc" hx-swap="transition:true"
     hx-target="body" hx-push-url="true">
     <div class="space-y-12">
         {children...}
     </div>
-    @ButtonsCancelSave()
+    @ButtonsCancelSave(cancelURL)
 </form>
 }
 
@@ -127,9 +127,10 @@ templ FormTextAreaFull(id, title, description, value string) {
 }
 
 
-templ ButtonsCancelSave() {
+templ ButtonsCancelSave(cancelLink string) {
 <div class="flex items-center justify-end mt-6 gap-x-6">
-    <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+    <button hx-get={cancelLink} hx-swap="transition:true" hx-target="body" hx-push-url="true" type="button"
+        class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
     <button type="submit"
         class="px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
 </div>

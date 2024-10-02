@@ -40,7 +40,7 @@ templ UsersIndex(users []models.User) {
 
 
 templ UserFormNew(selectOptionsCI models.SelectOptions, ci models.Company) {
-@partials.FormNew("POST", "/configuration-items") {
+@partials.FormNew("POST", "/users", "/users") {
 @partials.FormSection("Configuration Item", "Configuration Item information") {
 
 @partials.FormInput3Disabled("configuration_item_id", "Configuration Item ID", "", "text", ci.ID.String())

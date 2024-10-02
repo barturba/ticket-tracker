@@ -7,7 +7,7 @@ import (
 )
 
 templ NewIncidentForm(f models.IncidentForm, fields []models.Field) {
-@partials.FormNew(f.Action, f.Path) {
+@partials.FormNew(f.Action, f.Path, f.CancelPath) {
 @partials.FormSection("Incident", "Incident information") {
 
 for _, f := range fields {

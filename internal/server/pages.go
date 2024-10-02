@@ -284,7 +284,8 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 
 	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
-	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
+	cancelPath := "/incidents"
+	form := models.NewIncidentForm("PUT", path, cancelPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)
@@ -369,7 +370,8 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
-	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
+	cancelPath := "/incidents"
+	form := models.NewIncidentForm("PUT", path, cancelPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)
@@ -425,7 +427,8 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 
 	formData := models.NewFormData()
 	path := "/incidents"
-	form := models.NewIncidentForm("POST", path, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
+	cancelPath := "/incidents"
+	form := models.NewIncidentForm("POST", path, cancelPath, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Add", cfg, u)

@@ -254,6 +254,7 @@ type Page struct {
 type IncidentForm struct {
 	Action     string
 	Path       string
+	CancelPath string
 	Companies  SelectOptions
 	CIs        SelectOptions
 	States     SelectOptions
@@ -263,10 +264,11 @@ type IncidentForm struct {
 }
 
 // "PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData
-func NewIncidentForm(action, path string, companies, cis, states, assignedTo SelectOptions, incident Incident, formData FormData) IncidentForm {
+func NewIncidentForm(action, path, cancelPath string, companies, cis, states, assignedTo SelectOptions, incident Incident, formData FormData) IncidentForm {
 	return IncidentForm{
 		Action:     action,
 		Path:       path,
+		CancelPath: cancelPath,
 		Companies:  companies,
 		CIs:        cis,
 		States:     states,
