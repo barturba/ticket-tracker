@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -114,7 +113,6 @@ func DatabaseIncidentToIncident(incident database.Incident) Incident {
 }
 
 func DatabaseIncidentRowToIncident(incident database.GetIncidentsRow) Incident {
-	log.Println("conversion: name: ", incident.Name)
 	return Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
