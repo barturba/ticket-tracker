@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
@@ -96,8 +97,7 @@ func (cfg *ApiConfig) GetUsers(r *http.Request) ([]models.User, error) {
 
 	return users, nil
 }
-
-func NewIncident() models.Incident {
+func NewIncidentEmpty() models.Incident {
 	return models.Incident{
 		ID:                    uuid.New(),
 		CreatedAt:             time.Now(),
@@ -110,5 +110,21 @@ func NewIncident() models.Incident {
 		ConfigurationItemID:   [16]byte{},
 		ConfigurationItemName: "",
 		CompanyID:             [16]byte{},
+	}
+}
+
+func NewIncident(id, companyID, configurationItemID uuid.UUID, shortDescription, description string, state database.StateEnum) models.Incident {
+	return models.Incident{
+		ID:                    uuid.New(),
+		CreatedAt:             time.Now(),
+		UpdatedAt:             time.Now(),
+		ShortDescription:      shortDescription,
+		Description:           description,
+		State:                 state,
+		AssignedTo:            [16]byte{},
+		AssignedToName:        "",
+		ConfigurationItemID:   configurationItemID,
+		ConfigurationItemName: "",
+		CompanyID:             companyID,
 	}
 }

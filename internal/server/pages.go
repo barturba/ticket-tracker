@@ -280,10 +280,10 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
 
 	formData := models.NewFormData()
-	path := "/incidents"
+	path := fmt.Sprintf("/incidents/%s", incident.ID)
 	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
@@ -306,33 +306,30 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.ShortDescription, input.Description, input.State)
 
-	v := validator.New()
-	v.Check(input.ID != uuid.UUID{}, "id", "must be provided")
-	v.Check(input.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
-	v.Check(input.CompanyID != uuid.UUID{}, "company_id", "must be provided")
-	v.Check(input.Description != "", "description", "must be provided")
-	v.Check(input.ShortDescription != "", "short_description", "must be provided")
-	if !v.Valid() {
-		respondToFailedValidation(w, r, v.Errors)
+	err = CheckIncident(incident)
+
+	if err != nil {
+		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
 		return
 	}
 
 	databaseIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
-		ID:                  input.ID,
+		ID:                  incident.ID,
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
-		ShortDescription:    input.ShortDescription,
-		Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
-		State:               input.State,
-		ConfigurationItemID: input.ConfigurationItemID,
-		CompanyID:           input.CompanyID,
+		ShortDescription:    incident.ShortDescription,
+		Description:         sql.NullString{String: incident.Description, Valid: incident.Description != ""},
+		State:               incident.State,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		CompanyID:           incident.CompanyID,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
 		return
 	}
-	incident := models.DatabaseIncidentToIncident(databaseIncident)
+	incident = models.DatabaseIncidentToIncident(databaseIncident)
 
 	var selectOptionsCompany models.SelectOptions
 	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
@@ -375,10 +372,10 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
 
 	formData := models.NewFormData()
-	path := "/incidents"
+	path := fmt.Sprintf("/incidents/%s", incident.ID)
 	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
@@ -389,7 +386,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
-	incident := NewIncident()
+	incident := NewIncidentEmpty()
 
 	var selectOptionsCompany models.SelectOptions
 	err := cfg.GetCompaniesSelection(r, &selectOptionsCompany)
@@ -431,7 +428,7 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
 
 	formData := models.NewFormData()
 	path := "/incidents"
