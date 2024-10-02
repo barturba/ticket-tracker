@@ -104,7 +104,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 
 const getUsers = `-- name: GetUsers :many
 SELECT id, created_at, updated_at, name, apikey, email, password FROM users 
-ORDER BY users.updated_at DESC
+ORDER BY users.name ASC
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {

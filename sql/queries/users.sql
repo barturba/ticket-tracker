@@ -5,7 +5,7 @@ RETURNING *;
 
 -- name: GetUsers :many
 SELECT * FROM users 
-ORDER BY users.updated_at DESC;
+ORDER BY users.name ASC;
 
 -- name: GetUserByAPIKey :one
 SELECT * FROM USERS WHERE APIKEY = $1;
