@@ -240,52 +240,40 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	}
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
 
-	companies, err := cfg.GetCompanies(r)
+	var companies models.SelectOptions
+	err = cfg.GetCompaniesSelection(r, &companies)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	var selectOptionsCompany models.SelectOptions
-	err = cfg.GetCompaniesSelection(r, &selectOptionsCompany)
+	var cis models.SelectOptions
+	err = cfg.GetCISelection(r, &cis)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	cis, err := cfg.GetCIsByCompanyID(r, companies[0].ID)
+	var users models.SelectOptions
+	err = cfg.GetUsersSelection(r, &users)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	users, err := cfg.GetUsers(r)
+	var states models.SelectOptions
+	err = cfg.GetStatesSelection(r, &states)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	selectOptionsCI := models.SelectOptions{}
-	for _, ci := range cis {
-		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
-	}
-
-	selectOptionsState := models.SelectOptions{}
-	for _, so := range models.StateOptionsEnum {
-		selectOptionsState = append(selectOptionsState, models.NewSelectOption(string(so), string(so)))
-	}
-
-	assignedToOptions := models.SelectOptions{}
-	for _, user := range users {
-		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
-	}
-
-	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions)
+	fields := MakeIncidentFields(incident, companies, cis, states, users)
 
 	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
 	cancelPath := "/incidents"
-	form := models.NewIncidentForm("PUT", path, cancelPath, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
+	form := models.NewIncidentForm("PUT", path, cancelPath, companies, cis, states, users, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)

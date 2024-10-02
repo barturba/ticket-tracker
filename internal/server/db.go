@@ -25,6 +25,44 @@ func (cfg *ApiConfig) GetCompaniesSelection(r *http.Request, dst any) error {
 	*dst.(*models.SelectOptions) = selectOptionsCompany
 	return nil
 }
+func (cfg *ApiConfig) GetCISelection(r *http.Request, dst any) error {
+	databaseCIs, err := cfg.DB.GetConfigurationItems(r.Context())
+	if err != nil {
+		return errors.New("couldn't find configuration items")
+	}
+	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseCIs)
+	selectOptionsCI := models.SelectOptions{}
+
+	for _, ci := range cis {
+		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
+	}
+	*dst.(*models.SelectOptions) = selectOptionsCI
+	return nil
+}
+
+func (cfg *ApiConfig) GetUsersSelection(r *http.Request, dst any) error {
+	databaseUsers, err := cfg.DB.GetUsers(r.Context())
+	if err != nil {
+		return errors.New("couldn't find users")
+	}
+	users := models.DatabaseUsersToUsers(databaseUsers)
+	selectOptionsUsers := models.SelectOptions{}
+
+	for _, user := range users {
+		selectOptionsUsers = append(selectOptionsUsers, models.NewSelectOption(user.Name, user.ID.String()))
+	}
+	*dst.(*models.SelectOptions) = selectOptionsUsers
+	return nil
+}
+
+func (cfg *ApiConfig) GetStatesSelection(r *http.Request, dst any) error {
+	selectOptionsStates := models.SelectOptions{}
+	for _, so := range models.StateOptionsEnum {
+		selectOptionsStates = append(selectOptionsStates, models.NewSelectOption(string(so), string(so)))
+	}
+	*dst.(*models.SelectOptions) = selectOptionsStates
+	return nil
+}
 
 func (cfg *ApiConfig) GetStateSelection(dst any) {
 	stateOptions := models.SelectOptions{}
