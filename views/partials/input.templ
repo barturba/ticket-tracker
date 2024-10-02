@@ -1,0 +1,15 @@
+package partials
+
+import "github.com/barturba/ticket-tracker/models"
+
+templ Input(f models.InputField) {
+<input id={f.ID} name={f.ID} type={f.InputType} autocomplete={f.Autocomplete}
+    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm sm:leading-6"
+    value={f.Value}>
+}
+
+templ InputDisabled(f models.InputFieldDisabled) {
+<input id={f.ID} name={f.ID} type={f.InputType} autocomplete={f.Autocomplete} readonly
+    class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200 sm:text-sm sm:leading-6"
+    value={f.Value}>
+}

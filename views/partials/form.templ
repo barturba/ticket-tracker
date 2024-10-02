@@ -3,7 +3,7 @@ package partials
 import "github.com/barturba/ticket-tracker/models"
 
 templ FormNew(action, postURL string) {
-<form if (action=="POST" ) { hx-post={postURL} } else { hx-put={postURL} } hx-ext="json-enc" hx-swap="transition:true"
+<form if ( action=="POST" ) { hx-post={postURL} } else { hx-put={postURL} } hx-ext="json-enc" hx-swap="transition:true"
     hx-target="body" hx-push-url="true">
     <div class="space-y-12">
         {children...}
@@ -37,7 +37,7 @@ templ FormInput3Disabled(id, title, autocomplete, inputType, placeholder string)
 <div class="sm:col-span-3">
     <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
     <div class="mt-2">
-        <input type={inputType} name={id} id={id} autocomplete={autocomplete} disabled
+        <input type={inputType} name={id} id={id} autocomplete={autocomplete}
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
             placeholder={placeholder}>
     </div>
@@ -71,6 +71,46 @@ templ FormSelect3(id, title, autocomplete, selected, err, hxGet, hxTarget string
             }
             }
         </select>
+    </div>
+</div>
+}
+
+templ FormSelect3New(d models.Dropdown) {
+<div class="sm:col-span-3">
+    <label for={d.ID} class="block text-sm font-medium leading-6 text-gray-900">{d.Label}</label>
+    <div class="mt-2">
+        <select id={d.ID} name={d.ID} if (d.HXGet !="" ) { hx-get={d.HXGet} } if (d.HXTarget !="" ) {
+            hx-target={d.HXTarget} } hx-push-url="false"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:max-w-xs sm:text-sm sm:leading-6">
+            for _, o := range d.SelectOptions{
+            if d.Selected == o.Link {
+            <option value={o.Link} selected={o.Link}>{ o.Name }</option>
+            } else {
+            <option value={o.Link}>{ o.Name }</option>
+            }
+            }
+        </select>
+    </div>
+</div>
+}
+
+templ FormInput4New(f models.InputField) {
+
+<div class="sm:col-span-4">
+    <label for={f.ID} class="block text-sm font-medium leading-6 text-gray-900">{f.Label}</label>
+    <div class="mt-2">
+        <input id={f.ID} name={f.ID} type={f.InputType} autocomplete={f.Autocomplete}
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm sm:leading-6"
+            value={f.Value}>
+    </div>
+</div>
+}
+
+templ FormSelect3Wrapper(id, title string) {
+<div class="sm:col-span-3">
+    <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{title}</label>
+    <div class="mt-2">
+        {children...}
     </div>
 </div>
 }

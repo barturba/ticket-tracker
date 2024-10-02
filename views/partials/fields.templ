@@ -1,0 +1,16 @@
+package partials
+
+import "github.com/barturba/ticket-tracker/models"
+
+templ Field4() {
+<div class="sm:col-span-4">
+    {children...}
+</div>
+}
+
+templ Label(f models.Field) {
+<label for={f.GetID()} class="block text-sm font-medium leading-6 text-gray-900">{f.GetLabel()}</label>
+<div class="mt-2">
+    {children...}
+</div>
+}

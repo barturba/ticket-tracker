@@ -247,3 +247,119 @@ type Page struct {
 	MenuItems        MenuItems
 	ProfileMenuItems MenuItems
 }
+
+// form := NewIncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData)
+type IncidentForm struct {
+	Action     string
+	Path       string
+	Companies  SelectOptions
+	CIs        SelectOptions
+	States     SelectOptions
+	AssignedTo SelectOptions
+	Incident   Incident
+	FormData   FormData
+}
+
+// "PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, incident, formData
+func NewIncidentForm(action, path string, companies, cis, states, assignedTo SelectOptions, incident Incident, formData FormData) IncidentForm {
+	return IncidentForm{
+		Action:     action,
+		Path:       path,
+		Companies:  companies,
+		CIs:        cis,
+		States:     states,
+		AssignedTo: assignedTo,
+		Incident:   incident,
+		FormData:   formData,
+	}
+}
+
+type Dropdown struct {
+	ID            string
+	Label         string
+	Name          string
+	SelectOptions SelectOptions
+	Selected      string
+	ErrorText     string
+	HXGet         string
+	HXTarget      string
+}
+
+func NewDropdown(id string, label string, selectOptions SelectOptions, selected, errorText, hxGet, hxTarget string) Dropdown {
+	return Dropdown{
+		ID:            id,
+		Label:         label,
+		SelectOptions: selectOptions,
+		Selected:      selected,
+		ErrorText:     errorText,
+		HXGet:         hxGet,
+		HXTarget:      hxTarget,
+	}
+}
+
+type InputField struct {
+	ID           string
+	Label        string
+	Value        string
+	InputType    string
+	Autocomplete string
+	ErrorText    string
+	HXGet        string
+	HXTarget     string
+	Disabled     bool
+}
+
+func NewInputField(id string, label string, value string, inputType string, autocomplete string, errorText string, hxGet, hxTarget string) InputField {
+	return InputField{
+		ID:           id,
+		Label:        label,
+		Value:        value,
+		InputType:    inputType,
+		Autocomplete: autocomplete,
+		ErrorText:    errorText,
+		HXGet:        hxGet,
+		HXTarget:     hxTarget,
+	}
+}
+
+type InputFieldDisabled struct {
+	ID           string
+	Label        string
+	Value        string
+	InputType    string
+	Autocomplete string
+	ErrorText    string
+	HXGet        string
+	HXTarget     string
+}
+
+func NewInputFieldDisabled(id string, label string, value string, inputType string, autocomplete string, errorText string, hxGet, hxTarget string) InputFieldDisabled {
+	return InputFieldDisabled{
+		ID:           id,
+		Label:        label,
+		Value:        value,
+		InputType:    inputType,
+		Autocomplete: autocomplete,
+		ErrorText:    errorText,
+		HXGet:        hxGet,
+		HXTarget:     hxTarget,
+	}
+}
+
+type Field interface {
+	Field()
+	GetID() string
+	GetLabel() string
+}
+
+func (*InputField) Field()         {}
+func (*InputFieldDisabled) Field() {}
+func (*Dropdown) Field()           {}
+
+func (i *InputField) GetID() string         { return i.ID }
+func (i *InputFieldDisabled) GetID() string { return i.ID }
+func (i *Dropdown) GetID() string           { return i.ID }
+
+func (i *InputField) GetLabel() string         { return i.Label }
+func (i *InputFieldDisabled) GetLabel() string { return i.Label }
+func (i *Dropdown) GetLabel() string           { return i.Label }

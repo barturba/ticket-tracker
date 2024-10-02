@@ -6,21 +6,53 @@ import (
 "github.com/barturba/ticket-tracker/views/partials"
 )
 
-templ IncidentForm(action, path string, optsCompany, optsCI, optsState models.SelectOptions, incident models.Incident,
-formData models.FormData) {
-@partials.FormNew(action, path) {
+templ NewIncidentForm(f models.IncidentForm, fields []models.Field) {
+@partials.FormNew(f.Action, f.Path) {
 @partials.FormSection("Incident", "Incident information") {
 
-@partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", incident.ID.String())
-@partials.FormSelect3("company_id", "Company", "company-name",
-incident.CompanyID.String(), formData.Errors["company_id"], "/configuration-items-select","#configuration_item_id",
-optsCompany, )
+for _, f := range fields {
+switch f := f.(type) {
+case *models.InputField:
+@partials.Field4() {
+@partials.Label(f) {
+@partials.Input(*f)
+}
+}
+case *models.InputFieldDisabled:
+@partials.Field4() {
+@partials.Label(f) {
+@partials.InputDisabled(*f)
+}
+}
+case *models.Dropdown:
+@partials.FormSelect3New(*f)
+default:
+panic(fmt.Sprintf("unsupported type: %T", f))
+}
+}
+}
+}
+}
+
+templ IncidentForm(f models.IncidentForm) {
+@partials.FormNew(f.Action, f.Path) {
+@partials.FormSection("Incident", "Incident information") {
+
+@partials.FormInput3Disabled("incident_id", "Incident ID", "", "text", f.Incident.ID.String())
+@partials.FormSelect3Wrapper("company_id", "Company") {
+
+}
+
+@partials.FormSelect3("company_id", "Company", "company-name", f.Incident.CompanyID.String(), "",
+"/configuration-items-select","#configuration_item_id", f.Companies)
 @partials.FormSelect3("configuration_item_id", "Configuration Item", "configuration-item-id",
-incident.ConfigurationItemID.String(), formData.Errors["configuration_item_id"], "","", optsCI)
-@partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", incident.State), formData.Errors["state"], "", "",
-optsState)
-@partials.FormInput4("short_description", "Short Description", "", "text", incident.ShortDescription)
-@partials.FormTextAreaFull("description", "Description", "Write a description here", incident.Description)
+f.Incident.ConfigurationItemID.String(), "", "","", f.CIs)
+@partials.FormSelect3("state", "State", "state", fmt.Sprintf("%s", f.Incident.State), "", "", "", f.States)
+@partials.FormSelect3("assigned_to", "Assigned To", "assigned-to", fmt.Sprintf("%s", f.Incident.AssignedToName),
+"", "", "",
+f.AssignedTo)
+@partials.FormInput4("short_description", "Short Description", "", "text", f.Incident.ShortDescription)
+@partials.FormTextAreaFull("description", "Description", "Write a description here", f.Incident.Description)
 }
 }
 }
