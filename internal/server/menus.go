@@ -22,10 +22,10 @@ var MenuItems = models.MenuItems{
 	}}
 
 var ProfileItems = models.MenuItems{
-	models.MenuItem{
-		Name: "Settings",
-		Link: "/settings",
-	},
+	// models.MenuItem{
+	// 	Name: "Settings",
+	// 	Link: "/settings",
+	// },
 	models.MenuItem{
 		Name: "Log Out",
 		Link: "/logout",
