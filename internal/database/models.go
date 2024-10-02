@@ -66,12 +66,11 @@ type Company struct {
 }
 
 type ConfigurationItem struct {
-	ID             uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Name           string
-	OrganizationID uuid.UUID
-	CompanyID      uuid.UUID
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	CompanyID uuid.UUID
 }
 
 type Incident struct {

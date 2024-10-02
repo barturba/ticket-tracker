@@ -15,7 +15,7 @@ import (
 const createConfigurationItem = `-- name: CreateConfigurationItem :one
 INSERT INTO configuration_items (id, created_at, updated_at, name, company_id)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, name, organization_id, company_id
+RETURNING id, created_at, updated_at, name, company_id
 `
 
 type CreateConfigurationItemParams struct {
@@ -40,14 +40,13 @@ func (q *Queries) CreateConfigurationItem(ctx context.Context, arg CreateConfigu
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.OrganizationID,
 		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getConfigurationItemByID = `-- name: GetConfigurationItemByID :one
-SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+SELECT id, created_at, updated_at, name, company_id FROM configuration_items
 WHERE id = $1
 `
 
@@ -59,14 +58,13 @@ func (q *Queries) GetConfigurationItemByID(ctx context.Context, id uuid.UUID) (C
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.OrganizationID,
 		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getConfigurationItems = `-- name: GetConfigurationItems :many
-SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+SELECT id, created_at, updated_at, name, company_id FROM configuration_items
 `
 
 func (q *Queries) GetConfigurationItems(ctx context.Context) ([]ConfigurationItem, error) {
@@ -83,7 +81,6 @@ func (q *Queries) GetConfigurationItems(ctx context.Context) ([]ConfigurationIte
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Name,
-			&i.OrganizationID,
 			&i.CompanyID,
 		); err != nil {
 			return nil, err
@@ -100,7 +97,7 @@ func (q *Queries) GetConfigurationItems(ctx context.Context) ([]ConfigurationIte
 }
 
 const getConfigurationItemsByCompanyID = `-- name: GetConfigurationItemsByCompanyID :many
-SELECT id, created_at, updated_at, name, organization_id, company_id FROM configuration_items
+SELECT id, created_at, updated_at, name, company_id FROM configuration_items
 WHERE company_id = $1
 `
 
@@ -118,7 +115,6 @@ func (q *Queries) GetConfigurationItemsByCompanyID(ctx context.Context, companyI
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Name,
-			&i.OrganizationID,
 			&i.CompanyID,
 		); err != nil {
 			return nil, err
@@ -139,7 +135,7 @@ UPDATE configuration_items
 SET name = $2,
 updated_at = $3
 WHERE id = $1
-RETURNING id, created_at, updated_at, name, organization_id, company_id
+RETURNING id, created_at, updated_at, name, company_id
 `
 
 type UpdateConfigurationItemParams struct {
@@ -156,7 +152,6 @@ func (q *Queries) UpdateConfigurationItem(ctx context.Context, arg UpdateConfigu
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.OrganizationID,
 		&i.CompanyID,
 	)
 	return i, err
