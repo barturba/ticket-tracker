@@ -280,21 +280,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	id := models.NewInputFieldDisabled("id", "id", incident.ID.String(), "text", "id", "", "", "")
-	company := models.NewDropdown("company_id", "Company", selectOptionsCompany, string(selectOptionsCompany[0].Name), "", "/configuration-items-select", "#configuration_item_id")
-	ci := models.NewDropdown("configuration_item_id", "Configuration Item", selectOptionsCI, string(selectOptionsCI[0].Name), "", "", "")
-	state := models.NewDropdown("state", "State", selectOptionsState, string(selectOptionsState[0].Name), "", "", "")
-	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
-	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
-
-	fields := []models.Field{
-		&id,
-		&company,
-		&ci,
-		&state,
-		&shortDesc,
-		&desc,
-	}
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
 
 	formData := models.NewFormData()
 	path := "/incidents"
@@ -389,21 +375,7 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	id := models.NewInputFieldDisabled("id", "id", incident.ID.String(), "text", "id", "", "", "")
-	company := models.NewDropdown("company_id", "Company", selectOptionsCompany, string(selectOptionsCompany[0].Name), "", "/configuration-items-select", "#configuration_item_id")
-	ci := models.NewDropdown("configuration_item_id", "Configuration Item", selectOptionsCI, string(selectOptionsCI[0].Name), "", "", "")
-	state := models.NewDropdown("state", "State", selectOptionsState, string(selectOptionsState[0].Name), "", "", "")
-	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
-	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
-
-	fields := []models.Field{
-		&id,
-		&company,
-		&ci,
-		&state,
-		&shortDesc,
-		&desc,
-	}
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
 
 	formData := models.NewFormData()
 	path := "/incidents"
@@ -459,21 +431,7 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
-	id := models.NewInputFieldDisabled("id", "id", incident.ID.String(), "text", "id", "", "", "")
-	company := models.NewDropdown("company_id", "Company", selectOptionsCompany, string(selectOptionsCompany[0].Name), "", "/configuration-items-select", "#configuration_item_id")
-	ci := models.NewDropdown("configuration_item_id", "Configuration Item", selectOptionsCI, string(selectOptionsCI[0].Name), "", "", "")
-	state := models.NewDropdown("state", "State", selectOptionsState, string(selectOptionsState[0].Name), "", "", "")
-	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
-	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
-
-	fields := []models.Field{
-		&id,
-		&company,
-		&ci,
-		&state,
-		&shortDesc,
-		&desc,
-	}
+	fields := MakeIncidentFields(incident, selectOptionsCompany, selectOptionsCI, selectOptionsState)
 
 	formData := models.NewFormData()
 	path := "/incidents"
