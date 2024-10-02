@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -228,13 +227,13 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
 	idString := r.PathValue("id")
-	id, err := uuid.Parse(idString)
+	incidentId, err := uuid.Parse(idString)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
 		return
 	}
 
-	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), id)
+	databaseIncident, err := cfg.DB.GetIncidentByID(r.Context(), incidentId)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "can't find incident")
 		return
@@ -271,9 +270,9 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
 	}
 
-	stateOptions := models.SelectOptions{}
+	selectOptionsState := models.SelectOptions{}
 	for _, so := range models.StateOptionsEnum {
-		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
+		selectOptionsState = append(selectOptionsState, models.NewSelectOption(string(so), string(so)))
 	}
 
 	assignedToOptions := models.SelectOptions{}
@@ -281,16 +280,30 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
+	id := models.NewInputFieldDisabled("id", "id", incident.ID.String(), "text", "id", "", "", "")
+	company := models.NewDropdown("company_id", "Company", selectOptionsCompany, string(selectOptionsCompany[0].Name), "", "/configuration-items-select", "#configuration_item_id")
+	ci := models.NewDropdown("configuration_item_id", "Configuration Item", selectOptionsCI, string(selectOptionsCI[0].Name), "", "", "")
+	state := models.NewDropdown("state", "State", selectOptionsState, string(selectOptionsState[0].Name), "", "", "")
+	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
+	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
+
+	fields := []models.Field{
+		&id,
+		&company,
+		&ci,
+		&state,
+		&shortDesc,
+		&desc,
+	}
+
 	formData := models.NewFormData()
-	iEPath := fmt.Sprintf("/incidents/%s", incident.ID)
-	form := models.NewIncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
+	path := "/incidents"
+	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
-	iEIndexNew := views.IncidentForm(form)
-
+	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)
-
-	iEdit := views.BuildLayout(page, iEIndexNew)
-	templ.Handler(iEdit).ServeHTTP(w, r)
+	layout := views.BuildLayout(page, index)
+	templ.Handler(layout).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
@@ -366,9 +379,9 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		selectOptionsCI = append(selectOptionsCI, models.NewSelectOption(ci.Name, ci.ID.String()))
 	}
 
-	stateOptions := models.SelectOptions{}
+	selectOptionsState := models.SelectOptions{}
 	for _, so := range models.StateOptionsEnum {
-		stateOptions = append(stateOptions, models.NewSelectOption(string(so), string(so)))
+		selectOptionsState = append(selectOptionsState, models.NewSelectOption(string(so), string(so)))
 	}
 
 	assignedToOptions := models.SelectOptions{}
@@ -376,16 +389,30 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 		assignedToOptions = append(assignedToOptions, models.NewSelectOption(user.Name, user.ID.String()))
 	}
 
+	id := models.NewInputFieldDisabled("id", "id", incident.ID.String(), "text", "id", "", "", "")
+	company := models.NewDropdown("company_id", "Company", selectOptionsCompany, string(selectOptionsCompany[0].Name), "", "/configuration-items-select", "#configuration_item_id")
+	ci := models.NewDropdown("configuration_item_id", "Configuration Item", selectOptionsCI, string(selectOptionsCI[0].Name), "", "", "")
+	state := models.NewDropdown("state", "State", selectOptionsState, string(selectOptionsState[0].Name), "", "", "")
+	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
+	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
+
+	fields := []models.Field{
+		&id,
+		&company,
+		&ci,
+		&state,
+		&shortDesc,
+		&desc,
+	}
+
 	formData := models.NewFormData()
-	iEPath := fmt.Sprintf("/incidents/%s", incident.ID)
-	form := models.NewIncidentForm("PUT", iEPath, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
+	path := "/incidents"
+	form := models.NewIncidentForm("PUT", path, selectOptionsCompany, selectOptionsCI, selectOptionsState, assignedToOptions, incident, formData)
 
-	iEIndexNew := views.IncidentForm(form)
-
+	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Edit", cfg, u)
-
-	iEdit := views.BuildLayout(page, iEIndexNew)
-	templ.Handler(iEdit).ServeHTTP(w, r)
+	layout := views.BuildLayout(page, index)
+	templ.Handler(layout).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u models.User) {
@@ -452,13 +479,10 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	path := "/incidents"
 	form := models.NewIncidentForm("POST", path, selectOptionsCompany, selectOptionsCI, stateOptions, assignedToOptions, incident, formData)
 
-	iIndexNew := views.NewIncidentForm(form, fields)
-	log.Println("form.action: ", form.Action)
-
+	index := views.NewIncidentForm(form, fields)
 	page := NewPage("Incidents - Add", cfg, u)
-
-	iNew := views.BuildLayout(page, iIndexNew)
-	templ.Handler(iNew).ServeHTTP(w, r)
+	layout := views.BuildLayout(page, index)
+	templ.Handler(layout).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
