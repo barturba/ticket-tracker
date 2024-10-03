@@ -30,7 +30,6 @@ func MakeIncidentFields(incident models.Incident, companies, cis, states, users 
 	}
 	// Set error messages
 	if len(errs) > 0 {
-		// Apply the error text to the fields
 		for i, e := range errs {
 			for _, f := range fields {
 				if i == f.GetID() {
