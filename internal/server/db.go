@@ -129,12 +129,14 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 
 func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models.Incident, error) {
 	dbIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
-		ID:               i.ID,
-		UpdatedAt:        time.Now(),
-		Description:      sql.NullString{String: i.Description, Valid: i.Description != ""},
-		ShortDescription: i.ShortDescription,
-		State:            i.State,
-		AssignedTo:       uuid.NullUUID{UUID: i.AssignedTo, Valid: true},
+		ID:                  i.ID,
+		UpdatedAt:           time.Now(),
+		CompanyID:           i.CompanyID,
+		ConfigurationItemID: i.ConfigurationItemID,
+		Description:         sql.NullString{String: i.Description, Valid: i.Description != ""},
+		ShortDescription:    i.ShortDescription,
+		State:               i.State,
+		AssignedTo:          uuid.NullUUID{UUID: i.AssignedTo, Valid: true},
 	})
 	if err != nil {
 		return models.Incident{}, errors.New("couldn't update incident")

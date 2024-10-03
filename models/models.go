@@ -388,10 +388,18 @@ var IncidentInput struct {
 }
 
 func CheckIncident(i Incident) map[string]string {
+	StateEnum := []database.StateEnum{
+		database.StateEnumNew,
+		database.StateEnumAssigned,
+		database.StateEnumInProgress,
+		database.StateEnumOnHold,
+		database.StateEnumResolved,
+	}
 	v := validator.New()
 	v.Check(i.ID != uuid.UUID{}, "id", "must be provided")
-	v.Check(i.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
 	v.Check(i.CompanyID != uuid.UUID{}, "company_id", "must be provided")
+	v.Check(i.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
+	v.Check(validator.PermittedValue(i.State, StateEnum...), "state", "This field must equal New, Assigned, In Progress, On Hold, or Resolved")
 	v.Check(i.AssignedTo != uuid.UUID{}, "assigned_to_id", "must be provided")
 	v.Check(i.Description != "", "description", "must be provided")
 	v.Check(i.ShortDescription != "", "short_description", "must be provided")

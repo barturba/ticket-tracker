@@ -12,9 +12,9 @@ import (
 func MakeIncidentFields(incident models.Incident, companies, cis, states, users models.SelectOptions, errs map[string]string) []models.Field {
 
 	id := models.NewInputFieldDisabled("id", "ID", incident.ID.String(), "text", "id", "", "", "")
-	company := models.NewDropdown("company_id", "Company", companies, string(companies[0].Name), "", "/configuration-items-select", "#configuration_item_id")
-	ci := models.NewDropdown("configuration_item_id", "Configuration Item", cis, string(cis[0].Name), "", "", "")
-	state := models.NewDropdown("state", "State", states, string(states[0].Name), "", "", "")
+	company := models.NewDropdown("company_id", "Company", companies, incident.CompanyID.String(), "", "/configuration-items-select", "#configuration_item_id")
+	ci := models.NewDropdown("configuration_item_id", "Configuration Item", cis, incident.ConfigurationItemID.String(), "", "", "")
+	state := models.NewDropdown("state", "State", states, string(incident.State), "", "", "")
 	assignedTo := models.NewDropdown("assigned_to_id", "Assigned To", users, incident.AssignedTo.String(), "", "", "")
 	shortDesc := models.NewInputField("short_description", "Short Description", incident.ShortDescription, "text", "short-description", "", "", "")
 	desc := models.NewInputField("description", "Description", incident.Description, "text", "description", "", "", "")
@@ -28,6 +28,7 @@ func MakeIncidentFields(incident models.Incident, companies, cis, states, users 
 		&shortDesc,
 		&desc,
 	}
+	// Set error messages
 	if len(errs) > 0 {
 		// Apply the error text to the fields
 		for i, e := range errs {

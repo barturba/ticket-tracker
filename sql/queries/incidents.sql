@@ -31,9 +31,11 @@ SELECT * FROM incidents WHERE id = $1;
 -- name: UpdateIncident :one
 UPDATE incidents
 SET updated_at = $2, 
-description = $3, 
-short_description = $4, 
-state = $5,
-assigned_to = $6
+company_id = $3,
+configuration_item_id = $4,
+description = $5, 
+short_description = $6, 
+state = $7,
+assigned_to = $8
 WHERE ID = $1
 RETURNING *;
