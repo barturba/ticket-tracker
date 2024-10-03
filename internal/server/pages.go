@@ -36,7 +36,6 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 
 func (cfg *ApiConfig) handleViewConfigurationItemsSelect(w http.ResponseWriter, r *http.Request, u models.User) {
 	companyID := r.URL.Query().Get("company_id")
-
 	companyUUID, err := uuid.Parse(companyID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "invalid 'company_id' parameter")
@@ -168,7 +167,7 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 
 	incident, err := cfg.GetIncidentByID(r, incidentId)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -179,7 +178,6 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 	templ.Handler(layout).ServeHTTP(w, r)
-	return
 }
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
@@ -236,7 +234,8 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	incident := NewIncidentEmpty()
 
 	path := "/incidents"
-	layout, err := cfg.BuildIncidentsPage(r, "POST", "Incidents - Add", incident, u, path, models.Alert{}, nil)
+	alert := models.Alert{}
+	layout, err := cfg.BuildIncidentsPage(r, "POST", "Incidents - Add", incident, u, path, alert, nil)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -256,7 +255,14 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
-		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
+		path := "/incidents/%s/edit"
+		alert := models.NewAlert("Couldn't update incident", models.AlertEnumError, "red")
+		layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		templ.Handler(layout).ServeHTTP(w, r)
 		return
 	}
 
@@ -281,9 +287,6 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	// w.Header().Set("HX-Redirect", path)
-	// http.Redirect(w, r, path, http.StatusOK)
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
