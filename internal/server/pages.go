@@ -24,7 +24,7 @@ func (cfg *ApiConfig) handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	page := NewPage("Login", cfg, models.User{})
+	page := NewPage("Login", cfg, models.User{}, models.Alert{})
 	page.MenuItems = menuItems
 
 	lIndexNew := views.LoginIndexNew(fromProtected, cfg.Logo)
@@ -71,7 +71,7 @@ func (cfg *ApiConfig) handleViewConfigurationItems(w http.ResponseWriter, r *htt
 	}
 
 	cIIndex := views.ConfigurationItemsIndex(cis)
-	page := NewPage("Configuration Items List", cfg, u)
+	page := NewPage("Configuration Items List", cfg, u, models.Alert{})
 	cIList := views.BuildLayout(page, cIIndex)
 
 	templ.Handler(cIList).ServeHTTP(w, r)
@@ -99,7 +99,7 @@ func (cfg *ApiConfig) handleConfigurationItemsEditPage(w http.ResponseWriter, r 
 		return
 	}
 
-	page := NewPage("Configuration Items - Edit", cfg, u)
+	page := NewPage("Configuration Items - Edit", cfg, u, models.Alert{})
 
 	cEIndexNew := views.ConfigurationItemFormNew(companies, ci)
 	cEdit := views.BuildLayout(page, cEIndexNew)
@@ -157,7 +157,7 @@ func (cfg *ApiConfig) handleViewIncidents(w http.ResponseWriter, r *http.Request
 
 	iIndex := views.IncidentsIndex(incidents)
 
-	page := NewPage("Incidents List", cfg, u)
+	page := NewPage("Incidents List", cfg, u, models.Alert{})
 
 	iList := views.BuildLayout(page, iIndex)
 	templ.Handler(iList).ServeHTTP(w, r)
@@ -225,8 +225,8 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 }
 
 func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Request, u models.User) {
-
 	idString := r.PathValue("id")
+
 	incidentId, err := uuid.Parse(idString)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
@@ -239,50 +239,15 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	var companies models.SelectOptions
-	err = cfg.GetCompaniesSelection(r, &companies)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var cis models.SelectOptions
-	err = cfg.GetCISelection(r, &cis)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var users models.SelectOptions
-	err = cfg.GetUsersSelection(r, &users)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var states models.SelectOptions
-	err = cfg.GetStatesSelection(r, &states)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	errs := models.CheckIncident(incident)
-	if errs != nil {
-		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
-		return
-	}
-	fields := MakeIncidentFields(incident, companies, cis, states, users, errs)
-
-	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
-	cancelPath := "/incidents"
-	form := models.NewIncidentForm("PUT", path, cancelPath, companies, cis, states, users, incident, formData)
-
-	index := views.NewIncidentForm(form, fields)
-	page := NewPage("Incidents - Edit", cfg, u)
-	layout := views.BuildLayout(page, index)
+	// alert := models.NewAlert("Incident Updated", models.AlertEnumSuccess, "green")
+	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, models.Alert{}, nil)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	templ.Handler(layout).ServeHTTP(w, r)
+	return
 }
 
 func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
@@ -300,7 +265,9 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
-		layout, err := cfg.BuildIncidentsPage(r, incident, u, errs)
+		path := fmt.Sprintf("/incidents/add")
+		alert := models.NewAlert("Couldn't add incident", models.AlertEnumError, "red")
+		layout, err := cfg.BuildIncidentsPage(r, "POST", "Incidents - Add", incident, u, path, alert, errs)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -325,12 +292,16 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	incident = models.DatabaseIncidentToIncident(databaseIncident)
 
-	layout, err := cfg.BuildIncidentsPage(r, incident, u, errs)
+	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
+	alert := models.NewAlert("Incident added successfully!", models.AlertEnumSuccess, "green")
+	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	w.Header().Set("HX-Redirect", path)
+	http.Redirect(w, r, path, http.StatusOK)
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
@@ -374,13 +345,12 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	form := models.NewIncidentForm("POST", path, cancelPath, companies, cis, states, users, incident, formData)
 
 	index := views.NewIncidentForm(form, fields)
-	page := NewPage("Incidents - Add", cfg, u)
+	page := NewPage("Incidents - Add", cfg, u, models.Alert{})
 	layout := views.BuildLayout(page, index)
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
 func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
-
 	input := models.IncidentInput
 
 	err := cfg.readJSON(w, r, &input)
@@ -410,8 +380,17 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	w.Header().Set("HX-Redirect", "/incidents")
-	http.Redirect(w, r, "/incidents", http.StatusOK)
+	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
+	alert := models.NewAlert("Incident Updated", models.AlertEnumSuccess, "green")
+	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// w.Header().Set("HX-Redirect", path)
+	// http.Redirect(w, r, path, http.StatusOK)
+	templ.Handler(layout).ServeHTTP(w, r)
 }
 
 // Companies
@@ -424,7 +403,7 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	page := NewPage("Companies List", cfg, u)
+	page := NewPage("Companies List", cfg, u, models.Alert{})
 
 	cIndex := views.CompaniesIndex(companies)
 	cList := views.BuildLayout(page, cIndex)
@@ -440,7 +419,7 @@ func (cfg *ApiConfig) handleViewUsers(w http.ResponseWriter, r *http.Request, u 
 		return
 	}
 
-	page := NewPage("Users List", cfg, u)
+	page := NewPage("Users List", cfg, u, models.Alert{})
 
 	cIndex := views.UsersIndex(users)
 	cList := views.BuildLayout(page, cIndex)
@@ -453,7 +432,7 @@ func (cfg *ApiConfig) handlePageIndex(w http.ResponseWriter, r *http.Request, u 
 		fromProtected = true
 	}
 
-	page := NewPage("TicketTracker", cfg, u)
+	page := NewPage("TicketTracker", cfg, u, models.Alert{})
 
 	hindex := views.HomeIndex(fromProtected)
 	home := views.BuildLayout(page, hindex)

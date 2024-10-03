@@ -28,21 +28,23 @@ func MakeIncidentFields(incident models.Incident, companies, cis, states, users 
 		&shortDesc,
 		&desc,
 	}
+	if len(errs) > 0 {
+		// Apply the error text to the fields
+		for i, e := range errs {
+			for _, f := range fields {
+				if i == f.GetID() {
+					f.SetError(fmt.Sprintf("%s %s", f.GetLabel(), e))
+				}
 
-	// Apply the error text to the fields
-	for i, e := range errs {
-		for _, f := range fields {
-			if i == f.GetID() {
-				f.SetError(fmt.Sprintf("%s %s", f.GetLabel(), e))
 			}
-
 		}
+
 	}
 
 	return fields
 }
 
-func (cfg *ApiConfig) BuildIncidentsPage(r *http.Request, i models.Incident, u models.User, errs map[string]string) (templ.Component, error) {
+func (cfg *ApiConfig) BuildIncidentsPage(r *http.Request, action, title string, i models.Incident, u models.User, path string, alert models.Alert, errs map[string]string) (templ.Component, error) {
 	var companies models.SelectOptions
 	err := cfg.GetCompaniesSelection(r, &companies)
 	if err != nil {
@@ -70,13 +72,11 @@ func (cfg *ApiConfig) BuildIncidentsPage(r *http.Request, i models.Incident, u m
 	fields := MakeIncidentFields(i, companies, cis, states, users, errs)
 
 	formData := models.NewFormData()
-	// path := fmt.Sprintf("/incidents/%s", i.ID)
-	path := "/incidents/add"
 	cancelPath := "/incidents"
-	form := models.NewIncidentForm("POST", path, cancelPath, companies, cis, states, users, i, formData)
+	form := models.NewIncidentForm(action, path, cancelPath, companies, cis, states, users, i, formData)
 
 	index := views.NewIncidentForm(form, fields)
-	page := NewPage("Incidents - ADD", cfg, u)
+	page := NewPage(title, cfg, u, alert)
 	layout := views.BuildLayout(page, index)
 	return layout, nil
 }

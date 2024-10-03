@@ -238,7 +238,7 @@ func NewFormData() FormData {
 type Page struct {
 	Title            string
 	Logo             string
-	FlashMessage     string
+	Alert            Alert
 	IsLoggedIn       bool
 	IsError          bool
 	Msg              string
@@ -399,4 +399,27 @@ func CheckIncident(i Incident) map[string]string {
 		return v.Errors
 	}
 	return nil
+}
+
+type AlertEnum string
+
+const (
+	AlertEnumError   AlertEnum = "Error"
+	AlertEnumWarning AlertEnum = "Warning"
+	AlertEnumSuccess AlertEnum = "Success"
+	AlertEnumInfo    AlertEnum = "Info"
+)
+
+type Alert struct {
+	Message   string
+	AlertType AlertEnum
+	Color     string
+}
+
+func NewAlert(message string, alertType AlertEnum, color string) Alert {
+	return Alert{
+		Message:   message,
+		AlertType: alertType,
+		Color:     color,
+	}
 }

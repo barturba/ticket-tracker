@@ -77,11 +77,11 @@ func (cfg *ApiConfig) readJSON(w http.ResponseWriter, r *http.Request, dst any) 
 	return nil
 }
 
-func NewPage(title string, cfg *ApiConfig, u models.User) models.Page {
+func NewPage(title string, cfg *ApiConfig, u models.User, alert models.Alert) models.Page {
 	return models.Page{
 		Title:            title,
 		Logo:             cfg.Logo,
-		FlashMessage:     "",
+		Alert:            alert,
 		IsLoggedIn:       true,
 		IsError:          false,
 		Msg:              "",

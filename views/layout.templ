@@ -5,33 +5,6 @@ import (
 "github.com/barturba/ticket-tracker/models"
 )
 
-templ Layout(title, logo, fl string, fp, isError bool, msg, user, email, pPic string, mItems, pItems models.MenuItems) {
-<!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-100">
-@HeaderComponent(title)
-
-<body class="h-full">
-    if fl != "" {
-    @partials.FlashMessage("Alert", fl)
-    }
-    <div class="min-h-full">
-        if !isError {
-        @partials.NavbarNew(fp, user, email, pPic, title,
-        logo, "TicketTracker", mItems, pItems)
-        }
-        <main class="-mt-32">
-            <div class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="px-5 py-6 bg-white rounded-lg shadow sm:px-6">
-                    {children...}
-                </div>
-            </div>
-        </main>
-    </div>
-</body>
-
-</html>
-}
-
 templ BuildLayout(page models.Page, cmp templ.Component) {
 @LayoutNew(page) {
 @cmp
@@ -44,8 +17,8 @@ templ LayoutNew(p models.Page) {
 @HeaderComponent(p.Title)
 
 <body class="h-full">
-    if p.FlashMessage!= "" {
-    @partials.FlashMessage("Alert", p.FlashMessage)
+    if (p.Alert != models.Alert{}) {
+    @partials.FlashMessage(p.Alert)
     }
     <div class="min-h-full">
         if !p.IsError {
