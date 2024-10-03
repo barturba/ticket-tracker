@@ -1,16 +1,29 @@
 package partials
 
-import "github.com/barturba/ticket-tracker/models"
+import (
+"fmt"
+"github.com/barturba/ticket-tracker/models"
+)
 
-templ Field4() {
+templ Field4(f models.Field) {
 <div class="sm:col-span-4">
     {children...}
+    if (f.GetError() != "") {
+    <p class="mt-2 text-sm text-red-600" id={fmt.Sprintf("%s-error", f.GetID())}>{f.GetError()}</p>
+
+    }
 </div>
 }
 
 templ Label(f models.Field) {
 <label for={f.GetID()} class="block text-sm font-medium leading-6 text-gray-900">{f.GetLabel()}</label>
+if (f.GetError() != "") {
+<div class="relative mt-2 rounded-md shadow-sm">
+    {children...}
+</div>
+} else {
 <div class="mt-2">
     {children...}
 </div>
+}
 }

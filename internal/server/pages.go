@@ -267,7 +267,12 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	fields := MakeIncidentFields(incident, companies, cis, states, users)
+	errs := models.CheckIncident(incident)
+	if errs != nil {
+		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
+		return
+	}
+	fields := MakeIncidentFields(incident, companies, cis, states, users, errs)
 
 	formData := models.NewFormData()
 	path := fmt.Sprintf("/incidents/%s", incident.ID)
@@ -290,9 +295,17 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
-	err = models.CheckIncident(incident)
-	if err != nil {
-		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
+	// here is where you send back a modified version of the form with the
+	// invalid fields highlighted
+
+	errs := models.CheckIncident(incident)
+	if errs != nil {
+		layout, err := cfg.BuildIncidentsPage(r, incident, u, errs)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		templ.Handler(layout).ServeHTTP(w, r)
 		return
 	}
 
@@ -312,44 +325,12 @@ func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Req
 	}
 	incident = models.DatabaseIncidentToIncident(databaseIncident)
 
-	var companies models.SelectOptions
-	err = cfg.GetCompaniesSelection(r, &companies)
+	layout, err := cfg.BuildIncidentsPage(r, incident, u, errs)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	var cis models.SelectOptions
-	err = cfg.GetCISelection(r, &cis)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var users models.SelectOptions
-	err = cfg.GetUsersSelection(r, &users)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var states models.SelectOptions
-	err = cfg.GetStatesSelection(r, &states)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	fields := MakeIncidentFields(incident, companies, cis, states, users)
-
-	formData := models.NewFormData()
-	path := fmt.Sprintf("/incidents/%s", incident.ID)
-	cancelPath := "/incidents"
-	form := models.NewIncidentForm("PUT", path, cancelPath, companies, cis, states, users, incident, formData)
-
-	index := views.NewIncidentForm(form, fields)
-	page := NewPage("Incidents - Edit", cfg, u)
-	layout := views.BuildLayout(page, index)
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
@@ -384,7 +365,8 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fields := MakeIncidentFields(incident, companies, cis, states, users)
+	errs := models.CheckIncident(incident)
+	fields := MakeIncidentFields(incident, companies, cis, states, users, errs)
 
 	formData := models.NewFormData()
 	path := "/incidents"
@@ -408,8 +390,8 @@ func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Requ
 	}
 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
-	err = models.CheckIncident(incident)
-	if err != nil {
+	errs := models.CheckIncident(incident)
+	if errs != nil {
 		respondToFailedValidation(w, r, map[string]string{"error": err.Error()})
 		return
 	}

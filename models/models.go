@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -354,6 +353,8 @@ type Field interface {
 	Field()
 	GetID() string
 	GetLabel() string
+	SetError(e string)
+	GetError() string
 }
 
 func (*InputField) Field()         {}
@@ -368,6 +369,14 @@ func (i *InputField) GetLabel() string         { return i.Label }
 func (i *InputFieldDisabled) GetLabel() string { return i.Label }
 func (i *Dropdown) GetLabel() string           { return i.Label }
 
+func (i *InputField) SetError(e string)         { i.ErrorText = e }
+func (i *InputFieldDisabled) SetError(e string) { i.ErrorText = e }
+func (i *Dropdown) SetError(e string)           { i.ErrorText = e }
+
+func (i *InputField) GetError() string         { return i.ErrorText }
+func (i *InputFieldDisabled) GetError() string { return i.ErrorText }
+func (i *Dropdown) GetError() string           { return i.ErrorText }
+
 var IncidentInput struct {
 	ID                  uuid.UUID          `json:"id"`
 	ShortDescription    string             `json:"short_description"`
@@ -378,7 +387,7 @@ var IncidentInput struct {
 	State               database.StateEnum `json:"state"`
 }
 
-func CheckIncident(i Incident) error {
+func CheckIncident(i Incident) map[string]string {
 	v := validator.New()
 	v.Check(i.ID != uuid.UUID{}, "id", "must be provided")
 	v.Check(i.ConfigurationItemID != uuid.UUID{}, "configuration_item_id", "must be provided")
@@ -387,7 +396,7 @@ func CheckIncident(i Incident) error {
 	v.Check(i.Description != "", "description", "must be provided")
 	v.Check(i.ShortDescription != "", "short_description", "must be provided")
 	if !v.Valid() {
-		return fmt.Errorf("validation errors: %v", v.Errors)
+		return v.Errors
 	}
 	return nil
 }

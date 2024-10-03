@@ -13,13 +13,13 @@ templ NewIncidentForm(f models.IncidentForm, fields []models.Field) {
 for _, f := range fields {
 switch f := f.(type) {
 case *models.InputField:
-@partials.Field4() {
+@partials.Field4(f) {
 @partials.Label(f) {
 @partials.Input(*f)
 }
 }
 case *models.InputFieldDisabled:
-@partials.Field4() {
+@partials.Field4(f) {
 @partials.Label(f) {
 @partials.InputDisabled(*f)
 }

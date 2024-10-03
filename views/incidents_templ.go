@@ -98,7 +98,7 @@ func NewIncidentForm(f models.IncidentForm, fields []models.Field) templ.Compone
 							}
 							return templ_7745c5c3_Err
 						})
-						templ_7745c5c3_Err = partials.Field4().Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = partials.Field4(f).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -139,7 +139,7 @@ func NewIncidentForm(f models.IncidentForm, fields []models.Field) templ.Compone
 							}
 							return templ_7745c5c3_Err
 						})
-						templ_7745c5c3_Err = partials.Field4().Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
+						templ_7745c5c3_Err = partials.Field4(f).Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
