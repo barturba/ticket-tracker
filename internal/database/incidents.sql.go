@@ -77,14 +77,14 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 	return i, err
 }
 
-const getIncidents = `-- name: GetIncidents :many
+const getIncidentsAsc = `-- name: GetIncidentsAsc :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-ORDER BY incidents.updated_at DESC
+ORDER BY $1 ASC, id ASC
 `
 
-type GetIncidentsRow struct {
+type GetIncidentsAscRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
@@ -103,15 +103,15 @@ type GetIncidentsRow struct {
 	Password            sql.NullString
 }
 
-func (q *Queries) GetIncidents(ctx context.Context) ([]GetIncidentsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidents)
+func (q *Queries) GetIncidentsAsc(ctx context.Context, dollar_1 interface{}) ([]GetIncidentsAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsAsc, dollar_1)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsRow
+	var items []GetIncidentsAscRow
 	for rows.Next() {
-		var i GetIncidentsRow
+		var i GetIncidentsAscRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
@@ -273,6 +273,72 @@ func (q *Queries) GetIncidentsBySearchTermLimitOffset(ctx context.Context, arg G
 			&i.Email,
 			&i.Password,
 			&i.FullCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getIncidentsDesc = `-- name: GetIncidentsDesc :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+ORDER BY $1 DESC, id ASC
+`
+
+type GetIncidentsDescRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
+}
+
+func (q *Queries) GetIncidentsDesc(ctx context.Context, dollar_1 interface{}) ([]GetIncidentsDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsDesc, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetIncidentsDescRow
+	for rows.Next() {
+		var i GetIncidentsDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ShortDescription,
+			&i.Description,
+			&i.ConfigurationItemID,
+			&i.CompanyID,
+			&i.State,
+			&i.AssignedTo,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
 		); err != nil {
 			return nil, err
 		}
