@@ -4,11 +4,6 @@ export default async function IncidentsChart() {
   const incidents = await fetchIncidents();
 
   if (!incidents || incidents.length === 0) {
-    console.log(
-      `!incidents || incidents.length === 0: ${
-        !incidents || incidents.length === 0
-      }`
-    );
     return <p className="mt-4 text-gray-400">No data available.</p>;
   }
   return (
@@ -18,5 +13,4 @@ export default async function IncidentsChart() {
       ))}
     </ul>
   );
-  //   console.log(`else:`);
 }

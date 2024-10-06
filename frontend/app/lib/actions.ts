@@ -68,7 +68,6 @@ export async function fetchFilteredIncidents(
       }
     }
   } catch (error) {
-    console.error("Database Error:", error);
     throw new Error("Failed to fetch incidents.");
   }
 }
@@ -83,9 +82,7 @@ export async function fetchIncidentsPages(query: string) {
     // Simulate slow load
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      console.log(`fetchIncidentsPages received the following data ${data}`);
       const count = await data.json();
-      console.log(`fetchIncidentsPages received the following data ${count}`);
       if (count > 0) {
         const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
         return totalPages;
@@ -94,7 +91,6 @@ export async function fetchIncidentsPages(query: string) {
       }
     }
   } catch (error) {
-    console.error(`Database Error:${error}`, error);
     throw new Error("Failed to fetch incidents pages.");
   }
 }

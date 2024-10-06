@@ -17,10 +17,8 @@ export default async function Page({
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  console.log(`dashboard/incidents currentPage ${currentPage}`);
 
   const totalPages = await fetchIncidentsPages(query);
-  console.log(`dashboard/incidents totalPages ${totalPages}`);
 
   return (
     <div className="w-full">
