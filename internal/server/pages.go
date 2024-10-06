@@ -365,6 +365,7 @@ func (cfg *ApiConfig) handleIncidentsGet(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusOK, i)
 }
+
 func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 
@@ -379,19 +380,18 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 	fmt.Println("query: ", query)
 
 	limitInput := params.Get("limit")
-	fmt.Println("limit: ", limitInput)
 
 	offsetInput := params.Get("offset")
 	fmt.Println("offset: ", offsetInput)
 
-	v := validator.New()
-	v.Check(query != "", "query", "must be provided")
-	v.Check(limitInput != "", "limit", "must be provided")
-	v.Check(offsetInput != "", "offset", "must be provided")
-	if !v.Valid() {
-		respondToFailedValidation(w, r, v.Errors)
-		return
-	}
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// v.Check(limitInput != "", "limit", "must be provided")
+	// v.Check(offsetInput != "", "offset", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
 
 	if limit, err = strconv.Atoi(limitInput); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
@@ -408,6 +408,34 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 		return
 	}
 	log.Printf("got the following incidents: %s", i)
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+	fmt.Println("params: ", params, " url: ", r.URL.String())
+
+	query := params.Get("query")
+	fmt.Println("query: ", query)
+
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
+
+	i, err := cfg.GetIncidentsFilteredCount(r, query)
+	if err != nil {
+		log.Printf("couldn't get incidents")
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+	log.Printf("got the following incidents count: %d", i)
 
 	respondWithJSON(w, http.StatusOK, i)
 }

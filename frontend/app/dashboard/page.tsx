@@ -1,5 +1,5 @@
-import { fetchIncidents, fetchIncidentsPages } from "../lib/actions";
-import { lusitana } from "../ui/fonts";
+import { fetchIncidents, fetchIncidentsPages } from "@/app/lib/actions";
+import { lusitana } from "@/app/ui/fonts";
 
 export default async function Page() {
   const incidents = await fetchIncidents();

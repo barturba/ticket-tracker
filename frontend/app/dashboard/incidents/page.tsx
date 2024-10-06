@@ -1,5 +1,7 @@
+import { fetchIncidentsPages } from "@/app/lib/actions";
 import { lusitana } from "@/app/ui/fonts";
 import { CreateIncident } from "@/app/ui/incidents/buttons";
+import Pagination from "@/app/ui/incidents/pagination";
 import Table from "@/app/ui/incidents/table";
 import Search from "@/app/ui/search";
 import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
@@ -15,6 +17,11 @@ export default async function Page({
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
+  console.log(`dashboard/incidents currentPage ${currentPage}`);
+
+  const totalPages = await fetchIncidentsPages(query);
+  console.log(`dashboard/incidents totalPages ${totalPages}`);
+
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -28,6 +35,9 @@ export default async function Page({
       <Suspense key={query + currentPage} fallback={<IncidentsTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
+      </div>
     </div>
   );
 }

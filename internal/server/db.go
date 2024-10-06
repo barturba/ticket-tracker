@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -132,6 +133,7 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 }
 
 func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit, offset int) ([]models.Incident, error) {
+	log.Printf("GetIncidentsFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
 	params := database.GetIncidentsFilteredParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -144,6 +146,16 @@ func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit,
 	incidents := models.DatabaseIncidentsFilteredRowToIncidents(databaseIncidentsFilteredRow)
 	return incidents, nil
 }
+
+func (cfg *ApiConfig) GetIncidentsFilteredCount(r *http.Request, query string) (int64, error) {
+	databaseIncidentsFilteredCountRow, err := cfg.DB.GetIncidentsFilteredCount(r.Context(),
+		sql.NullString{String: query, Valid: query != ""})
+	if err != nil {
+		return 0, errors.New("couldn't find incidents")
+	}
+	return databaseIncidentsFilteredCountRow, nil
+}
+
 func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models.Incident, error) {
 	dbIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:                  i.ID,

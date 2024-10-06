@@ -17,6 +17,13 @@ WHERE (short_description ILIKE '%' || @query || '%')
 OR (description ILIKE '%' || @query || '%')
 LIMIT $1 OFFSET $2;
 
+-- name: GetIncidentsFilteredCount :one
+SELECT count(*) FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE (short_description ILIKE '%' || @query || '%')
+OR (description ILIKE '%' || @query || '%');
+
 -- name: GetIncidentsAsc :many
 SELECT * FROM incidents
 LEFT JOIN users

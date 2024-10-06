@@ -493,6 +493,21 @@ func (q *Queries) GetIncidentsFiltered(ctx context.Context, arg GetIncidentsFilt
 	return items, nil
 }
 
+const getIncidentsFilteredCount = `-- name: GetIncidentsFilteredCount :one
+SELECT count(*) FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE (short_description ILIKE '%' || $1 || '%')
+OR (description ILIKE '%' || $1 || '%')
+`
+
+func (q *Queries) GetIncidentsFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getIncidentsFilteredCount, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const updateIncident = `-- name: UpdateIncident :one
 UPDATE incidents
 SET updated_at = $2, 

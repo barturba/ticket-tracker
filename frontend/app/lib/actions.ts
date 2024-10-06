@@ -83,20 +83,22 @@ export async function fetchIncidentsPages(query: string) {
     // Simulate slow load
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
+      console.log(`fetchIncidentsPages received the following data ${data}`);
       const count = await data.json();
-      if (count) {
-        const totalPages = Math.ceil(
-          Number(count.rows[0].count) / ITEMS_PER_PAGE
-        );
-
+      console.log(`fetchIncidentsPages received the following data ${count}`);
+      if (count > 0) {
+        const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
         return totalPages;
+      } else {
+        return 0;
       }
     }
   } catch (error) {
-    console.error("Database Error:", error);
+    console.error(`Database Error:${error}`, error);
     throw new Error("Failed to fetch incidents pages.");
   }
 }
+
 export async function deleteIncident(id: string) {
   // Simulate slow load
   // await new Promise((resolve) => setTimeout(resolve, 1000));

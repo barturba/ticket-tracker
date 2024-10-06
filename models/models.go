@@ -455,3 +455,7 @@ func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsFiltere
 	}
 
 }
+
+type Count struct {
+	Count int
+}

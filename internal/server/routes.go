@@ -21,6 +21,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux.HandleFunc("GET /v1/incidents", cfg.handleIncidentsGet)
 	mux.HandleFunc("GET /v1/filtered_incidents", cfg.handleFilteredIncidentsGet)
+	mux.HandleFunc("GET /v1/filtered_incidents_count", cfg.handleFilteredIncidentsCountGet)
 
 	// - Configuration Items
 
