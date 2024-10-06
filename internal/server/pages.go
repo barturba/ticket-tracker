@@ -353,6 +353,18 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 	})
 }
 
+func (cfg *ApiConfig) handleIncidentsGet(w http.ResponseWriter, r *http.Request) {
+	log.Println("handleIncidentsGet")
+
+	i, err := cfg.GetIncidents(r)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
 // Companies
 
 func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u models.User) {

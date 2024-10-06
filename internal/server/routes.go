@@ -19,6 +19,8 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("GET /incidents/{id}/edit", cfg.middlewareAuthPage(cfg.handleIncidentsEditPage))
 	mux.HandleFunc("PUT /incidents/{id}", cfg.middlewareAuthPage(cfg.handleIncidentsPutPage))
 
+	mux.HandleFunc("GET /v1/incidents", cfg.handleIncidentsGet)
+
 	// - Configuration Items
 
 	mux.HandleFunc("GET /configuration-items", cfg.middlewareAuthPage(cfg.handleViewConfigurationItems))
@@ -40,6 +42,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	// Login Endpoints
 	mux.HandleFunc("POST /v1/login", cfg.handleLogin)
+	mux.HandleFunc("POST /v1/login-test", cfg.handleLoginTest)
 	mux.HandleFunc("GET /login", cfg.handleLoginPage)
 	mux.HandleFunc("GET /logout", cfg.handleLogout)
 

@@ -5,7 +5,9 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./ticket-tracker"
-  cmd = "templ generate && tailwindcss -i input.css -o internal/server/static/css/tailwind.css && go build ."
+  # cmd = "templ generate && tailwindcss -i input.css -o internal/server/static/css/tailwind.css && go build ."
+  # remove tailwind for a bit it's messing with the frontend
+  cmd = "templ generate && go build ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules"]
   exclude_file = []

@@ -3,6 +3,12 @@ INSERT INTO incidents (id, created_at, updated_at, short_description, descriptio
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
+-- name: GetIncidents :many
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+ORDER BY incidents.updated_at DESC;
+
 -- name: GetIncidentsAsc :many
 SELECT * FROM incidents
 LEFT JOIN users

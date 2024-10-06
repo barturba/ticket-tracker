@@ -8,7 +8,6 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/models"
-	"github.com/containerd/containerd/filters"
 	"github.com/google/uuid"
 )
 
@@ -110,22 +109,14 @@ func (cfg *ApiConfig) GetIncidentByID(r *http.Request, id uuid.UUID) (models.Inc
 	return incident, nil
 }
 
-func (cfg *ApiConfig) GetIncidents(r *http.Request, filters filters.Filter) ([]models.Incident, error) {
-	databaseIncidentsAsc := []database.GetIncidentsAscRow{}
-	databaseIncidentsDesc := []database.GetIncidentsDescRow{}
-	var err error
-	if filters.SortDirection() == "ASC" {
-		databaseIncidentsAsc, err = cfg.DB.GetIncidentsAsc(r.Context(), filters.SortColumn())
-		if err != nil {
-			return nil, errors.New("couldn't find incidents")
-		}
-
-	} else {
-		databaseIncidentsDesc, err = cfg.DB.GetIncidentsDesc(r.Context(), filters.SortColumn())
-		if err != nil {
-			return nil, errors.New("couldn't find incidents")
-		}
-
+//	func (cfg *ApiConfig) GetIncidents(r *http.Request, filters filters.Filter) ([]models.Incident, error) {
+//		databaseIncidentsAsc := []database.GetIncidentsAscRow{}
+//		databaseIncidentsDesc := []database.GetIncidentsDescRow{}
+//		var err error
+func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
+	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
+	if err != nil {
+		return nil, errors.New("couldn't find incidents")
 	}
 	incidents := models.DatabaseIncidentsRowToIncidents(databaseIncidents)
 
