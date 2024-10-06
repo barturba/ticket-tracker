@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -361,6 +362,52 @@ func (cfg *ApiConfig) handleIncidentsGet(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	limit := 0
+	offset := 0
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+	fmt.Println("params: ", params, " url: ", r.URL.String())
+
+	query := params.Get("query")
+	fmt.Println("query: ", query)
+
+	limitInput := params.Get("limit")
+	fmt.Println("limit: ", limitInput)
+
+	offsetInput := params.Get("offset")
+	fmt.Println("offset: ", offsetInput)
+
+	v := validator.New()
+	v.Check(query != "", "query", "must be provided")
+	v.Check(limitInput != "", "limit", "must be provided")
+	v.Check(offsetInput != "", "offset", "must be provided")
+	if !v.Valid() {
+		respondToFailedValidation(w, r, v.Errors)
+		return
+	}
+
+	if limit, err = strconv.Atoi(limitInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+		return
+	}
+	if offset, err = strconv.Atoi(offsetInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
+		return
+	}
+
+	i, err := cfg.GetIncidentsFiltered(r, query, limit, offset)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+	log.Printf("got the following incidents: %s", i)
 
 	respondWithJSON(w, http.StatusOK, i)
 }

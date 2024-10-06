@@ -131,6 +131,14 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 	return incidents, nil
 }
 
+func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit, offset int) ([]models.Incident, error) {
+	databaseIncidentsFilteredRow, err := cfg.DB.GetIncidentsFiltered(r.Context(), query)
+	if err != nil {
+		return nil, errors.New("couldn't find incidents")
+	}
+	incidents := models.DatabaseIncidentsFilteredRowToIncidents(databaseIncidentsFilteredRow)
+	return incidents, nil
+}
 func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models.Incident, error) {
 	dbIncident, err := cfg.DB.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:                  i.ID,

@@ -9,6 +9,12 @@ LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC;
 
+-- name: GetIncidentsFiltered :many
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE (@short_description::text = '' OR short_description ILIKE '%' || @short_description || '%');
+
 -- name: GetIncidentsAsc :many
 SELECT * FROM incidents
 LEFT JOIN users

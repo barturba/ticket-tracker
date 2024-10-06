@@ -1,5 +1,5 @@
 import { lusitana } from "@/app/ui/fonts";
-import { CreateInvoice } from "@/app/ui/invoices/buttons";
+import { CreateIncident } from "@/app/ui/invoices/buttons";
 import Table from "@/app/ui/invoices/table";
 import Search from "@/app/ui/search";
 import { InvoicesTableSkeleton } from "@/app/ui/skeletons";
@@ -23,7 +23,7 @@ export default async function Page({
 
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search incidents..." />
-        <CreateInvoice />
+        <CreateIncident />
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />

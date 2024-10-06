@@ -419,6 +419,72 @@ func (q *Queries) GetIncidentsDesc(ctx context.Context, dollar_1 interface{}) ([
 	return items, nil
 }
 
+const getIncidentsFiltered = `-- name: GetIncidentsFiltered :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE ($1::text = '' OR short_description ILIKE '%' || $1 || '%')
+`
+
+type GetIncidentsFilteredRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
+}
+
+func (q *Queries) GetIncidentsFiltered(ctx context.Context, shortDescription string) ([]GetIncidentsFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsFiltered, shortDescription)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetIncidentsFilteredRow
+	for rows.Next() {
+		var i GetIncidentsFilteredRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ShortDescription,
+			&i.Description,
+			&i.ConfigurationItemID,
+			&i.CompanyID,
+			&i.State,
+			&i.AssignedTo,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateIncident = `-- name: UpdateIncident :one
 UPDATE incidents
 SET updated_at = $2, 

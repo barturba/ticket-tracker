@@ -431,3 +431,27 @@ func NewAlert(message string, alertType AlertEnum, color string) Alert {
 		Color:     color,
 	}
 }
+
+func DatabaseIncidentsFilteredRowToIncidents(incidents []database.GetIncidentsFilteredRow) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, DatabaseIncidentFilteredRowToIncident(item))
+	}
+	return items
+}
+func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsFilteredRow) Incident {
+	return Incident{
+		ID:                    incident.ID,
+		CreatedAt:             incident.CreatedAt,
+		UpdatedAt:             incident.UpdatedAt,
+		ShortDescription:      incident.ShortDescription,
+		Description:           incident.Description.String,
+		State:                 incident.State,
+		AssignedTo:            incident.AssignedTo.UUID,
+		AssignedToName:        incident.Name.String,
+		ConfigurationItemID:   incident.ConfigurationItemID,
+		ConfigurationItemName: "",
+		CompanyID:             incident.CompanyID,
+	}
+
+}
