@@ -180,19 +180,19 @@ export function IncidentsTableSkeleton() {
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
                 <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
+                  ID
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Email
+                  Short Description
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Amount
+                  Assigned To
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Date
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Status
+                  State
                 </th>
                 <th
                   scope="col"
