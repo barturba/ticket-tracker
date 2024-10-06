@@ -30,7 +30,7 @@ export async function fetchIncidents() {
       method: "GET",
     });
     // Simulate slow load
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (data.ok) {
       const incidents = await data.json();
@@ -60,7 +60,7 @@ export async function fetchFilteredIncidents(
       method: "GET",
     });
     // Simulate slow load
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const incidents = await data.json();
       if (incidents) {
@@ -74,6 +74,6 @@ export async function fetchFilteredIncidents(
 }
 export async function deleteIncident(id: string) {
   // Simulate slow load
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   console.log(`deleted incident; ${id}`);
 }
