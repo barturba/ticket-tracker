@@ -13,7 +13,9 @@ ORDER BY incidents.updated_at DESC;
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (@short_description::text = '' OR short_description ILIKE '%' || @short_description || '%');
+WHERE (@short_description::text = '' OR short_description ILIKE '%' || @short_description || '%')
+or (@description::text = '' OR description ILIKE '%' || @description|| '%')
+LIMIT $1 OFFSET $2;
 
 -- name: GetIncidentsAsc :many
 SELECT * FROM incidents

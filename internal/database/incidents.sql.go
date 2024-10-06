@@ -423,8 +423,17 @@ const getIncidentsFiltered = `-- name: GetIncidentsFiltered :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE ($1::text = '' OR short_description ILIKE '%' || $1 || '%')
+WHERE ($3::text = '' OR short_description ILIKE '%' || $3 || '%')
+or ($4::text = '' OR description ILIKE '%' || $4|| '%')
+LIMIT $1 OFFSET $2
 `
+
+type GetIncidentsFilteredParams struct {
+	Limit            int32
+	Offset           int32
+	ShortDescription string
+	Description      string
+}
 
 type GetIncidentsFilteredRow struct {
 	ID                  uuid.UUID
@@ -445,8 +454,13 @@ type GetIncidentsFilteredRow struct {
 	Password            sql.NullString
 }
 
-func (q *Queries) GetIncidentsFiltered(ctx context.Context, shortDescription string) ([]GetIncidentsFilteredRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsFiltered, shortDescription)
+func (q *Queries) GetIncidentsFiltered(ctx context.Context, arg GetIncidentsFilteredParams) ([]GetIncidentsFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsFiltered,
+		arg.Limit,
+		arg.Offset,
+		arg.ShortDescription,
+		arg.Description,
+	)
 	if err != nil {
 		return nil, err
 	}
