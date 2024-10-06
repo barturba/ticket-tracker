@@ -1,8 +1,8 @@
 import { lusitana } from "@/app/ui/fonts";
-import { CreateIncident } from "@/app/ui/invoices/buttons";
-import Table from "@/app/ui/invoices/table";
+import { CreateIncident } from "@/app/ui/incidents/buttons";
+import Table from "@/app/ui/incidents/table";
 import Search from "@/app/ui/search";
-import { InvoicesTableSkeleton } from "@/app/ui/skeletons";
+import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
 import { Suspense } from "react";
 
 export default async function Page({
@@ -18,14 +18,14 @@ export default async function Page({
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Invoices</h1>
+        <h1 className={`${lusitana.className} text-2xl`}>Incidents</h1>
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search incidents..." />
         <CreateIncident />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<IncidentsTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
     </div>

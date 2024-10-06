@@ -13,8 +13,8 @@ export default function NavLinks() {
   const links = [
     { name: "Home", href: "/dashboard", icon: HomeIcon },
     {
-      name: "Invoices",
-      href: "/dashboard/invoices",
+      name: "Incidents",
+      href: "/dashboard/incidents",
       icon: DocumentDuplicateIcon,
     },
     { name: "Customers", href: "/dashboard/customers", icon: UserGroupIcon },

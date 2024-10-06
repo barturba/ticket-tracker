@@ -1,4 +1,4 @@
-import { fetchIncidents } from "../lib/actions";
+import { fetchIncidents, fetchIncidentsPages } from "../lib/actions";
 import { lusitana } from "../ui/fonts";
 
 export default async function Page() {

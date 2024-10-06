@@ -1,6 +1,6 @@
 import { fetchFilteredIncidents } from "@/app/lib/actions";
-import IncidentStatus from "@/app/ui/invoices/status";
-import { DeleteIncident, UpdateIncident } from "@/app/ui/invoices/buttons";
+import IncidentStatus from "@/app/ui/incidents/status";
+import { DeleteIncident, UpdateIncident } from "@/app/ui/incidents/buttons";
 export default async function IncidentTable({
   query,
   currentPage,

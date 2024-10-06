@@ -52,9 +52,9 @@ export async function fetchFilteredIncidents(
   try {
     const url = new URL(`http://localhost:8080/v1/filtered_incidents`);
     const searchParams = url.searchParams;
-    searchParams.set("query", query); // Set a new search param
-    searchParams.set("limit", ITEMS_PER_PAGE.toString()); // Set a new search param
-    searchParams.set("offset", offset.toString()); // Set a new search param
+    searchParams.set("query", query);
+    searchParams.set("limit", ITEMS_PER_PAGE.toString());
+    searchParams.set("offset", offset.toString());
 
     const data = await fetch(url.toString(), {
       method: "GET",
@@ -70,6 +70,31 @@ export async function fetchFilteredIncidents(
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch incidents.");
+  }
+}
+export async function fetchIncidentsPages(query: string) {
+  try {
+    const url = new URL(`http://localhost:8080/v1/filtered_incidents_count`);
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const count = await data.json();
+      if (count) {
+        const totalPages = Math.ceil(
+          Number(count.rows[0].count) / ITEMS_PER_PAGE
+        );
+
+        return totalPages;
+      }
+    }
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch incidents pages.");
   }
 }
 export async function deleteIncident(id: string) {
