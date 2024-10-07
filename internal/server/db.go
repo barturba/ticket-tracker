@@ -195,6 +195,16 @@ func (cfg *ApiConfig) GetUsers(r *http.Request) ([]models.User, error) {
 	return users, nil
 }
 
+func (cfg *ApiConfig) GetConfigurationItems(r *http.Request) ([]models.ConfigurationItem, error) {
+	databaseCI, err := cfg.DB.GetConfigurationItems(r.Context())
+	if err != nil {
+		return nil, errors.New("couldn't find configuration items")
+	}
+	cis := models.DatabaseConfigurationItemsToConfigurationItems(databaseCI)
+
+	return cis, nil
+}
+
 func NewIncidentEmpty() models.Incident {
 	return models.Incident{
 		ID:                    uuid.New(),

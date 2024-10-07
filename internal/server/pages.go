@@ -182,54 +182,54 @@ func (cfg *ApiConfig) handleIncidentsEditPage(w http.ResponseWriter, r *http.Req
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
-func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
-	input := models.IncidentInput
+// func (cfg *ApiConfig) handleIncidentsPostPage(w http.ResponseWriter, r *http.Request, u models.User) {
+// 	input := models.IncidentInput
 
-	err := cfg.readJSON(w, r, &input)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+// 	err := cfg.readJSON(w, r, &input)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusBadRequest, err.Error())
+// 		return
+// 	}
+// 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
-	errs := models.CheckIncident(incident)
-	if errs != nil {
-		path := "/incidents"
-		alert := models.NewAlert("Couldn't add incident", models.AlertEnumError, "red")
-		layout, err := cfg.BuildIncidentsPage(r, "POST", "Incidents - Add", incident, u, path, alert, errs)
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		templ.Handler(layout).ServeHTTP(w, r)
-		return
-	}
+// 	errs := models.CheckIncident(incident)
+// 	if errs != nil {
+// 		path := "/incidents"
+// 		alert := models.NewAlert("Couldn't add incident", models.AlertEnumError, "red")
+// 		layout, err := cfg.BuildIncidentsPage(r, "POST", "Incidents - Add", incident, u, path, alert, errs)
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, err.Error())
+// 			return
+// 		}
+// 		templ.Handler(layout).ServeHTTP(w, r)
+// 		return
+// 	}
 
-	databaseIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
-		ID:                  incident.ID,
-		CreatedAt:           time.Now(),
-		UpdatedAt:           time.Now(),
-		ShortDescription:    incident.ShortDescription,
-		Description:         sql.NullString{String: incident.Description, Valid: incident.Description != ""},
-		State:               incident.State,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-	})
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
-		return
-	}
-	incident = models.DatabaseIncidentToIncident(databaseIncident)
+// 	databaseIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+// 		ID:                  incident.ID,
+// 		CreatedAt:           time.Now(),
+// 		UpdatedAt:           time.Now(),
+// 		ShortDescription:    incident.ShortDescription,
+// 		Description:         sql.NullString{String: incident.Description, Valid: incident.Description != ""},
+// 		State:               incident.State,
+// 		ConfigurationItemID: incident.ConfigurationItemID,
+// 		CompanyID:           incident.CompanyID,
+// 	})
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+// 		return
+// 	}
+// 	incident = models.DatabaseIncidentToIncident(databaseIncident)
 
-	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
-	alert := models.NewAlert("Incident added successfully!", models.AlertEnumSuccess, "green")
-	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	templ.Handler(layout).ServeHTTP(w, r)
-}
+// 	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
+// 	alert := models.NewAlert("Incident added successfully!", models.AlertEnumSuccess, "green")
+// 	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
+// 	templ.Handler(layout).ServeHTTP(w, r)
+// }
 
 func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Request, u models.User) {
 
@@ -245,53 +245,53 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 	templ.Handler(layout).ServeHTTP(w, r)
 }
 
-func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
-	input := models.IncidentInput
+// func (cfg *ApiConfig) handleIncidentsPutPage(w http.ResponseWriter, r *http.Request, u models.User) {
+// 	input := models.IncidentInput
 
-	err := cfg.readJSON(w, r, &input)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
-	log.Printf("editing incident: ", incident)
+// 	err := cfg.readJSON(w, r, &input)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusBadRequest, err.Error())
+// 		return
+// 	}
+// 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+// 	log.Printf("editing incident: ", incident)
 
-	errs := models.CheckIncident(incident)
-	if errs != nil {
-		path := "/incidents/%s/edit"
-		alert := models.NewAlert("Couldn't update incident", models.AlertEnumError, "red")
-		layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		templ.Handler(layout).ServeHTTP(w, r)
-		return
-	}
+// 	errs := models.CheckIncident(incident)
+// 	if errs != nil {
+// 		path := "/incidents/%s/edit"
+// 		alert := models.NewAlert("Couldn't update incident", models.AlertEnumError, "red")
+// 		layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, err.Error())
+// 			return
+// 		}
+// 		templ.Handler(layout).ServeHTTP(w, r)
+// 		return
+// 	}
 
-	idString := r.PathValue("id")
-	id, err := uuid.Parse(idString)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
-		return
-	}
-	incident.ID = id
+// 	idString := r.PathValue("id")
+// 	id, err := uuid.Parse(idString)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+// 		return
+// 	}
+// 	incident.ID = id
 
-	incident, err = cfg.UpdateIncident(r, incident)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+// 	incident, err = cfg.UpdateIncident(r, incident)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
 
-	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
-	alert := models.NewAlert("Incident Updated", models.AlertEnumSuccess, "green")
-	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	templ.Handler(layout).ServeHTTP(w, r)
-}
+// 	path := fmt.Sprintf("/incidents/%s/edit", incident.ID)
+// 	alert := models.NewAlert("Incident Updated", models.AlertEnumSuccess, "green")
+// 	layout, err := cfg.BuildIncidentsPage(r, "PUT", "Incidents - Edit", incident, u, path, alert, errs)
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
+// 	templ.Handler(layout).ServeHTTP(w, r)
+// }
 
 func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Request, u models.User) {
 
@@ -355,7 +355,6 @@ func (cfg *ApiConfig) handleSearchIncidents(w http.ResponseWriter, r *http.Reque
 }
 
 func (cfg *ApiConfig) handleIncidentsGet(w http.ResponseWriter, r *http.Request) {
-	log.Println("handleIncidentsGet")
 
 	i, err := cfg.GetIncidents(r)
 	if err != nil {
@@ -407,7 +406,6 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("got the following incidents: %s", i)
 
 	respondWithJSON(w, http.StatusOK, i)
 }
@@ -431,13 +429,58 @@ func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *
 
 	i, err := cfg.GetIncidentsFilteredCount(r, query)
 	if err != nil {
-		log.Printf("couldn't get incidents")
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("got the following incidents count: %d", i)
 
 	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleIncidentsPost(w http.ResponseWriter, r *http.Request) {
+	log.Printf("handleIncidentsPost")
+
+	// DEBUG
+	// testID := "5faba39f-64fe-4805-8365-0a91bb396477"
+	// userID, err := uuid.Parse(testID)
+	// if err != nil {
+	// 	respondWithError(w, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+	// u := models.NewUser(userID, "admin", "john@gmail.com", "abc123", "abc123")
+
+	input := models.IncidentInput
+	err := cfg.readJSON2(w, r, &input)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	incident := NewIncident(uuid.New(), input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+
+	errs := models.CheckIncident(incident)
+	if errs != nil {
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("%v", errs))
+		return
+	}
+
+	databaseIncident, err := cfg.DB.CreateIncident(r.Context(), database.CreateIncidentParams{
+		ID:                  incident.ID,
+		CreatedAt:           time.Now(),
+		UpdatedAt:           time.Now(),
+		ShortDescription:    incident.ShortDescription,
+		Description:         sql.NullString{String: incident.Description, Valid: incident.Description != ""},
+		State:               incident.State,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		CompanyID:           incident.CompanyID,
+	})
+	if err != nil {
+		log.Printf("handleIncidentsPost: err is %v", err)
+		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
+		return
+	}
+	incident = models.DatabaseIncidentToIncident(databaseIncident)
+	log.Printf("handleIncidentsPost: created the following incident in the database %v", incident)
+
+	respondWithJSON(w, http.StatusOK, incident)
 }
 
 // Companies
@@ -455,6 +498,39 @@ func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request
 	cIndex := views.CompaniesIndex(companies)
 	cList := views.BuildLayout(page, cIndex)
 	templ.Handler(cList).ServeHTTP(w, r)
+}
+
+func (cfg *ApiConfig) handleCompaniesGet(w http.ResponseWriter, r *http.Request) {
+
+	i, err := cfg.GetCompanies(r)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get companies")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleUsersGet(w http.ResponseWriter, r *http.Request) {
+
+	i, err := cfg.GetUsers(r)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get companies")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleConfigurationItemsGet(w http.ResponseWriter, r *http.Request) {
+
+	i, err := cfg.GetConfigurationItems(r)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get configuration items")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
 }
 
 // Users

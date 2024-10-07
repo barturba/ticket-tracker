@@ -378,7 +378,7 @@ func (i *InputFieldDisabled) GetError() string { return i.ErrorText }
 func (i *Dropdown) GetError() string           { return i.ErrorText }
 
 var IncidentInput struct {
-	ID                  uuid.UUID          `json:"id"`
+	// ID                  uuid.UUID          `json:"id"`
 	ShortDescription    string             `json:"short_description"`
 	Description         string             `json:"description"`
 	CompanyID           uuid.UUID          `json:"company_id"`
@@ -458,4 +458,16 @@ func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsFiltere
 
 type Count struct {
 	Count int
+}
+
+func NewUser(id uuid.UUID, name, email, apiKey, token string) User {
+	return User{
+		ID:        id,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      name,
+		Email:     email,
+		APIkey:    apiKey,
+		Token:     token,
+	}
 }

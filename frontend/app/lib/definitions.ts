@@ -15,3 +15,24 @@ export type Incident = {
   state: string;
   assigned_to: string;
 };
+
+export type CompaniesField = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+};
+
+export type UsersField = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+};
+
+export type ConfigurationItemsField = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+};
