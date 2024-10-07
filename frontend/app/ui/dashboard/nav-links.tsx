@@ -17,7 +17,13 @@ export default function NavLinks() {
       href: "/dashboard/incidents",
       icon: DocumentDuplicateIcon,
     },
-    { name: "Customers", href: "/dashboard/customers", icon: UserGroupIcon },
+    { name: "Companies", href: "/dashboard/companies", icon: UserGroupIcon },
+    { name: "Users", href: "/dashboard/users", icon: UserGroupIcon },
+    {
+      name: "Configuration Items",
+      href: "/dashboard/configuration-items",
+      icon: UserGroupIcon,
+    },
   ];
   return (
     <>
