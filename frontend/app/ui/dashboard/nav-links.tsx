@@ -1,5 +1,7 @@
 "use client";
 import {
+  BriefcaseIcon,
+  CpuChipIcon,
   DocumentDuplicateIcon,
   HomeIcon,
   UserGroupIcon,
@@ -17,12 +19,12 @@ export default function NavLinks() {
       href: "/dashboard/incidents",
       icon: DocumentDuplicateIcon,
     },
-    { name: "Companies", href: "/dashboard/companies", icon: UserGroupIcon },
+    { name: "Companies", href: "/dashboard/companies", icon: BriefcaseIcon },
     { name: "Users", href: "/dashboard/users", icon: UserGroupIcon },
     {
       name: "Configuration Items",
       href: "/dashboard/configuration-items",
-      icon: UserGroupIcon,
+      icon: CpuChipIcon,
     },
   ];
   return (
