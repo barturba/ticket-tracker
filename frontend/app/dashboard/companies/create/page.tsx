@@ -5,6 +5,11 @@ import {
 } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
 import Form from "@/app/ui/incidents/create-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Create Company",
+};
 
 export default async function Page() {
   const companies = await fetchCompanies();

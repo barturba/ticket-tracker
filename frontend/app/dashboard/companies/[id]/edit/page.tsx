@@ -6,7 +6,12 @@ import {
 } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
 import EditForm from "@/app/ui/incidents/edit-form";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Edit Company",
+};
 
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
@@ -31,12 +36,12 @@ export default async function Page({ params }: { params: { id: string } }) {
           },
         ]}
       />
-      {/* <EditForm
+      <EditForm
         incident={incident}
         companies={companies}
         users={users}
         configurationItems={configurationItems}
-      /> */}
+      />
     </main>
   );
 }

@@ -8,7 +8,7 @@ import Form from "@/app/ui/incidents/create-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Create Incident",
+  title: "Create Configuration Item",
 };
 
 export default async function Page() {
@@ -19,10 +19,13 @@ export default async function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Incidents", href: "/dashboard/incidents" },
           {
-            label: "Create Incident",
-            href: "/dashboard/incidents/create",
+            label: "Configuration Items",
+            href: "/dashboard/configuration-items",
+          },
+          {
+            label: "Create Configuraction Item",
+            href: "/dashboard/configuration-items/create",
             active: true,
           },
         ]}

@@ -10,7 +10,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Edit Incident",
+  title: "Edit Configuration Item",
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
@@ -21,26 +21,17 @@ export default async function Page({ params }: { params: { id: string } }) {
     fetchUsers(),
     fetchConfigurationItems(),
   ]);
-  console.log(
-    `dashboard/incidents/[id]/edit/incident: ${JSON.stringify(
-      incident,
-      null,
-      2
-    )}`
-  );
-  console.log(`!incident: ${JSON.stringify(!incident, null, 2)}`);
   if (!incident) {
-    console.log(`calling notFound`);
     notFound();
   }
   return (
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Incidents", href: "/dashboard/incidents" },
+          { label: "Configuration Items", href: "/dashboard/companies" },
           {
-            label: "Edit Incident",
-            href: `/dashboard/incidents/${id}/edit`,
+            label: "Edit Configuration Item",
+            href: `/dashboard/configuration-items/${id}/edit`,
             active: true,
           },
         ]}

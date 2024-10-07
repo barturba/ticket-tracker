@@ -1,4 +1,5 @@
 import { fetchIncidents } from "@/app/lib/actions";
+import { Incident } from "@/app/lib/definitions";
 
 export default async function IncidentsChart() {
   const incidents = await fetchIncidents();
@@ -8,7 +9,7 @@ export default async function IncidentsChart() {
   }
   return (
     <ul>
-      {incidents.map((i) => (
+      {incidents.map((i: Incident) => (
         <li key={i.id}>{i.short_description}</li>
       ))}
     </ul>

@@ -25,7 +25,9 @@ export function UpdateIncident({ id }: { id: string }) {
 }
 
 export function DeleteIncident({ id }: { id: string }) {
-  const deleteIncidentWithId = deleteIncident.bind(null, id);
+  const deleteIncidentWithId = async () => {
+    await deleteIncident(id);
+  };
 
   return (
     <form action={deleteIncidentWithId}>

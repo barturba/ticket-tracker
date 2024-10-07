@@ -2,8 +2,6 @@
 
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { Incident } from "./definitions";
-import { off } from "process";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -96,6 +94,7 @@ export async function fetchFilteredIncidents(
       }
     }
   } catch (error) {
+    console.log(`fetchFilteredIncidents error: ${error}`);
     throw new Error("Failed to fetch incidents.");
   }
 }
@@ -119,6 +118,7 @@ export async function fetchIncidentsPages(query: string) {
       }
     }
   } catch (error) {
+    console.log(`fetchIncidentsPages error: ${error}`);
     throw new Error("Failed to fetch incidents pages.");
   }
 }
@@ -127,13 +127,14 @@ export async function deleteIncident(id: string) {
   // Prepare data for sending to the API.
   try {
     const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
-    const data = await fetch(url.toString(), {
+    await fetch(url.toString(), {
       method: "DELETE",
     });
     // Revalidate the cache for the incident page
     revalidatePath("/dashboard/incidents");
     return { message: "Deleted Incident." };
   } catch (error) {
+    console.log(`deleteIncident error: ${error}`);
     // If a database error occurs, return a more specific error.
     return {
       message: "Database Error: Failed to Update Incident.",
@@ -170,6 +171,7 @@ export async function fetchCompanies() {
       }
     }
   } catch (error) {
+    console.log(`fetchCompanies error: ${error}`);
     throw new Error("Failed to fetch incidents pages.");
   }
 }
@@ -190,6 +192,7 @@ export async function fetchUsers() {
       }
     }
   } catch (error) {
+    console.log(`fetchUsers error: ${error}`);
     throw new Error("Failed to fetch users data.");
   }
 }
@@ -210,6 +213,7 @@ export async function fetchConfigurationItems() {
       }
     }
   } catch (error) {
+    console.log(`fetchConfigurationItems error: ${error}`);
     throw new Error("Failed to fetch configuration items data.");
   }
 }
@@ -236,15 +240,14 @@ export async function fetchIncidentById(id: string) {
         return "";
       }
     } else {
-      console.log(`Network error: ${data.headers}`);
       return "";
     }
   } catch (error) {
-    console.log(`Database error: ${error}`);
+    console.log(`fetchIncidentById error: ${error}`);
     throw new Error("Failed to fetch incident data.");
   }
 }
-const UpdateIncident = FormSchema.omit({ date: true, id: true });
+const UpdateIncident = FormSchema.omit({ id: true });
 export async function updateIncident(
   id: string,
   prevState: State,
@@ -286,7 +289,7 @@ export async function updateIncident(
   // Prepare data for sending to the API.
   try {
     const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
-    const data = await fetch(url.toString(), {
+    await fetch(url.toString(), {
       method: "PUT",
       body: JSON.stringify({
         id: id,
@@ -300,6 +303,7 @@ export async function updateIncident(
     });
   } catch (error) {
     // If a database error occurs, return a more specific error.
+    console.log(`updateIncident error: ${error}`);
     return {
       message: "Database Error: Failed to Update Incident.",
     };
@@ -348,7 +352,7 @@ export async function createIncident(prevState: State, formData: FormData) {
   } = validatedFields.data;
   try {
     const url = new URL(`http://localhost:8080/v1/incidents`);
-    const data = await fetch(url.toString(), {
+    await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
         short_description: shortDescription,
@@ -370,6 +374,7 @@ export async function createIncident(prevState: State, formData: FormData) {
     // }
   } catch (error) {
     // If a database error occurs, return a more specific error.
+    console.log(`createIncident error: ${error}`);
     return {
       message: "Database Error: Failed to Create Incident.",
     };

@@ -1,5 +1,11 @@
-import { fetchIncidents, fetchIncidentsPages } from "@/app/lib/actions";
+import { fetchIncidents } from "@/app/lib/actions";
 import { lusitana } from "@/app/ui/fonts";
+import { Metadata } from "next";
+import { Incident } from "@/app/lib/definitions";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default async function Page() {
   const incidents = await fetchIncidents();
@@ -9,7 +15,7 @@ export default async function Page() {
         Dashboard
       </h1>
       <ul>
-        {incidents?.map((incident) => {
+        {incidents?.map((incident: Incident) => {
           return <li key={incident.id}>{incident.short_description}</li>;
         })}
       </ul>

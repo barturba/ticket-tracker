@@ -5,7 +5,12 @@ import Pagination from "@/app/ui/incidents/pagination";
 import Table from "@/app/ui/incidents/table";
 import Search from "@/app/ui/search";
 import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
+import { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Incidents",
+};
 
 export default async function Page({
   searchParams,
@@ -18,7 +23,7 @@ export default async function Page({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchIncidentsPages(query);
+  const totalPages = (await fetchIncidentsPages(query)) ?? 0;
 
   return (
     <div className="w-full">
