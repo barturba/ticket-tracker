@@ -35,6 +35,8 @@ async function getUser(
       } else {
         return undefined;
       }
+    } else {
+      return undefined;
     }
   } catch (error) {
     throw new Error("Failed to login");
