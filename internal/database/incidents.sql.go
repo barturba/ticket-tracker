@@ -77,6 +77,56 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 	return i, err
 }
 
+const getIncidentById = `-- name: GetIncidentById :one
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE incidents.id = $1
+`
+
+type GetIncidentByIdRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
+}
+
+func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetIncidentByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getIncidentById, id)
+	var i GetIncidentByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ShortDescription,
+		&i.Description,
+		&i.ConfigurationItemID,
+		&i.CompanyID,
+		&i.State,
+		&i.AssignedTo,
+		&i.ID_2,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.Name,
+		&i.Apikey,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
+}
+
 const getIncidents = `-- name: GetIncidents :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users

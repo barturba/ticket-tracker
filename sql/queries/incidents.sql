@@ -9,6 +9,12 @@ LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC;
 
+-- name: GetIncidentById :one
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE incidents.id = $1;
+
 -- name: GetIncidentsFiltered :many
 SELECT * FROM incidents
 LEFT JOIN users

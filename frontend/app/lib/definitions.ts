@@ -36,3 +36,19 @@ export type ConfigurationItemsField = {
   updated_at: string;
   name: string;
 };
+
+export type IncidentForm = {
+  id: string;
+  short_description: string;
+  description: string;
+  company_id: string;
+  assigned_to_id: string;
+  configuration_item_id: string;
+  state:
+    | "New"
+    | "Assigned"
+    | "In Progress"
+    | "Pending"
+    | "On Hold"
+    | "Resolved";
+};

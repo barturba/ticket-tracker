@@ -20,6 +20,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	// mux.HandleFunc("PUT /incidents/{id}", cfg.middlewareAuthPage(cfg.handleIncidentsPutPage))
 
 	mux.HandleFunc("GET /v1/incidents", cfg.handleIncidentsGet)
+	mux.HandleFunc("GET /v1/incident_by_id", cfg.handleIncidentByIdGet)
 	mux.HandleFunc("GET /v1/filtered_incidents", cfg.handleFilteredIncidentsGet)
 	mux.HandleFunc("GET /v1/filtered_incidents_count", cfg.handleFilteredIncidentsCountGet)
 	mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)

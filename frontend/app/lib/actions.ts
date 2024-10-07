@@ -176,6 +176,33 @@ export async function fetchConfigurationItems() {
     throw new Error("Failed to fetch configuration items data.");
   }
 }
+export async function fetchIncidentById(id: string) {
+  try {
+    const url = new URL(`http://localhost:8080/v1/incident_by_id`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("id", id);
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const incident = await data.json();
+      console.log(
+        `got the following data: ${JSON.stringify(incident, null, 2)}`
+      );
+      if (incident) {
+        return incident;
+      } else {
+        return [];
+      }
+    }
+  } catch (error) {
+    throw new Error("Failed to fetch incident data.");
+  }
+}
 
 // Backend is expecting the following
 //   ID                  uuid.UUID          `json:"id"`

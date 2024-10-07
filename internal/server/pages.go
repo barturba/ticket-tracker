@@ -410,6 +410,29 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 	respondWithJSON(w, http.StatusOK, i)
 }
 
+func (cfg *ApiConfig) handleIncidentByIdGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	idString := params.Get("id")
+	fmt.Println("idString: ", idString)
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	i, err := cfg.GetIncidentByID(r, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
 func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 

@@ -16,12 +16,15 @@ import {
 import Link from "next/link";
 import { Button } from "../button";
 import { useFormState } from "react-dom";
+import { IncidentForm } from "@/app/lib/definitions";
 
-export default function Form({
+export default function EditForm({
+  incident,
   companies,
   users,
   configurationItems,
 }: {
+  incident: IncidentForm;
   companies: CompaniesField[];
   users: UsersField[];
   configurationItems: ConfigurationItemsField[];
@@ -42,7 +45,7 @@ export default function Form({
               id="companyId"
               name="company_id"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
+              defaultValue={incident.company_id}
               aria-describedby="company-error"
             >
               <option value="" disabled>
@@ -80,7 +83,7 @@ export default function Form({
               id="assignedToId"
               name="assigned_to_id"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
+              defaultValue={incident.assigned_to_id}
               aria-describedby="assigned-to-error"
             >
               <option value="" disabled>
@@ -118,7 +121,7 @@ export default function Form({
               id="configurationItemId"
               name="configuration_item_id"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
+              defaultValue={incident.configuration_item_id}
               aria-describedby="configuration-item-error"
             >
               <option value="" disabled>
@@ -160,6 +163,7 @@ export default function Form({
                 placeholder="Enter short description"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby="amount-error"
+                defaultValue={incident.short_description}
               />
             </div>
           </div>
@@ -195,6 +199,7 @@ export default function Form({
                 placeholder="Enter a description"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby="amount-error"
+                defaultValue={incident.description}
               />
             </div>
           </div>
