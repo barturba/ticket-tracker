@@ -124,9 +124,21 @@ export async function fetchIncidentsPages(query: string) {
 }
 
 export async function deleteIncident(id: string) {
-  // Simulate slow load
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log(`deleted incident; ${id}`);
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
+    const data = await fetch(url.toString(), {
+      method: "DELETE",
+    });
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    return {
+      message: "Database Error: Failed to Update Incident.",
+    };
+  }
+  // Revalidate the cache for the invoices page and redirect the user.
+  revalidatePath("/dashboard/incidents");
+  redirect("/dashboard/incidents");
 }
 
 export type State = {

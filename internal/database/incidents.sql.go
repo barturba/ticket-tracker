@@ -56,6 +56,29 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 	return i, err
 }
 
+const deleteIncidentByID = `-- name: DeleteIncidentByID :one
+DELETE FROM incidents 
+WHERE id = $1
+RETURNING id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to
+`
+
+func (q *Queries) DeleteIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
+	row := q.db.QueryRowContext(ctx, deleteIncidentByID, id)
+	var i Incident
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ShortDescription,
+		&i.Description,
+		&i.ConfigurationItemID,
+		&i.CompanyID,
+		&i.State,
+		&i.AssignedTo,
+	)
+	return i, err
+}
+
 const getIncidentByID = `-- name: GetIncidentByID :one
 SELECT id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
 `

@@ -28,6 +28,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("GET /v1/configuration_items", cfg.handleConfigurationItemsGet)
 	mux.HandleFunc("POST /v1/incidents", cfg.handleIncidentsPost)
 	mux.HandleFunc("PUT /v1/incidents/{id}", cfg.handleIncidentsPut)
+	mux.HandleFunc("DELETE /v1/incidents/{id}", cfg.handleIncidentsDelete)
 
 	// - Configuration Items
 

@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -133,7 +132,7 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 }
 
 func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit, offset int) ([]models.Incident, error) {
-	log.Printf("GetIncidentsFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
+	// log.Printf("GetIncidentsFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
 	params := database.GetIncidentsFilteredParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -167,6 +166,15 @@ func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models
 		State:               i.State,
 		AssignedTo:          uuid.NullUUID{UUID: i.AssignedTo, Valid: true},
 	})
+	if err != nil {
+		return models.Incident{}, errors.New("couldn't update incident")
+	}
+	incident := models.DatabaseIncidentToIncident(dbIncident)
+
+	return incident, nil
+}
+func (cfg *ApiConfig) DeleteIncidentByID(r *http.Request, id uuid.UUID) (models.Incident, error) {
+	dbIncident, err := cfg.DB.DeleteIncidentByID(r.Context(), id)
 	if err != nil {
 		return models.Incident{}, errors.New("couldn't update incident")
 	}

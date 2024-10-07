@@ -72,3 +72,8 @@ state = $7,
 assigned_to = $8
 WHERE ID = $1
 RETURNING *;
+
+-- name: DeleteIncidentByID :one
+DELETE FROM incidents 
+WHERE id = $1
+RETURNING *;

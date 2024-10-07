@@ -522,6 +522,23 @@ func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request)
 	log.Printf("handleIncidentsPut: updated the following incident in the database %v", incident)
 	respondWithJSON(w, http.StatusOK, incident)
 }
+func (cfg *ApiConfig) handleIncidentsDelete(w http.ResponseWriter, r *http.Request) {
+
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+
+	incident, err := cfg.DeleteIncidentByID(r, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	log.Printf("handleIncidentsDelete: deleted the following incident from the database %v", incident)
+	respondWithJSON(w, http.StatusOK, incident)
+}
 
 // Companies
 
