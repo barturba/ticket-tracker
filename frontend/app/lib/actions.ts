@@ -130,15 +130,15 @@ export async function deleteIncident(id: string) {
     const data = await fetch(url.toString(), {
       method: "DELETE",
     });
+    // Revalidate the cache for the incident page
+    revalidatePath("/dashboard/incidents");
+    return { message: "Deleted Incident." };
   } catch (error) {
     // If a database error occurs, return a more specific error.
     return {
       message: "Database Error: Failed to Update Incident.",
     };
   }
-  // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath("/dashboard/incidents");
-  redirect("/dashboard/incidents");
 }
 
 export type State = {
@@ -214,11 +214,11 @@ export async function fetchConfigurationItems() {
   }
 }
 export async function fetchIncidentById(id: string) {
-  try {
-    const url = new URL(`http://localhost:8080/v1/incident_by_id`);
+  const url = new URL(`http://localhost:8080/v1/incident_by_id`);
 
-    const searchParams = url.searchParams;
-    searchParams.set("id", id);
+  const searchParams = url.searchParams;
+  searchParams.set("id", id);
+  try {
     const data = await fetch(url.toString(), {
       method: "GET",
     });
@@ -233,10 +233,14 @@ export async function fetchIncidentById(id: string) {
       if (incident) {
         return incident;
       } else {
-        return [];
+        return "";
       }
+    } else {
+      console.log(`Network error: ${data.headers}`);
+      return "";
     }
   } catch (error) {
+    console.log(`Database error: ${error}`);
     throw new Error("Failed to fetch incident data.");
   }
 }
@@ -300,7 +304,7 @@ export async function updateIncident(
       message: "Database Error: Failed to Update Incident.",
     };
   }
-  // Revalidate the cache for the invoices page and redirect the user.
+  // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath("/dashboard/incidents");
   redirect("/dashboard/incidents");
 }
@@ -370,7 +374,7 @@ export async function createIncident(prevState: State, formData: FormData) {
       message: "Database Error: Failed to Create Incident.",
     };
   }
-  // Revalidate the cache for the invoices page and redirect the user.
+  // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath("/dashboard/incidents");
   redirect("/dashboard/incidents");
 }

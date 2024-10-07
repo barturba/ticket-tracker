@@ -222,7 +222,7 @@ export default function EditForm({
         {/* Incident State */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
-            Set the invoice state
+            Set the incident state
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">

@@ -5,8 +5,8 @@ import {
   fetchUsers,
 } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
-import Form from "@/app/ui/incidents/create-form";
 import EditForm from "@/app/ui/incidents/edit-form";
+import { notFound } from "next/navigation";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
@@ -16,13 +16,25 @@ export default async function Page({ params }: { params: { id: string } }) {
     fetchUsers(),
     fetchConfigurationItems(),
   ]);
+  console.log(
+    `dashboard/incidents/[id]/edit/incident: ${JSON.stringify(
+      incident,
+      null,
+      2
+    )}`
+  );
+  console.log(`!incident: ${JSON.stringify(!incident, null, 2)}`);
+  if (!incident) {
+    console.log(`calling notFound`);
+    notFound();
+  }
   return (
     <main>
       <Breadcrumbs
         breadcrumbs={[
           { label: "Incidents", href: "/dashboard/incidents" },
           {
-            label: "Edit Invoice",
+            label: "Edit Incident",
             href: `/dashboard/incidents/${id}/edit`,
             active: true,
           },
