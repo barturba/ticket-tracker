@@ -8,6 +8,31 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+const FormSchema = z.object({
+  id: z.string(),
+  shortDescription: z.string({
+    required_error: "Please enter a short description.",
+  }),
+  description: z.string({
+    required_error: "Please enter a description.",
+  }),
+  companyId: z.string({
+    invalid_type_error: "Please select a company.",
+  }),
+  assignedToId: z.string({
+    invalid_type_error: "Please select a user to assign to.",
+  }),
+  configurationItemId: z.string({
+    invalid_type_error: "Please select a configuration item to assign to.",
+  }),
+  state: z.enum(
+    ["New", "Assigned", "In Progress", "Pending", "On Hold", "Resolved"],
+    {
+      invalid_type_error: "Please select an incident state.",
+    }
+  ),
+});
+
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData
@@ -190,9 +215,9 @@ export async function fetchIncidentById(id: string) {
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const incident = await data.json();
-      console.log(
-        `got the following data: ${JSON.stringify(incident, null, 2)}`
-      );
+      // console.log(
+      //   `got the following data: ${JSON.stringify(incident, null, 2)}`
+      // );
       if (incident) {
         return incident;
       } else {
@@ -203,39 +228,70 @@ export async function fetchIncidentById(id: string) {
     throw new Error("Failed to fetch incident data.");
   }
 }
+const UpdateIncident = FormSchema.omit({ date: true, id: true });
+export async function updateIncident(
+  id: string,
+  prevState: State,
+  formData: FormData
+) {
+  const validatedFields = UpdateIncident.safeParse({
+    shortDescription: formData.get("short_description"),
+    description: formData.get("description"),
+    companyId: formData.get("company_id"),
+    assignedToId: formData.get("assigned_to_id"),
+    configurationItemId: formData.get("configuration_item_id"),
+    state: formData.get("state"),
+  });
 
-// Backend is expecting the following
-//   ID                  uuid.UUID          `json:"id"`
-//   ShortDescription    string             `json:"short_description"`
-//   Description         string             `json:"description"`
-//   CompanyID           uuid.UUID          `json:"company_id"`
-//   AssignedToID        uuid.UUID          `json:"assigned_to_id"`
-//   ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
-//   State               database.StateEnum `json:"state"`
-const FormSchema = z.object({
-  id: z.string(),
-  shortDescription: z.string({
-    required_error: "Please enter a short description.",
-  }),
-  description: z.string({
-    required_error: "Please enter a description.",
-  }),
-  companyId: z.string({
-    invalid_type_error: "Please select a company.",
-  }),
-  assignedToId: z.string({
-    invalid_type_error: "Please select a user to assign to.",
-  }),
-  configurationItemId: z.string({
-    invalid_type_error: "Please select a configuration item to assign to.",
-  }),
-  state: z.enum(
-    ["New", "Assigned", "In Progress", "Pending", "On Hold", "Resolved"],
-    {
-      invalid_type_error: "Please select an incident state.",
-    }
-  ),
-});
+  if (!validatedFields.success) {
+    console.log(
+      `updateIncident error: ${JSON.stringify(
+        validatedFields.error.flatten().fieldErrors,
+        null,
+        2
+      )}`
+    );
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Update Incident.",
+    };
+  }
+
+  // Validate form fields using Zod
+  const {
+    shortDescription,
+    description,
+    companyId,
+    assignedToId,
+    configurationItemId,
+    state,
+  } = validatedFields.data;
+
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
+    const data = await fetch(url.toString(), {
+      method: "PUT",
+      body: JSON.stringify({
+        id: id,
+        short_description: shortDescription,
+        description: description,
+        company_id: companyId,
+        assigned_to_id: assignedToId,
+        configuration_item_id: configurationItemId,
+        state: state,
+      }),
+    });
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    return {
+      message: "Database Error: Failed to Update Incident.",
+    };
+  }
+  // Revalidate the cache for the invoices page and redirect the user.
+  revalidatePath("/dashboard/incidents");
+  redirect("/dashboard/incidents");
+}
 
 const CreateIncident = FormSchema.omit({ id: true });
 

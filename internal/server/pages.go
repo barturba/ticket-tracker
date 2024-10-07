@@ -254,7 +254,6 @@ func (cfg *ApiConfig) handleIncidentsAddPage(w http.ResponseWriter, r *http.Requ
 // 		return
 // 	}
 // 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
-// 	log.Printf("editing incident: ", incident)
 
 // 	errs := models.CheckIncident(incident)
 // 	if errs != nil {
@@ -373,15 +372,12 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 
 	myUrl, _ := url.Parse(r.URL.String())
 	params, _ := url.ParseQuery(myUrl.RawQuery)
-	fmt.Println("params: ", params, " url: ", r.URL.String())
 
 	query := params.Get("query")
-	fmt.Println("query: ", query)
 
 	limitInput := params.Get("limit")
 
 	offsetInput := params.Get("offset")
-	fmt.Println("offset: ", offsetInput)
 
 	// v := validator.New()
 	// v.Check(query != "", "query", "must be provided")
@@ -417,7 +413,6 @@ func (cfg *ApiConfig) handleIncidentByIdGet(w http.ResponseWriter, r *http.Reque
 	params, _ := url.ParseQuery(myUrl.RawQuery)
 
 	idString := params.Get("id")
-	fmt.Println("idString: ", idString)
 	id, err := uuid.Parse(idString)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -438,10 +433,8 @@ func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *
 
 	myUrl, _ := url.Parse(r.URL.String())
 	params, _ := url.ParseQuery(myUrl.RawQuery)
-	fmt.Println("params: ", params, " url: ", r.URL.String())
 
 	query := params.Get("query")
-	fmt.Println("query: ", query)
 
 	// v := validator.New()
 	// v.Check(query != "", "query", "must be provided")
@@ -460,18 +453,8 @@ func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *
 }
 
 func (cfg *ApiConfig) handleIncidentsPost(w http.ResponseWriter, r *http.Request) {
-	log.Printf("handleIncidentsPost")
 
-	// DEBUG
-	// testID := "5faba39f-64fe-4805-8365-0a91bb396477"
-	// userID, err := uuid.Parse(testID)
-	// if err != nil {
-	// 	respondWithError(w, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-	// u := models.NewUser(userID, "admin", "john@gmail.com", "abc123", "abc123")
-
-	input := models.IncidentInput
+	input := models.NewIncidentInput
 	err := cfg.readJSON2(w, r, &input)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -496,13 +479,47 @@ func (cfg *ApiConfig) handleIncidentsPost(w http.ResponseWriter, r *http.Request
 		CompanyID:           incident.CompanyID,
 	})
 	if err != nil {
-		log.Printf("handleIncidentsPost: err is %v", err)
 		respondWithError(w, http.StatusInternalServerError, "couldn't create incident")
 		return
 	}
 	incident = models.DatabaseIncidentToIncident(databaseIncident)
-	log.Printf("handleIncidentsPost: created the following incident in the database %v", incident)
 
+	respondWithJSON(w, http.StatusOK, incident)
+}
+
+func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request) {
+
+	input := models.IncidentInput
+
+	err := cfg.readJSON2(w, r, &input)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+	log.Printf("editing incident: %v", incident)
+
+	errs := models.CheckIncident(incident)
+	if errs != nil {
+		log.Printf("handleIncidentsPut: err is %v", err)
+		respondWithError(w, http.StatusInternalServerError, "couldn't update incident")
+		return
+	}
+
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+	incident.ID = id
+
+	incident, err = cfg.UpdateIncident(r, incident)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	log.Printf("handleIncidentsPut: updated the following incident in the database %v", incident)
 	respondWithJSON(w, http.StatusOK, incident)
 }
 

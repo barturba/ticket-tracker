@@ -377,8 +377,17 @@ func (i *InputField) GetError() string         { return i.ErrorText }
 func (i *InputFieldDisabled) GetError() string { return i.ErrorText }
 func (i *Dropdown) GetError() string           { return i.ErrorText }
 
+var NewIncidentInput struct {
+	ShortDescription    string             `json:"short_description"`
+	Description         string             `json:"description"`
+	CompanyID           uuid.UUID          `json:"company_id"`
+	AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+	State               database.StateEnum `json:"state"`
+}
+
 var IncidentInput struct {
-	// ID                  uuid.UUID          `json:"id"`
+	ID                  uuid.UUID          `json:"id"`
 	ShortDescription    string             `json:"short_description"`
 	Description         string             `json:"description"`
 	CompanyID           uuid.UUID          `json:"company_id"`

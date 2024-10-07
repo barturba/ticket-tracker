@@ -1,5 +1,5 @@
 "use client";
-import { createIncident, State } from "@/app/lib/actions";
+import { createIncident, State, updateIncident } from "@/app/lib/actions";
 import {
   CompaniesField,
   ConfigurationItemsField,
@@ -10,13 +10,13 @@ import {
   CheckIcon,
   ClockIcon,
   CpuChipIcon,
-  PlayCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "../button";
-import { useFormState } from "react-dom";
 import { IncidentForm } from "@/app/lib/definitions";
+import { UpdateIncident } from "./buttons";
+import { useFormState } from "react-dom";
 
 export default function EditForm({
   incident,
@@ -30,7 +30,8 @@ export default function EditForm({
   configurationItems: ConfigurationItemsField[];
 }) {
   const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useFormState(createIncident, initialState);
+  const updateIncidentWithId = updateIncident.bind(null, incident.id);
+  const [state, formAction] = useFormState(updateIncidentWithId, initialState);
 
   return (
     <form action={formAction}>
@@ -231,6 +232,7 @@ export default function EditForm({
                   name="state"
                   type="radio"
                   value="New"
+                  defaultChecked={incident.state === "New"}
                   className="text-white-600 h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 focus:ring-2"
                 />
                 <label
@@ -246,6 +248,7 @@ export default function EditForm({
                   name="state"
                   type="radio"
                   value="In Progress"
+                  defaultChecked={incident.state === "In Progress"}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -282,7 +285,7 @@ export default function EditForm({
         >
           Cancel
         </Link>
-        <Button type="submit">Create Incident</Button>
+        <Button type="submit">Update Incident</Button>
       </div>
     </form>
   );
