@@ -581,6 +581,78 @@ func (q *Queries) GetIncidentsFilteredCount(ctx context.Context, query sql.NullS
 	return count, err
 }
 
+const getIncidentsLatest = `-- name: GetIncidentsLatest :many
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+ORDER BY incidents.updated_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetIncidentsLatestParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetIncidentsLatestRow struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	ShortDescription    string
+	Description         sql.NullString
+	ConfigurationItemID uuid.UUID
+	CompanyID           uuid.UUID
+	State               StateEnum
+	AssignedTo          uuid.NullUUID
+	ID_2                uuid.NullUUID
+	CreatedAt_2         sql.NullTime
+	UpdatedAt_2         sql.NullTime
+	Name                sql.NullString
+	Apikey              sql.NullString
+	Email               sql.NullString
+	Password            sql.NullString
+}
+
+func (q *Queries) GetIncidentsLatest(ctx context.Context, arg GetIncidentsLatestParams) ([]GetIncidentsLatestRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidentsLatest, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetIncidentsLatestRow
+	for rows.Next() {
+		var i GetIncidentsLatestRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ShortDescription,
+			&i.Description,
+			&i.ConfigurationItemID,
+			&i.CompanyID,
+			&i.State,
+			&i.AssignedTo,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateIncident = `-- name: UpdateIncident :one
 UPDATE incidents
 SET updated_at = $2, 

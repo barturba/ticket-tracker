@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -72,6 +73,58 @@ func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getCompaniesFiltered = `-- name: GetCompaniesFiltered :many
+SELECT id, created_at, updated_at, name FROM companies
+WHERE (name ILIKE '%' || $3 || '%')
+LIMIT $1 OFFSET $2
+`
+
+type GetCompaniesFilteredParams struct {
+	Limit  int32
+	Offset int32
+	Query  sql.NullString
+}
+
+func (q *Queries) GetCompaniesFiltered(ctx context.Context, arg GetCompaniesFilteredParams) ([]Company, error) {
+	rows, err := q.db.QueryContext(ctx, getCompaniesFiltered, arg.Limit, arg.Offset, arg.Query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Company
+	for rows.Next() {
+		var i Company
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCompaniesFilteredCount = `-- name: GetCompaniesFilteredCount :one
+SELECT count(*) FROM companies
+WHERE (name ILIKE '%' || $1 || '%')
+`
+
+func (q *Queries) GetCompaniesFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCompaniesFilteredCount, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const getCompanyByID = `-- name: GetCompanyByID :one

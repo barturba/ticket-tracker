@@ -1,5 +1,10 @@
 "use client";
-import { createIncident, State, updateIncident } from "@/app/lib/actions";
+import {
+  fetchUsers,
+  fetchUsersByCompany,
+  State,
+  updateIncident,
+} from "@/app/lib/actions";
 import {
   CompaniesField,
   ConfigurationItemsField,
@@ -15,28 +20,65 @@ import {
 import Link from "next/link";
 import { Button } from "../button";
 import { IncidentForm } from "@/app/lib/definitions";
-import { UpdateIncident } from "./buttons";
 import { useFormState } from "react-dom";
+import { useEffect, useState } from "react";
 
 export default function EditForm({
   incident,
+  initialUsers,
   companies,
-  users,
   configurationItems,
 }: {
   incident: IncidentForm;
   companies: CompaniesField[];
-  users: UsersField[];
+  initialUsers: UsersField[];
   configurationItems: ConfigurationItemsField[];
 }) {
   const initialState: State = { message: null, errors: {} };
   const updateIncidentWithId = updateIncident.bind(null, incident.id);
   const [state, formAction] = useFormState(updateIncidentWithId, initialState);
+  const [users, setUsers] = useState(initialUsers);
+  const [selectedCompany, setSelectedCompany] = useState(incident.company_id);
+
+  const handleChange = (event) => {
+    setSelectedCompany(event.target.value);
+  };
+
+  useEffect(() => {
+    console.log(`selectedCompany: ${selectedCompany}`);
+    const fetchData = async () => {
+      const data = await fetchUsersByCompany(selectedCompany);
+      console.log(`data.length: ${data.length}`);
+      setUsers(data);
+    };
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error);
+  }, [selectedCompany]);
+
+  // TODO [ ]: Get users and configuration items for selected company
+
+  // const handleChange = async (e): Promise<void> => {
+  //   const { name, value } = e.target;
+  //   const newUsers = await fetchUsersByCompany(value);
+  //   setUsers(newUsers);
+  //   console.log(`name: ${name} value: ${value}`);
+  //   console.log(`newUsers: ${newUsers}`);
+  // };
+  // const [users, setUsers] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const newUsers = await fetchUsersByCompany(value);
+  //     setUsers(newUsers);
+  //   };
+  //   fetchData();
+  // }, []);
 
   return (
     <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* Company Name */}
         <div className="mb-4">
           <label htmlFor="company" className="mb-2 block text-sm font-medium">
             Choose company
@@ -46,8 +88,10 @@ export default function EditForm({
               id="companyId"
               name="company_id"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue={incident.company_id}
+              // defaultValue={incident.company_id}
+              // defaultValue={selectedCompany}
               aria-describedby="company-error"
+              onChange={handleChange}
             >
               <option value="" disabled>
                 Select a company

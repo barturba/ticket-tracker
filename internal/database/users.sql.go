@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -124,6 +125,62 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUsersByCompany = `-- name: GetUsersByCompany :many
+SELECT users.id, users.created_at, users.updated_at, users.name, apikey, email, password, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
+LEFT JOIN companies 
+ON users.assigned_to = users.id
+ORDER BY users.name ASC
+`
+
+type GetUsersByCompanyRow struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Name        string
+	Apikey      string
+	Email       string
+	Password    sql.NullString
+	ID_2        uuid.NullUUID
+	CreatedAt_2 sql.NullTime
+	UpdatedAt_2 sql.NullTime
+	Name_2      sql.NullString
+}
+
+func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersByCompany)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersByCompanyRow
+	for rows.Next() {
+		var i GetUsersByCompanyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name_2,
 		); err != nil {
 			return nil, err
 		}

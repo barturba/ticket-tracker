@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -145,6 +146,23 @@ func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit,
 	incidents := models.DatabaseIncidentsFilteredRowToIncidents(databaseIncidentsFilteredRow)
 	return incidents, nil
 }
+func (cfg *ApiConfig) GetIncidentsLatest(r *http.Request, limit, offset int) ([]models.Incident, error) {
+	log.Printf("GetIncidentsLatest: limit: %v offset: %v ", int32(limit), int32(offset))
+	params := database.GetIncidentsLatestParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	}
+	databaseIncidentsLatestRow, err := cfg.DB.GetIncidentsLatest(r.Context(), params)
+	if err != nil {
+		return nil, errors.New("couldn't find incidents")
+	}
+	incidents := models.DatabaseIncidentsLatestRowToIncidents(databaseIncidentsLatestRow)
+	return incidents, nil
+}
+func (cfg *ApiConfig) GetUsersByCompany(r *http.Request, query string, limit, offset int) ([]models.User, error) {
+	users, err := cfg.GetUsers(r)
+	return users, err
+}
 
 func (cfg *ApiConfig) GetIncidentsFilteredCount(r *http.Request, query string) (int64, error) {
 	databaseIncidentsFilteredCountRow, err := cfg.DB.GetIncidentsFilteredCount(r.Context(),
@@ -153,6 +171,32 @@ func (cfg *ApiConfig) GetIncidentsFilteredCount(r *http.Request, query string) (
 		return 0, errors.New("couldn't find incidents")
 	}
 	return databaseIncidentsFilteredCountRow, nil
+}
+
+// - Companies
+
+func (cfg *ApiConfig) GetCompaniesFiltered(r *http.Request, query string, limit, offset int) ([]models.Company, error) {
+	// log.Printf("GetCompaniesFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
+	params := database.GetCompaniesFilteredParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+		Query:  sql.NullString{String: query, Valid: query != ""},
+	}
+	databaseCompanies, err := cfg.DB.GetCompaniesFiltered(r.Context(), params)
+	if err != nil {
+		return nil, errors.New("couldn't find companies")
+	}
+	companies := models.DatabaseCompaniesToCompanies(databaseCompanies)
+	return companies, nil
+}
+
+func (cfg *ApiConfig) GetCompaniesFilteredCount(r *http.Request, query string) (int64, error) {
+	databaseCompaniesFilteredCountRow, err := cfg.DB.GetCompaniesFilteredCount(r.Context(),
+		sql.NullString{String: query, Valid: query != ""})
+	if err != nil {
+		return 0, errors.New("couldn't find companies")
+	}
+	return databaseCompaniesFilteredCountRow, nil
 }
 
 func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models.Incident, error) {

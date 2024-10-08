@@ -402,29 +402,89 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-
+	log.Printf("handleFilteredIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
-
-func (cfg *ApiConfig) handleIncidentByIdGet(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) handleIncidentsLatestGet(w http.ResponseWriter, r *http.Request) {
 	var err error
+
+	limit := 0
+	offset := 0
 
 	myUrl, _ := url.Parse(r.URL.String())
 	params, _ := url.ParseQuery(myUrl.RawQuery)
 
-	idString := params.Get("id")
-	id, err := uuid.Parse(idString)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
+	limitInput := params.Get("limit")
+
+	offsetInput := params.Get("offset")
+
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// v.Check(limitInput != "", "limit", "must be provided")
+	// v.Check(offsetInput != "", "offset", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
+
+	if limit, err = strconv.Atoi(limitInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+		return
+	}
+	if offset, err = strconv.Atoi(offsetInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
 		return
 	}
 
-	i, err := cfg.GetIncidentByID(r, id)
+	i, err := cfg.GetIncidentsLatest(r, limit, offset)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
+	log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
+	respondWithJSON(w, http.StatusOK, i)
+}
 
+func (cfg *ApiConfig) handleUsersByCompanyGet(w http.ResponseWriter, r *http.Request) {
+	log.Println("called handleUsersByCompanyGet")
+	var err error
+
+	limit := 0
+	offset := 0
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	query := params.Get("query")
+
+	// limitInput := params.Get("limit")
+
+	// offsetInput := params.Get("offset")
+
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// v.Check(limitInput != "", "limit", "must be provided")
+	// v.Check(offsetInput != "", "offset", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
+
+	// if limit, err = strconv.Atoi(limitInput); err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+	// 	return
+	// }
+	// if offset, err = strconv.Atoi(offsetInput); err != nil {
+	// 	respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
+	// 	return
+	// }
+
+	i, err := cfg.GetUsersByCompany(r, query, limit, offset)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+	log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 
@@ -444,6 +504,28 @@ func (cfg *ApiConfig) handleFilteredIncidentsCountGet(w http.ResponseWriter, r *
 	// }
 
 	i, err := cfg.GetIncidentsFilteredCount(r, query)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleIncidentByIdGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	idString := params.Get("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	i, err := cfg.GetIncidentByID(r, id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
@@ -497,7 +579,8 @@ func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
-	log.Printf("editing incident: %v", incident)
+	log.Printf("editing incident: %v\n", incident.ID)
+	log.Printf("editing incident: %v\n", incident)
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
@@ -541,6 +624,72 @@ func (cfg *ApiConfig) handleIncidentsDelete(w http.ResponseWriter, r *http.Reque
 }
 
 // Companies
+
+func (cfg *ApiConfig) handleFilteredCompaniesGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	limit := 0
+	offset := 0
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	query := params.Get("query")
+
+	limitInput := params.Get("limit")
+
+	offsetInput := params.Get("offset")
+
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// v.Check(limitInput != "", "limit", "must be provided")
+	// v.Check(offsetInput != "", "offset", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
+
+	if limit, err = strconv.Atoi(limitInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'limit' parameter is not a number")
+		return
+	}
+	if offset, err = strconv.Atoi(offsetInput); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "the 'offset' parameter is not a number")
+		return
+	}
+
+	i, err := cfg.GetCompaniesFiltered(r, query, limit, offset)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get companies")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
+
+func (cfg *ApiConfig) handleFilteredCompaniesCountGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	query := params.Get("query")
+
+	// v := validator.New()
+	// v.Check(query != "", "query", "must be provided")
+	// if !v.Valid() {
+	// 	respondToFailedValidation(w, r, v.Errors)
+	// 	return
+	// }
+
+	i, err := cfg.GetCompaniesFilteredCount(r, query)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get companies")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i)
+}
 
 func (cfg *ApiConfig) handleViewCompanies(w http.ResponseWriter, r *http.Request, u models.User) {
 

@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
-  const [incident, users, companies, configurationItems] = await Promise.all([
+  const [incident, companies, users, configurationItems] = await Promise.all([
     fetchIncidentById(id),
-    fetchUsers(),
     fetchCompanies(),
+    fetchUsers(),
     fetchConfigurationItems(),
   ]);
   console.log(
@@ -48,7 +48,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <EditForm
         incident={incident}
         companies={companies}
-        initialUsers={users}
+        // users={users}
         configurationItems={configurationItems}
       />
     </main>

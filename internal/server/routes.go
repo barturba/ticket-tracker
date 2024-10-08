@@ -23,12 +23,18 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("GET /v1/incident_by_id", cfg.handleIncidentByIdGet)
 	mux.HandleFunc("GET /v1/filtered_incidents", cfg.handleFilteredIncidentsGet)
 	mux.HandleFunc("GET /v1/filtered_incidents_count", cfg.handleFilteredIncidentsCountGet)
+	mux.HandleFunc("GET /v1/incidents_latest", cfg.handleIncidentsLatestGet)
+	mux.HandleFunc("GET /v1/users_by_company", cfg.handleUsersByCompanyGet)
 	mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)
 	mux.HandleFunc("GET /v1/users", cfg.handleUsersGet)
 	mux.HandleFunc("GET /v1/configuration_items", cfg.handleConfigurationItemsGet)
 	mux.HandleFunc("POST /v1/incidents", cfg.handleIncidentsPost)
 	mux.HandleFunc("PUT /v1/incidents/{id}", cfg.handleIncidentsPut)
 	mux.HandleFunc("DELETE /v1/incidents/{id}", cfg.handleIncidentsDelete)
+
+	// - Companies
+	mux.HandleFunc("GET /v1/filtered_companies", cfg.handleFilteredCompaniesGet)
+	mux.HandleFunc("GET /v1/filtered_companies_count", cfg.handleFilteredCompaniesCountGet)
 
 	// - Configuration Items
 

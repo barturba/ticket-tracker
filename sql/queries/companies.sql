@@ -9,3 +9,12 @@ SELECT * from companies;
 -- name: GetCompanyByID :one
 SELECT * from companies
 WHERE id = $1;
+
+-- name: GetCompaniesFiltered :many
+SELECT * FROM companies
+WHERE (name ILIKE '%' || @query || '%')
+LIMIT $1 OFFSET $2;
+
+-- name: GetCompaniesFilteredCount :one
+SELECT count(*) FROM companies
+WHERE (name ILIKE '%' || @query || '%');

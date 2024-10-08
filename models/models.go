@@ -462,7 +462,48 @@ func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsFiltere
 		ConfigurationItemName: "",
 		CompanyID:             incident.CompanyID,
 	}
+}
 
+func DatabaseIncidentsLatestRowToIncidents(incidents []database.GetIncidentsLatestRow) []Incident {
+	var items []Incident
+	for _, item := range incidents {
+		items = append(items, DatabaseIncidentLatestRowToIncident(item))
+	}
+	return items
+}
+func DatabaseIncidentLatestRowToIncident(incident database.GetIncidentsLatestRow) Incident {
+	return Incident{
+		ID:                    incident.ID,
+		CreatedAt:             incident.CreatedAt,
+		UpdatedAt:             incident.UpdatedAt,
+		ShortDescription:      incident.ShortDescription,
+		Description:           incident.Description.String,
+		State:                 incident.State,
+		AssignedTo:            incident.AssignedTo.UUID,
+		AssignedToName:        incident.Name.String,
+		ConfigurationItemID:   incident.ConfigurationItemID,
+		ConfigurationItemName: "",
+		CompanyID:             incident.CompanyID,
+	}
+}
+
+// Companies
+
+func DatabaseCompaniesFilteredRowToCompanies(incidents []database.Company) []Company {
+	var items []Company
+	for _, item := range incidents {
+		items = append(items, DatabaseCompanyFilteredRowToCompany(item))
+	}
+	return items
+}
+
+func DatabaseCompanyFilteredRowToCompany(incident database.Company) Company {
+	return Company{
+		ID:        incident.ID,
+		CreatedAt: incident.CreatedAt,
+		UpdatedAt: incident.UpdatedAt,
+		Name:      incident.Name,
+	}
 }
 
 type Count struct {

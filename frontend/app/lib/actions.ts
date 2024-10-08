@@ -50,6 +50,8 @@ export async function authenticate(
   }
 }
 
+// Incidents
+
 export async function fetchIncidents() {
   try {
     const data = await fetch(`http://localhost:8080/v1/incidents`, {
@@ -91,7 +93,13 @@ export async function fetchFilteredIncidents(
       const incidents = await data.json();
       if (incidents) {
         return incidents;
+      } else {
+        console.log(`fetchFilteredIncidents data not received`);
+        return "";
       }
+    } else {
+      console.log(`fetchFilteredIncidents data not ok`);
+      return "";
     }
   } catch (error) {
     console.log(`fetchFilteredIncidents error: ${error}`);
@@ -154,6 +162,8 @@ export type State = {
   message?: string | null;
 };
 
+// Companies
+
 export async function fetchCompanies() {
   try {
     const url = new URL(`http://localhost:8080/v1/companies`);
@@ -173,6 +183,28 @@ export async function fetchCompanies() {
   } catch (error) {
     console.log(`fetchCompanies error: ${error}`);
     throw new Error("Failed to fetch incidents pages.");
+  }
+}
+export async function fetchCompaniesPages(query: string) {
+  try {
+    const url = new URL(`http://localhost:8080/v1/filtered_companies_count`);
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    if (data.ok) {
+      const count = await data.json();
+      if (count > 0) {
+        const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
+        return totalPages;
+      } else {
+        return 0;
+      }
+    }
+  } catch (error) {
+    console.log(`fetchCompaniesPages error: ${error}`);
+    throw new Error("Failed to fetch companies pages.");
   }
 }
 export async function fetchUsers() {
@@ -382,4 +414,63 @@ export async function createIncident(prevState: State, formData: FormData) {
   // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath("/dashboard/incidents");
   redirect("/dashboard/incidents");
+}
+
+export async function fetchLatestIncidents() {
+  const offset = 0;
+  try {
+    const url = new URL(`http://localhost:8080/v1/incidents_latest`);
+    const searchParams = url.searchParams;
+    searchParams.set("limit", ITEMS_PER_PAGE.toString());
+    searchParams.set("offset", offset.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const incidents = await data.json();
+      if (incidents) {
+        return incidents;
+      } else {
+        return "";
+      }
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.log(`fetchFilteredIncidents error: ${error}`);
+    throw new Error("Failed to fetch incidents.");
+  }
+}
+
+export async function fetchUsersByCompany(id: string) {
+  const url = new URL(`http://localhost:8080/v1/users_by_company`);
+
+  const searchParams = url.searchParams;
+  searchParams.set("id", id);
+  try {
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const users = await data.json();
+      console.log(`got the following data: ${JSON.stringify(users, null, 2)}`);
+      if (users) {
+        return users;
+      } else {
+        return "";
+      }
+    } else {
+      console.log(`data not ok: ${JSON.stringify(data, null, 2)}`);
+      return "";
+    }
+  } catch (error) {
+    console.log(`fetchUsersByCompany error: ${error}`);
+    throw new Error("Failed to fetch users data.");
+  }
 }

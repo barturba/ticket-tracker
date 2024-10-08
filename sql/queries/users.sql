@@ -7,6 +7,12 @@ RETURNING *;
 SELECT * FROM users 
 ORDER BY users.name ASC;
 
+-- name: GetUsersByCompany :many
+SELECT * FROM users 
+LEFT JOIN companies 
+ON users.assigned_to = users.id
+ORDER BY users.name ASC;
+
 -- name: GetUserByAPIKey :one
 SELECT * FROM USERS WHERE APIKEY = $1;
 

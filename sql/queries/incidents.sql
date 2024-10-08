@@ -30,6 +30,13 @@ ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || @query || '%')
 OR (description ILIKE '%' || @query || '%');
 
+-- name: GetIncidentsLatest :many
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+ORDER BY incidents.updated_at DESC
+LIMIT $1 OFFSET $2;
+
 -- name: GetIncidentsAsc :many
 SELECT * FROM incidents
 LEFT JOIN users

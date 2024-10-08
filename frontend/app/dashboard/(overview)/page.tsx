@@ -1,7 +1,11 @@
 import { lusitana } from "@/app/ui/fonts";
 import { Suspense } from "react";
-import { RevenueChartSkeleton } from "@/app/ui/skeletons";
+import {
+  LatestIncidentsSkeleton,
+  RevenueChartSkeleton,
+} from "@/app/ui/skeletons";
 import IncidentsChart from "../incidents-chart";
+import LatestIncidents from "@/app/ui/dashboard/latest-incidents";
 
 export default async function Page() {
   // const incidents = await fetchIncidents();
@@ -11,8 +15,11 @@ export default async function Page() {
         Dashboard
       </h1>
       <ul>
-        <Suspense fallback={<RevenueChartSkeleton />}>
+        {/* <Suspense fallback={<RevenueChartSkeleton />}>
           <IncidentsChart />
+        </Suspense> */}
+        <Suspense fallback={<LatestIncidentsSkeleton />}>
+          <LatestIncidents />
         </Suspense>
       </ul>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"></div>

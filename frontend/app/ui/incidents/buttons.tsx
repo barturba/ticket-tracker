@@ -25,16 +25,16 @@ export function UpdateIncident({ id }: { id: string }) {
 }
 
 export function DeleteIncident({ id }: { id: string }) {
-  const deleteIncidentWithId = async () => {
-    await deleteIncident(id);
-  };
+  // const deleteIncidentWithId = async () => {
+  //   await deleteIncident(id);
+  // };
 
   return (
-    <form action={deleteIncidentWithId}>
-      <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </form>
+    // <form action={deleteIncidentWithId}>
+    <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
+      <span className="sr-only">Delete</span>
+      <TrashIcon className="w-5" />
+    </button>
+    // </form>
   );
 }
