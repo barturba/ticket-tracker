@@ -250,6 +250,7 @@ export async function fetchConfigurationItems() {
   }
 }
 export async function fetchIncidentById(id: string) {
+  console.log(`fetchIncidentByID getting following data: ${id}`);
   const url = new URL(`http://localhost:8080/v1/incident_by_id`);
 
   const searchParams = url.searchParams;
@@ -263,9 +264,13 @@ export async function fetchIncidentById(id: string) {
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const incident = await data.json();
-      // console.log(
-      //   `got the following data: ${JSON.stringify(incident, null, 2)}`
-      // );
+      console.log(
+        `fetchIncidentByID got the following data: ${JSON.stringify(
+          incident,
+          null,
+          2
+        )}`
+      );
       if (incident) {
         return incident;
       } else {
@@ -333,6 +338,8 @@ export async function updateIncident(
         state: state,
       }),
     });
+    // Simulate slow load
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   } catch (error) {
     // If a database error occurs, return a more specific error.
     console.log(`updateIncident error: ${error}`);
@@ -459,7 +466,7 @@ export async function fetchUsersByCompany(id: string) {
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const users = await data.json();
-      console.log(`got the following data: ${JSON.stringify(users, null, 2)}`);
+      // console.log(`got the following data: ${JSON.stringify(users, null, 2)}`);
       if (users) {
         return users;
       } else {

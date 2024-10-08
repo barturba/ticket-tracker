@@ -28,7 +28,6 @@ export default async function Page({ params }: { params: { id: string } }) {
       2
     )}`
   );
-  console.log(`!incident: ${JSON.stringify(!incident, null, 2)}`);
   if (!incident) {
     console.log(`calling notFound`);
     notFound();

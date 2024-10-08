@@ -402,7 +402,7 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("handleFilteredIncidentsGet: returning this data: %v\n", i)
+	// log.Printf("handleFilteredIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 func (cfg *ApiConfig) handleIncidentsLatestGet(w http.ResponseWriter, r *http.Request) {
@@ -441,7 +441,7 @@ func (cfg *ApiConfig) handleIncidentsLatestGet(w http.ResponseWriter, r *http.Re
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
+	// log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 
@@ -484,7 +484,7 @@ func (cfg *ApiConfig) handleUsersByCompanyGet(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
+	// log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 

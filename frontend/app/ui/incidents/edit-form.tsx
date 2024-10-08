@@ -20,8 +20,18 @@ import {
 import Link from "next/link";
 import { Button } from "../button";
 import { IncidentForm } from "@/app/lib/definitions";
-import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useState } from "react";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" aria-disabled={pending}>
+      Update incident
+    </Button>
+  );
+}
 
 export default function EditForm({
   incident,
@@ -36,7 +46,10 @@ export default function EditForm({
 }) {
   const initialState: State = { message: null, errors: {} };
   const updateIncidentWithId = updateIncident.bind(null, incident.id);
-  const [state, formAction] = useFormState(updateIncidentWithId, initialState);
+  const [state, formAction] = useActionState(
+    updateIncidentWithId,
+    initialState
+  );
   const [users, setUsers] = useState(initialUsers);
   const [selectedCompany, setSelectedCompany] = useState(incident.company_id);
 
@@ -48,7 +61,7 @@ export default function EditForm({
     console.log(`selectedCompany: ${selectedCompany}`);
     const fetchData = async () => {
       const data = await fetchUsersByCompany(selectedCompany);
-      console.log(`data.length: ${data.length}`);
+      // console.log(`data.length: ${data.length}`);
       setUsers(data);
     };
     fetchData()
@@ -74,6 +87,7 @@ export default function EditForm({
   //   };
   //   fetchData();
   // }, []);
+  console.log(`got incident: ${JSON.stringify(incident)}`);
 
   return (
     <form action={formAction}>
@@ -329,7 +343,7 @@ export default function EditForm({
         >
           Cancel
         </Link>
-        <Button type="submit">Update Incident</Button>
+        <SubmitButton />
       </div>
     </form>
   );
