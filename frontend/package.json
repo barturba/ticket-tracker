@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/lusitana": "^0.2.3",
+    "@headlessui/react": "^2.1.9",
     "@heroicons/react": "^2.1.5",
     "@tailwindcss/forms": "^0.5.9",
     "clsx": "^2.1.1",

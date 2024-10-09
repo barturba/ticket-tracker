@@ -19,7 +19,7 @@ async function getUser(
   password: string
 ): Promise<User | undefined> {
   try {
-    const data = await fetch(`http://localhost:8080/v1/login-test`, {
+    const data = await fetch(`http://localhost:8080/v1/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
