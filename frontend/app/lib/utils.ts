@@ -51,7 +51,9 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-export function truncate(str: string, n: number, useWordBoundary: boolean) {
+const TRUNCATE_LENGTH = 35;
+export function truncate(str: string, useWordBoundary: boolean) {
+  const n = TRUNCATE_LENGTH;
   if (str.length <= n) {
     return str;
   }

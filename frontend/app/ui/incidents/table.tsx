@@ -2,6 +2,7 @@ import { fetchFilteredIncidents } from "@/app/lib/actions";
 import IncidentStatus from "@/app/ui/incidents/status";
 import { DeleteIncident, UpdateIncident } from "@/app/ui/incidents/buttons";
 import { Incident } from "@/app/lib/definitions";
+import { truncate } from "@/app/lib/utils";
 export default async function IncidentTable({
   query,
   currentPage,
@@ -13,9 +14,9 @@ export default async function IncidentTable({
     query,
     currentPage
   );
-  if (!incidents) {
-    return <p>No data</p>;
-  }
+  // if (!incidents) {
+  //   return <p>No data</p>;
+  // }
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
@@ -79,7 +80,7 @@ export default async function IncidentTable({
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {incident.short_description}
+                    {truncate(incident.short_description, true)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {incident.assigned_to_id}

@@ -95,11 +95,11 @@ export async function fetchFilteredIncidents(
         return incidents;
       } else {
         console.log(`fetchFilteredIncidents data not received`);
-        return "";
+        return [];
       }
     } else {
       console.log(`fetchFilteredIncidents data not ok`);
-      return "";
+      return [];
     }
   } catch (error) {
     console.log(`fetchFilteredIncidents error: ${error}`);

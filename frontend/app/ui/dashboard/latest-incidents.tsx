@@ -47,7 +47,7 @@ export default async function LatestIncidents() {
                       href={`/dashboard/incidents/${incident.id}/edit`}
                       className="truncate text-sm font-semibold md:text-base"
                     >
-                      {truncate(incident.short_description, 35, true)}
+                      {truncate(incident.short_description, true)}
                     </Link>
                     {/* <p className="hidden text-sm text-gray-500 sm:block">
                       {incident.id}
