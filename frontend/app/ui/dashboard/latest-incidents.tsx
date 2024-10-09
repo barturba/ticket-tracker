@@ -7,6 +7,7 @@ import { Incident } from "@/app/lib/definitions";
 import Link from "next/link";
 
 import dayjs from "dayjs";
+import { truncate } from "@/app/lib/utils";
 
 export default async function LatestIncidents() {
   console.log("LatestIncidents");
@@ -46,7 +47,7 @@ export default async function LatestIncidents() {
                       href={`/dashboard/incidents/${incident.id}/edit`}
                       className="truncate text-sm font-semibold md:text-base"
                     >
-                      {incident.short_description}
+                      {truncate(incident.short_description, 35, true)}
                     </Link>
                     {/* <p className="hidden text-sm text-gray-500 sm:block">
                       {incident.id}
