@@ -6,8 +6,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
-
 	// Page Endpoints
 
 	// - Incidents
@@ -57,7 +55,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	// Login Endpoints
 	mux.HandleFunc("POST /v1/login", cfg.handleLogin)
-	mux.HandleFunc("POST /v1/login-test", cfg.handleLoginTest)
 	mux.HandleFunc("GET /login", cfg.handleLoginPage)
 	mux.HandleFunc("GET /logout", cfg.handleLogout)
 

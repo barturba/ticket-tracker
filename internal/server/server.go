@@ -2,7 +2,6 @@ package server
 
 import (
 	"database/sql"
-	"embed"
 	"log"
 	"net/http"
 	"os"
@@ -12,9 +11,6 @@ import (
 	"github.com/barturba/ticket-tracker/models"
 	"github.com/joho/godotenv"
 )
-
-//go:embed static
-var static embed.FS
 
 const (
 	JWT_EXPIRES_IN_SECONDS = 3600

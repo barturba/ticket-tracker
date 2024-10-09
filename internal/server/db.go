@@ -146,6 +146,7 @@ func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit,
 	incidents := models.DatabaseIncidentsFilteredRowToIncidents(databaseIncidentsFilteredRow)
 	return incidents, nil
 }
+
 func (cfg *ApiConfig) GetIncidentsLatest(r *http.Request, limit, offset int) ([]models.Incident, error) {
 	log.Printf("GetIncidentsLatest: limit: %v offset: %v ", int32(limit), int32(offset))
 	params := database.GetIncidentsLatestParams{
@@ -159,6 +160,7 @@ func (cfg *ApiConfig) GetIncidentsLatest(r *http.Request, limit, offset int) ([]
 	incidents := models.DatabaseIncidentsLatestRowToIncidents(databaseIncidentsLatestRow)
 	return incidents, nil
 }
+
 func (cfg *ApiConfig) GetUsersByCompany(r *http.Request, query string, limit, offset int) ([]models.User, error) {
 	users, err := cfg.GetUsers(r)
 	return users, err
@@ -217,6 +219,7 @@ func (cfg *ApiConfig) UpdateIncident(r *http.Request, i models.Incident) (models
 
 	return incident, nil
 }
+
 func (cfg *ApiConfig) DeleteIncidentByID(r *http.Request, id uuid.UUID) (models.Incident, error) {
 	dbIncident, err := cfg.DB.DeleteIncidentByID(r.Context(), id)
 	if err != nil {
