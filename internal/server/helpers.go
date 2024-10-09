@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/barturba/ticket-tracker/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -17,10 +16,6 @@ import (
 
 func CheckHashPassword(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-}
-
-func respondToFailedValidation(w http.ResponseWriter, r *http.Request, errors map[string]string) {
-	respondWithError(w, http.StatusUnprocessableEntity, fmt.Sprintf("%v", errors))
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -71,14 +66,6 @@ func (cfg *ApiConfig) createJWT(expiresInSeconds int, userID uuid.UUID) (string,
 }
 
 func (cfg *ApiConfig) readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
-	err := json.NewDecoder(r.Body).Decode(dst)
-	if err != nil {
-		return errors.New("Error decoding parameters")
-	}
-	return nil
-}
-
-func (cfg *ApiConfig) readJSON2(w http.ResponseWriter, r *http.Request, dst any) error {
 	// Decode the request body into the target destination.
 	err := json.NewDecoder(r.Body).Decode(dst)
 	if err != nil {
@@ -126,20 +113,4 @@ func (cfg *ApiConfig) readJSON2(w http.ResponseWriter, r *http.Request, dst any)
 		}
 	}
 	return nil
-}
-
-func NewPage(title string, cfg *ApiConfig, u models.User, alert models.Alert) models.Page {
-	return models.Page{
-		Title:            title,
-		Logo:             cfg.Logo,
-		Alert:            alert,
-		IsLoggedIn:       true,
-		IsError:          false,
-		Msg:              "",
-		User:             u.Name,
-		Email:            u.Email,
-		ProfilePicture:   cfg.ProfilePicPlaceholder,
-		MenuItems:        cfg.MenuItems,
-		ProfileMenuItems: cfg.ProfileItems,
-	}
 }

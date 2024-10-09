@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
-	"github.com/barturba/ticket-tracker/models"
 	"github.com/joho/godotenv"
 )
 
@@ -17,12 +16,8 @@ const (
 )
 
 type ApiConfig struct {
-	DB                    *database.Queries
-	JWTSecret             string
-	MenuItems             models.MenuItems
-	ProfileItems          models.MenuItems
-	Logo                  string
-	ProfilePicPlaceholder string
+	DB        *database.Queries
+	JWTSecret string
 }
 
 func NewServer() *http.Server {
@@ -53,16 +48,9 @@ func NewServer() *http.Server {
 	}
 	dbQueries := database.New(db)
 
-	logo := "/static/images/logo.png"
-	ProfilePicPlaceholder := "/static/images/profile_placeholder.webp"
-
 	apiCfg := ApiConfig{
-		DB:                    dbQueries,
-		JWTSecret:             jwtSecret,
-		MenuItems:             MenuItems,
-		ProfileItems:          ProfileItems,
-		Logo:                  logo,
-		ProfilePicPlaceholder: ProfilePicPlaceholder,
+		DB:        dbQueries,
+		JWTSecret: jwtSecret,
 	}
 
 	srv := &http.Server{
