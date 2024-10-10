@@ -15,6 +15,8 @@ import {
   CheckIcon,
   ClockIcon,
   CpuChipIcon,
+  DocumentIcon,
+  PencilIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -225,6 +227,7 @@ export default function EditForm({
                 defaultValue={incident.short_description}
               />
             </div>
+            <PencilIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
           <div
@@ -261,6 +264,7 @@ export default function EditForm({
                 defaultValue={incident.description}
               />
             </div>
+            <DocumentIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
           <div

@@ -7,9 +7,12 @@ import {
 } from "@/app/lib/definitions";
 import {
   BuildingOffice2Icon,
+  ChatBubbleLeftIcon,
   CheckIcon,
   ClockIcon,
   CpuChipIcon,
+  DocumentIcon,
+  PencilIcon,
   PlayCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -162,6 +165,7 @@ export default function Form({
                 aria-describedby="amount-error"
               />
             </div>
+            <PencilIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
           <div
@@ -197,6 +201,7 @@ export default function Form({
                 aria-describedby="amount-error"
               />
             </div>
+            <DocumentIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
           <div

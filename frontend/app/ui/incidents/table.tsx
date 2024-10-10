@@ -2,7 +2,7 @@ import { fetchFilteredIncidents } from "@/app/lib/actions";
 import IncidentStatus from "@/app/ui/incidents/status";
 import { DeleteIncident, UpdateIncident } from "@/app/ui/incidents/buttons";
 import { Incident } from "@/app/lib/definitions";
-import { truncate } from "@/app/lib/utils";
+import { formatDateToLocal, truncate } from "@/app/lib/utils";
 export default async function IncidentTable({
   query,
   currentPage,
@@ -33,7 +33,9 @@ export default async function IncidentTable({
                   <IncidentStatus status={incident.state} />
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
-                  <p className="text-xl font-medium">{incident.created_at}</p>
+                  <p className="text-xl font-medium">
+                    {formatDateToLocal(incident.updated_at)}
+                  </p>
                 </div>
                 <div className="flex justify-end gap-2">
                   <UpdateIncident id={incident.id} />
@@ -83,7 +85,7 @@ export default async function IncidentTable({
                     {incident.assigned_to_name}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {incident.created_at}
+                    {formatDateToLocal(incident.updated_at)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     <IncidentStatus status={incident.state} />
