@@ -6,28 +6,6 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-const FormSchema = z.object({
-  id: z.string(),
-  shortDescription: z.string({
-    required_error: "Please enter a short description.",
-  }),
-  description: z.string({
-    required_error: "Please enter a description.",
-  }),
-  companyId: z.string({
-    invalid_type_error: "Please select a company.",
-  }),
-  assignedToId: z.string({
-    invalid_type_error: "Please select a user to assign to.",
-  }),
-  configurationItemId: z.string({
-    invalid_type_error: "Please select a configuration item to assign to.",
-  }),
-  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
-    invalid_type_error: "Please select an incident state.",
-  }),
-});
-
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData
@@ -334,76 +312,30 @@ export async function fetchIncidentById(id: string) {
     throw new Error("Failed to fetch incident data.");
   }
 }
-const UpdateIncident = FormSchema.omit({ id: true });
-export async function updateIncident(
-  id: string,
-  prevState: State,
-  formData: FormData
-) {
-  const validatedFields = UpdateIncident.safeParse({
-    shortDescription: formData.get("short_description"),
-    description: formData.get("description"),
-    companyId: formData.get("company_id"),
-    assignedToId: formData.get("assigned_to_id"),
-    configurationItemId: formData.get("configuration_item_id"),
-    state: formData.get("state"),
-  });
 
-  if (!validatedFields.success) {
-    console.log(
-      `updateIncident error: ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: "Missing Fields. Failed to Update Incident.",
-    };
-  }
+const FormSchemaIncident = z.object({
+  id: z.string(),
+  shortDescription: z.string({
+    required_error: "Please enter a short description.",
+  }),
+  description: z.string({
+    required_error: "Please enter a description.",
+  }),
+  companyId: z.string({
+    invalid_type_error: "Please select a company.",
+  }),
+  assignedToId: z.string({
+    invalid_type_error: "Please select a user to assign to.",
+  }),
+  configurationItemId: z.string({
+    invalid_type_error: "Please select a configuration item to assign to.",
+  }),
+  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
+    invalid_type_error: "Please select an incident state.",
+  }),
+});
 
-  // Validate form fields using Zod
-  const {
-    shortDescription,
-    description,
-    companyId,
-    assignedToId,
-    configurationItemId,
-    state,
-  } = validatedFields.data;
-
-  // Prepare data for sending to the API.
-  try {
-    const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
-    await fetch(url.toString(), {
-      method: "PUT",
-      body: JSON.stringify({
-        id: id,
-        short_description: shortDescription,
-        description: description,
-        company_id: companyId,
-        assigned_to_id: assignedToId,
-        configuration_item_id: configurationItemId,
-        state: state,
-      }),
-    });
-    // Simulate slow load
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-  } catch (error) {
-    // If a database error occurs, return a more specific error.
-    console.log(`updateIncident error: ${error}`);
-    return {
-      message: "Database Error: Failed to Update Incident.",
-    };
-  }
-  // Revalidate the cache for the incidents page and redirect the user.
-  revalidatePath("/dashboard/incidents");
-  redirect("/dashboard/incidents");
-}
-
-const CreateIncident = FormSchema.omit({ id: true });
-
+const CreateIncident = FormSchemaIncident.omit({ id: true });
 export async function createIncident(prevState: State, formData: FormData) {
   // Validate form fields using Zod
   const validatedFields = CreateIncident.safeParse({
@@ -473,6 +405,73 @@ export async function createIncident(prevState: State, formData: FormData) {
   redirect("/dashboard/incidents");
 }
 
+const UpdateIncident = FormSchemaIncident.omit({ id: true });
+export async function updateIncident(
+  id: string,
+  prevState: State,
+  formData: FormData
+) {
+  const validatedFields = UpdateIncident.safeParse({
+    shortDescription: formData.get("short_description"),
+    description: formData.get("description"),
+    companyId: formData.get("company_id"),
+    assignedToId: formData.get("assigned_to_id"),
+    configurationItemId: formData.get("configuration_item_id"),
+    state: formData.get("state"),
+  });
+
+  if (!validatedFields.success) {
+    console.log(
+      `updateIncident error: ${JSON.stringify(
+        validatedFields.error.flatten().fieldErrors,
+        null,
+        2
+      )}`
+    );
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Update Incident.",
+    };
+  }
+
+  // Validate form fields using Zod
+  const {
+    shortDescription,
+    description,
+    companyId,
+    assignedToId,
+    configurationItemId,
+    state,
+  } = validatedFields.data;
+
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
+    await fetch(url.toString(), {
+      method: "PUT",
+      body: JSON.stringify({
+        id: id,
+        short_description: shortDescription,
+        description: description,
+        company_id: companyId,
+        assigned_to_id: assignedToId,
+        configuration_item_id: configurationItemId,
+        state: state,
+      }),
+    });
+    // Simulate slow load
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    console.log(`updateIncident error: ${error}`);
+    return {
+      message: "Database Error: Failed to Update Incident.",
+    };
+  }
+  // Revalidate the cache for the incidents page and redirect the user.
+  revalidatePath("/dashboard/incidents");
+  redirect("/dashboard/incidents");
+}
 export async function fetchLatestIncidents() {
   const offset = 0;
   try {
@@ -501,7 +500,6 @@ export async function fetchLatestIncidents() {
     throw new Error("Failed to fetch incidents.");
   }
 }
-
 export async function fetchUsersByCompany(id: string) {
   const url = new URL(`http://localhost:8080/v1/users_by_company`);
 
@@ -530,4 +528,55 @@ export async function fetchUsersByCompany(id: string) {
     console.log(`fetchUsersByCompany error: ${error}`);
     throw new Error("Failed to fetch users data.");
   }
+}
+
+const FormSchemaCompany = z.object({
+  id: z.string(),
+  name: z.string({
+    required_error: "Please enter a short description.",
+  }),
+});
+
+const CreateCompany = FormSchemaCompany.omit({ id: true });
+export async function createCompany(prevState: State, formData: FormData) {
+  // Validate form fields using Zod
+  const validatedFields = CreateCompany.safeParse({
+    name: formData.get("name"),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    console.log(
+      `createCompany error: ${JSON.stringify(
+        validatedFields.error.flatten().fieldErrors,
+        null,
+        2
+      )}`
+    );
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Create Company.",
+    };
+  }
+
+  // Prepare data for sending to the API.
+  const { name } = validatedFields.data;
+  try {
+    const url = new URL(`http://localhost:8080/v1/companies`);
+    await fetch(url.toString(), {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+      }),
+    });
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    console.log(`createCompany error: ${error}`);
+    return {
+      message: "Database Error: Failed to Create Company.",
+    };
+  }
+  // Revalidate the cache for the companies page and redirect the user.
+  revalidatePath("/dashboard/companies");
+  redirect("/dashboard/companies");
 }

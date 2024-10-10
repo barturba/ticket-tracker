@@ -23,6 +23,7 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)
 	mux.HandleFunc("GET /v1/filtered_companies", cfg.handleFilteredCompaniesGet)
 	mux.HandleFunc("GET /v1/filtered_companies_count", cfg.handleFilteredCompaniesCountGet)
+	mux.HandleFunc("POST /v1/companies", cfg.handleCompaniesPost)
 
 	// - Configuration Items
 	mux.HandleFunc("GET /v1/configuration_items", cfg.handleConfigurationItemsGet)

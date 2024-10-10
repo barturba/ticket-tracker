@@ -1,6 +1,8 @@
 import { fetchCompaniesPages } from "@/app/lib/actions";
+import { CreateCompany } from "@/app/ui/companies/buttons";
 import Table from "@/app/ui/companies/table";
 import { lusitana } from "@/app/ui/fonts";
+import Pagination from "@/app/ui/utils/pagination";
 import Search from "@/app/ui/search";
 import { CompaniesTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
@@ -30,13 +32,13 @@ export default async function Page(props: {
 
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search companies ..." />
-        {/* <CreateCompany/> */}
+        <CreateCompany />
       </div>
       <Suspense key={query + currentPage} fallback={<CompaniesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
+        <Pagination totalPages={totalPages} />
       </div>
     </div>
   );

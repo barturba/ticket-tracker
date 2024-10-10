@@ -4,7 +4,7 @@ import {
   fetchUsers,
 } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
-import Form from "@/app/ui/incidents/create-form";
+import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,10 +19,10 @@ export default async function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Incidents", href: "/dashboard/incidents" },
+          { label: "Companies", href: "/dashboard/companies" },
           {
-            label: "Create Incident",
-            href: "/dashboard/incidents/create",
+            label: "Create Company",
+            href: "/dashboard/companies/create",
             active: true,
           },
         ]}

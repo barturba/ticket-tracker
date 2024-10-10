@@ -160,7 +160,7 @@ func (cfg *ApiConfig) handleIncidentsPost(w http.ResponseWriter, r *http.Request
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	incident := NewIncident(uuid.New(), input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+	incident := models.NewIncident(uuid.New(), input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
@@ -196,7 +196,7 @@ func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
+	incident := models.NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
@@ -314,6 +314,36 @@ func (cfg *ApiConfig) handleFilteredCompaniesCountGet(w http.ResponseWriter, r *
 	}
 
 	respondWithJSON(w, http.StatusOK, i)
+}
+func (cfg *ApiConfig) handleCompaniesPost(w http.ResponseWriter, r *http.Request) {
+
+	input := models.NewCompanyInput
+	err := cfg.readJSON(w, r, &input)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	company := models.NewCompany(uuid.New(), input.Name)
+
+	errs := models.CheckCompany(company)
+	if errs != nil {
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("%v", errs))
+		return
+	}
+
+	databaseCompany, err := cfg.DB.CreateCompany(r.Context(), database.CreateCompanyParams{
+		ID:        company.ID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      company.Name,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't create company")
+		return
+	}
+	company = models.DatabaseCompanyToCompany(databaseCompany)
+
+	respondWithJSON(w, http.StatusOK, company)
 }
 
 // Configuration Items

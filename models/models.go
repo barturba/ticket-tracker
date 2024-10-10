@@ -242,6 +242,38 @@ var IncidentInput struct {
 	State               database.StateEnum `json:"state"`
 }
 
+func NewIncidentEmpty() Incident {
+	return Incident{
+		ID:                    uuid.New(),
+		CreatedAt:             time.Now(),
+		UpdatedAt:             time.Now(),
+		ShortDescription:      "",
+		Description:           "",
+		State:                 "",
+		AssignedTo:            [16]byte{},
+		AssignedToName:        "",
+		ConfigurationItemID:   [16]byte{},
+		ConfigurationItemName: "",
+		CompanyID:             [16]byte{},
+	}
+}
+
+func NewIncident(id uuid.UUID, companyID, configurationItemID, assignedToID uuid.UUID, shortDescription, description string, state database.StateEnum) Incident {
+	return Incident{
+		ID:                    id,
+		CreatedAt:             time.Time{},
+		UpdatedAt:             time.Time{},
+		ShortDescription:      shortDescription,
+		Description:           description,
+		State:                 state,
+		AssignedTo:            assignedToID,
+		AssignedToName:        "",
+		ConfigurationItemID:   configurationItemID,
+		ConfigurationItemName: "",
+		CompanyID:             companyID,
+	}
+}
+
 func CheckIncident(i Incident) map[string]string {
 	StateEnum := []database.StateEnum{
 		database.StateEnumNew,
@@ -334,6 +366,45 @@ func DatabaseIncidentLatestRowToIncident(incident database.GetIncidentsLatestRow
 }
 
 // Companies
+
+var NewCompanyInput struct {
+	Name string `json:"name"`
+}
+
+var CompanyInput struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+func NewCompanyEmpty() Company {
+	return Company{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      "",
+	}
+}
+
+func NewCompany(id uuid.UUID,
+	name string,
+) Company {
+	return Company{
+		ID:        id,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
+		Name:      name,
+	}
+}
+
+func CheckCompany(c Company) map[string]string {
+	v := validator.New()
+	v.Check(c.ID != uuid.UUID{}, "id", "must be provided")
+	v.Check(c.Name != "", "name", "must be provided")
+	if !v.Valid() {
+		return v.Errors
+	}
+	return nil
+}
 
 func DatabaseCompaniesFilteredRowToCompanies(incidents []database.Company) []Company {
 	var items []Company

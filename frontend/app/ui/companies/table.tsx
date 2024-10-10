@@ -27,7 +27,6 @@ export default async function CompanyTable({
                       <p>{company.id}</p>
                     </div>
                   </div>
-                  {/* <CompanyStatus status={company.state} /> */}
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <p className="text-xl font-medium">{company.created_at}</p>

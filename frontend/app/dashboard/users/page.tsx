@@ -1,7 +1,7 @@
 import { fetchIncidentsPages } from "@/app/lib/actions";
 import { lusitana } from "@/app/ui/fonts";
 import { CreateIncident } from "@/app/ui/incidents/buttons";
-import Pagination from "@/app/ui/incidents/pagination";
+import Pagination from "@/app/ui/utils/pagination";
 import Table from "@/app/ui/incidents/table";
 import Search from "@/app/ui/search";
 import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
@@ -12,14 +12,12 @@ export const metadata: Metadata = {
   title: "Users",
 };
 
-export default async function Page(
-  props: {
-    searchParams?: Promise<{
-      query?: string;
-      page?: string;
-    }>;
-  }
-) {
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+    page?: string;
+  }>;
+}) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
