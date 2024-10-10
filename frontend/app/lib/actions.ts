@@ -207,6 +207,58 @@ export async function fetchCompaniesPages(query: string) {
     throw new Error("Failed to fetch companies pages.");
   }
 }
+export async function fetchFilteredCompanies(
+  query: string,
+  currentPage: number
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  try {
+    const url = new URL(`http://localhost:8080/v1/filtered_companies`);
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    searchParams.set("limit", ITEMS_PER_PAGE.toString());
+    searchParams.set("offset", offset.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const companies = await data.json();
+      if (companies) {
+        return companies;
+      } else {
+        console.log(`fetchFilteredCompanies data not received`);
+        return [];
+      }
+    } else {
+      console.log(`fetchFilteredCompanies data not ok`);
+      return [];
+    }
+  } catch (error) {
+    console.log(`fetchFilteredCompanies error: ${error}`);
+    throw new Error("Failed to fetch companies.");
+  }
+}
+export async function deleteCompany(id: string) {
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/companies/${id}`);
+    await fetch(url.toString(), {
+      method: "DELETE",
+    });
+    // Revalidate the cache for the company page
+    revalidatePath("/dashboard/companies");
+    return { message: "Deleted Company." };
+  } catch (error) {
+    console.log(`deleteCompany error: ${error}`);
+    // If a database error occurs, return a more specific error.
+    return {
+      message: "Database Error: Failed to Delete Company.",
+    };
+  }
+}
 export async function fetchUsers() {
   try {
     const url = new URL(`http://localhost:8080/v1/users`);

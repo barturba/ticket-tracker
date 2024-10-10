@@ -12,9 +12,10 @@ WHERE id = $1;
 
 -- name: GetCompaniesFiltered :many
 SELECT * FROM companies
-WHERE (name ILIKE '%' || @query || '%')
+WHERE (name ILIKE '%' || @query || '%' or @query is NULL)
+ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2;
 
 -- name: GetCompaniesFilteredCount :one
 SELECT count(*) FROM companies
-WHERE (name ILIKE '%' || @query || '%');
+WHERE (name ILIKE '%' || @query || '%' or @query is NULL);

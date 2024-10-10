@@ -1,19 +1,21 @@
+import { fetchCompaniesPages } from "@/app/lib/actions";
+import Table from "@/app/ui/companies/table";
 import { lusitana } from "@/app/ui/fonts";
 import Search from "@/app/ui/search";
+import { CompaniesTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Companies",
 };
 
-export default async function Page(
-  props: {
-    searchParams?: Promise<{
-      query?: string;
-      page?: string;
-    }>;
-  }
-) {
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+    page?: string;
+  }>;
+}) {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
@@ -30,9 +32,9 @@ export default async function Page(
         <Search placeholder="Search companies ..." />
         {/* <CreateCompany/> */}
       </div>
-      {/* <Suspense key={query + currentPage} fallback={<CompaniesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<CompaniesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
-      </Suspense> */}
+      </Suspense>
       <div className="mt-5 flex w-full justify-center">
         {/* <Pagination totalPages={totalPages} /> */}
       </div>

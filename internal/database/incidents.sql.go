@@ -571,8 +571,8 @@ const getIncidentsFilteredCount = `-- name: GetIncidentsFilteredCount :one
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $1 || '%')
-OR (description ILIKE '%' || $1 || '%')
+WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
 func (q *Queries) GetIncidentsFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {

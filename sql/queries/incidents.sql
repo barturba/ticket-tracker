@@ -28,8 +28,8 @@ LIMIT $1 OFFSET $2;
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || @query || '%')
-OR (description ILIKE '%' || @query || '%');
+WHERE (short_description ILIKE '%' || @query || '%' or @query is NULL)
+OR (description ILIKE '%' || @query || '%' or @query is NULL);
 
 -- name: GetIncidentsLatest :many
 SELECT * FROM incidents

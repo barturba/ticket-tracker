@@ -77,7 +77,8 @@ func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
 
 const getCompaniesFiltered = `-- name: GetCompaniesFiltered :many
 SELECT id, created_at, updated_at, name FROM companies
-WHERE (name ILIKE '%' || $3 || '%')
+WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
+ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -117,7 +118,7 @@ func (q *Queries) GetCompaniesFiltered(ctx context.Context, arg GetCompaniesFilt
 
 const getCompaniesFilteredCount = `-- name: GetCompaniesFilteredCount :one
 SELECT count(*) FROM companies
-WHERE (name ILIKE '%' || $1 || '%')
+WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
 func (q *Queries) GetCompaniesFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {

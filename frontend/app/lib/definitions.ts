@@ -43,6 +43,13 @@ export type Incident = {
   assigned_to: string;
 };
 
+export type Company = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+};
+
 export type CompaniesField = {
   id: string;
   created_at: string;
