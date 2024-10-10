@@ -80,7 +80,7 @@ export default async function IncidentTable({
                     {truncate(incident.short_description, true)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {incident.assigned_to_id}
+                    {incident.assigned_to}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {incident.created_at}

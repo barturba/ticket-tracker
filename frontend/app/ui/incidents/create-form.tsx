@@ -246,7 +246,7 @@ export default function Form({
                 />
                 <label
                   htmlFor="in-progress"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   In Progress
                   <CheckIcon className="h-4 w-4" />
@@ -278,7 +278,7 @@ export default function Form({
                 />
                 <label
                   htmlFor="pending"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   Pending
                   <CheckIcon className="h-4 w-4" />
@@ -294,7 +294,7 @@ export default function Form({
                 />
                 <label
                   htmlFor="on-hold"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   On Hold
                   <CheckIcon className="h-4 w-4" />
@@ -310,7 +310,7 @@ export default function Form({
                 />
                 <label
                   htmlFor="resolved"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   Resolved
                   <CheckIcon className="h-4 w-4" />
