@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -133,7 +132,6 @@ func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 }
 
 func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit, offset int) ([]models.Incident, error) {
-	// log.Printf("GetIncidentsFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
 	params := database.GetIncidentsFilteredParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -148,7 +146,6 @@ func (cfg *ApiConfig) GetIncidentsFiltered(r *http.Request, query string, limit,
 }
 
 func (cfg *ApiConfig) GetIncidentsLatest(r *http.Request, limit, offset int) ([]models.Incident, error) {
-	// log.Printf("GetIncidentsLatest: limit: %v offset: %v ", int32(limit), int32(offset))
 	params := database.GetIncidentsLatestParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -178,7 +175,6 @@ func (cfg *ApiConfig) GetIncidentsFilteredCount(r *http.Request, query string) (
 // - Companies
 
 func (cfg *ApiConfig) GetCompaniesFiltered(r *http.Request, query string, limit, offset int) ([]models.Company, error) {
-	log.Printf("GetCompaniesFiltered: limit: %v offset: %v query: %v", int32(limit), int32(offset), sql.NullString{String: query, Valid: query != ""})
 	params := database.GetCompaniesFilteredParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),

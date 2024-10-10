@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -87,7 +86,6 @@ func (cfg *ApiConfig) handleFilteredIncidentsGet(w http.ResponseWriter, r *http.
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	log.Printf("handleFilteredIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 
@@ -151,7 +149,6 @@ func (cfg *ApiConfig) handleIncidentsLatestGet(w http.ResponseWriter, r *http.Re
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	// log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }
 
@@ -200,12 +197,9 @@ func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	incident := NewIncident(input.ID, input.CompanyID, input.ConfigurationItemID, input.AssignedToID, input.ShortDescription, input.Description, input.State)
-	log.Printf("editing incident: %v\n", incident.ID)
-	log.Printf("editing incident: %v\n", incident)
 
 	errs := models.CheckIncident(incident)
 	if errs != nil {
-		log.Printf("handleIncidentsPut: err is %v", err)
 		respondWithError(w, http.StatusInternalServerError, "couldn't update incident")
 		return
 	}
@@ -223,7 +217,6 @@ func (cfg *ApiConfig) handleIncidentsPut(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	log.Printf("handleIncidentsPut: updated the following incident in the database %v", incident)
 	respondWithJSON(w, http.StatusOK, incident)
 }
 
@@ -241,7 +234,6 @@ func (cfg *ApiConfig) handleIncidentsDelete(w http.ResponseWriter, r *http.Reque
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	log.Printf("handleIncidentsDelete: deleted the following incident from the database %v", incident)
 	respondWithJSON(w, http.StatusOK, incident)
 }
 
@@ -259,7 +251,6 @@ func (cfg *ApiConfig) handleCompaniesGet(w http.ResponseWriter, r *http.Request)
 }
 
 func (cfg *ApiConfig) handleFilteredCompaniesGet(w http.ResponseWriter, r *http.Request) {
-	log.Println("called handleFilteredCompaniesGet")
 	var err error
 
 	limit := 0
@@ -352,7 +343,6 @@ func (cfg *ApiConfig) handleUsersGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *ApiConfig) handleUsersByCompanyGet(w http.ResponseWriter, r *http.Request) {
-	log.Println("called handleUsersByCompanyGet")
 	var err error
 
 	limit := 0
@@ -390,6 +380,5 @@ func (cfg *ApiConfig) handleUsersByCompanyGet(w http.ResponseWriter, r *http.Req
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return
 	}
-	// log.Printf("handleLatestIncidentsGet: returning this data: %v\n", i)
 	respondWithJSON(w, http.StatusOK, i)
 }

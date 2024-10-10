@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -27,7 +26,6 @@ func (cfg *ApiConfig) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
-	log.Println("handleLoginTest")
 	type parameters struct {
 		Email            string `json:"email"`
 		Password         string `json:"password"`
@@ -51,7 +49,6 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if params.ExpiresInSeconds == 0 {
 		params.ExpiresInSeconds = JWT_EXPIRES_IN_SECONDS
 	}
-	log.Println("handleLoginTest: ", params)
 
 	user, err := cfg.DB.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
@@ -81,9 +78,6 @@ func (cfg *ApiConfig) handleLogin(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 	http.SetCookie(w, &cookie)
-	log.Println("responded with user: ", models.DatabaseUserToUser(user))
 	respondWithJSON(w, http.StatusOK, models.DatabaseUserToUser(user))
 
-	// w.Header().Set("HX-Redirect", "/incidents")
-	// http.Redirect(w, r, "/incidents", http.StatusFound)
 }
