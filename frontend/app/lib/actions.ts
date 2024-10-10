@@ -92,6 +92,7 @@ export async function fetchFilteredIncidents(
     if (data.ok) {
       const incidents = await data.json();
       if (incidents) {
+        console.log(`got these incidents${JSON.stringify(incidents, null, 2)}`);
         return incidents;
       } else {
         console.log(`fetchFilteredIncidents data not received`);

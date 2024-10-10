@@ -38,9 +38,11 @@ export type Incident = {
   short_description: string;
   description: string;
   configuration_item_id: string;
+  configuration_item_id_name: string;
   company_id: string;
   state: string;
   assigned_to: string;
+  assigned_to_name: string;
 };
 
 export type Company = {
