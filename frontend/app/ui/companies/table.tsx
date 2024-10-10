@@ -2,7 +2,7 @@ import { fetchFilteredCompanies } from "@/app/lib/actions";
 // import CompanyStatus from "@/app/ui/companies/status";
 import { DeleteCompany, UpdateCompany } from "@/app/ui/companies/buttons";
 import { Company } from "@/app/lib/definitions";
-import { truncate } from "@/app/lib/utils";
+import { formatDateToLocal, truncate } from "@/app/lib/utils";
 export default async function CompanyTable({
   query,
   currentPage,
@@ -71,7 +71,7 @@ export default async function CompanyTable({
                     {truncate(company.name, true)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {company.created_at}
+                    {formatDateToLocal(company.updated_at)}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
