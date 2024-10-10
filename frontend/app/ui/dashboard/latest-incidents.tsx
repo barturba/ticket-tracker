@@ -7,7 +7,7 @@ import { Incident } from "@/app/lib/definitions";
 import Link from "next/link";
 
 import dayjs from "dayjs";
-import { truncate } from "@/app/lib/utils";
+import { formatDateToLocal, truncate } from "@/app/lib/utils";
 
 export default async function LatestIncidents() {
   console.log("LatestIncidents");
@@ -47,23 +47,23 @@ export default async function LatestIncidents() {
                       href={`/dashboard/incidents/${incident.id}/edit`}
                       className="truncate text-sm font-semibold md:text-base"
                     >
-                      {truncate(incident.short_description, true)}
+                      {truncate(incident.short_description, false)}
                     </Link>
-                    {/* <p className="hidden text-sm text-gray-500 sm:block">
-                      {incident.id}
-                    </p> */}
-                    {/* <Link
+                    <p className="hidden text-sm text-gray-500 sm:block">
+                      {incident.assigned_to_name}
+                    </p>
+                    <Link
                       href={`/dashboard/incidents/${incident.id}/edit`}
                       className="hidden text-sm text-gray-500 sm:block"
                     >
                       {incident.id}
-                    </Link> */}
+                    </Link>
                   </div>
                 </div>
                 <p
                   className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
                 >
-                  {dayjs(incident.updated_at).format("MMMM DD, YYYY")}
+                  {formatDateToLocal(incident.updated_at)}
                 </p>
               </div>
             );
