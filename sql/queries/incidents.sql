@@ -21,6 +21,7 @@ LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || @query || '%' or @query is NULL)
 OR (description ILIKE '%' || @query || '%' or @query is NULL)
+OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL)
 ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2;
 
@@ -29,7 +30,8 @@ SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || @query || '%' or @query is NULL)
-OR (description ILIKE '%' || @query || '%' or @query is NULL);
+OR (description ILIKE '%' || @query || '%' or @query is NULL)
+OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL);
 
 -- name: GetIncidentsLatest :many
 SELECT * FROM incidents

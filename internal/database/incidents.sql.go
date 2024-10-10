@@ -498,6 +498,7 @@ LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (description ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (incidents.id::text ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -573,6 +574,7 @@ LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
 OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
 func (q *Queries) GetIncidentsFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {
