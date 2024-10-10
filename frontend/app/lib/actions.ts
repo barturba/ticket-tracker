@@ -23,12 +23,9 @@ const FormSchema = z.object({
   configurationItemId: z.string({
     invalid_type_error: "Please select a configuration item to assign to.",
   }),
-  state: z.enum(
-    ["New", "Assigned", "In Progress", "Pending", "On Hold", "Resolved"],
-    {
-      invalid_type_error: "Please select an incident state.",
-    }
-  ),
+  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
+    invalid_type_error: "Please select an incident state.",
+  }),
 });
 
 export async function authenticate(

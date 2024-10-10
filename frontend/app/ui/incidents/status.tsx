@@ -11,7 +11,6 @@ export default function IncidentStatus({ status }: { status: string }) {
           "bg-gray-100 text-gray-500":
             status == "Assigned" ||
             status === "In Progress" ||
-            status == "Pending" ||
             status === "On Hold" ||
             status === "Resolved",
         }
@@ -32,12 +31,6 @@ export default function IncidentStatus({ status }: { status: string }) {
       {status === "In Progress" ? (
         <>
           In Progress
-          <ClockIcon className="ml-1 w-4 text-gray-500" />
-        </>
-      ) : null}
-      {status === "Pending" ? (
-        <>
-          Pending
           <ClockIcon className="ml-1 w-4 text-gray-500" />
         </>
       ) : null}
