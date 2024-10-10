@@ -226,6 +226,8 @@ func (cfg *ApiConfig) DeleteIncidentByID(r *http.Request, id uuid.UUID) (models.
 	return incident, nil
 }
 
+// Companies
+
 func (cfg *ApiConfig) GetCompanies(r *http.Request) ([]models.Company, error) {
 	databaseCompanies, err := cfg.DB.GetCompanies(r.Context())
 	if err != nil {
@@ -256,6 +258,15 @@ func (cfg *ApiConfig) GetCompanyByID(r *http.Request, id uuid.UUID) (models.Comp
 		return models.Company{}, errors.New("can't find company")
 	}
 	company := models.DatabaseCompanyToCompany(databaseCompany)
+	return company, nil
+}
+func (cfg *ApiConfig) DeleteCompanyByID(r *http.Request, id uuid.UUID) (models.Company, error) {
+	dbCompany, err := cfg.DB.DeleteCompanyByID(r.Context(), id)
+	if err != nil {
+		return models.Company{}, errors.New("couldn't update company")
+	}
+	company := models.DatabaseCompanyToCompany(dbCompany)
+
 	return company, nil
 }
 

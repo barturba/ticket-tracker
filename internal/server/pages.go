@@ -405,6 +405,23 @@ func (cfg *ApiConfig) handleCompaniesPut(w http.ResponseWriter, r *http.Request)
 	respondWithJSON(w, http.StatusOK, company)
 }
 
+func (cfg *ApiConfig) handleCompaniesDelete(w http.ResponseWriter, r *http.Request) {
+
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+
+	company, err := cfg.DeleteCompanyByID(r, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, company)
+}
+
 // Configuration Items
 
 func (cfg *ApiConfig) handleConfigurationItemsGet(w http.ResponseWriter, r *http.Request) {

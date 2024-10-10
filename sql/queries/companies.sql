@@ -26,3 +26,8 @@ LIMIT $1 OFFSET $2;
 -- name: GetCompaniesFilteredCount :one
 SELECT count(*) FROM companies
 WHERE (name ILIKE '%' || @query || '%' or @query is NULL);
+
+-- name: DeleteCompanyByID :one
+DELETE FROM companies 
+WHERE id = $1
+RETURNING *;
