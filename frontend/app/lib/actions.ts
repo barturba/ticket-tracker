@@ -537,6 +537,8 @@ const FormSchemaCompany = z.object({
   }),
 });
 
+// Companies
+
 const CreateCompany = FormSchemaCompany.omit({ id: true });
 export async function createCompany(prevState: State, formData: FormData) {
   // Validate form fields using Zod
@@ -579,4 +581,79 @@ export async function createCompany(prevState: State, formData: FormData) {
   // Revalidate the cache for the companies page and redirect the user.
   revalidatePath("/dashboard/companies");
   redirect("/dashboard/companies");
+}
+const UpdateCompany = FormSchemaCompany.omit({ id: true });
+export async function updateCompany(
+  id: string,
+  prevState: State,
+  formData: FormData
+) {
+  console.log("actions.ts updateCompany");
+  const validatedFields = UpdateCompany.safeParse({
+    name: formData.get("name"),
+  });
+
+  if (!validatedFields.success) {
+    console.log(
+      "actions.ts updateCompany !validatedFields.success: ",
+      validatedFields.error.flatten().fieldErrors
+    );
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Update Incident.",
+    };
+  }
+
+  // Validate form fields using Zod
+  const { name } = validatedFields.data;
+  console.log("actions.ts updateCompany validated fields");
+
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/companies/${id}`);
+    await fetch(url.toString(), {
+      method: "PUT",
+      body: JSON.stringify({
+        id: id,
+        name: name,
+      }),
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+  } catch (error) {
+    return {
+      message: "Database Error: Failed to Update Incident.",
+    };
+  }
+  // Revalidate the cache for the companies page and redirect the user.
+  revalidatePath("/dashboard/companies");
+  redirect("/dashboard/companies");
+}
+
+export async function fetchCompanyById(id: string) {
+  const url = new URL(`http://localhost:8080/v1/company_by_id`);
+
+  const searchParams = url.searchParams;
+  searchParams.set("id", id);
+  try {
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const company = await data.json();
+      if (company) {
+        return company;
+      } else {
+        return "";
+      }
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.log(`fetchCompanyById error: ${error}`);
+    throw new Error("Failed to fetch company data.");
+  }
 }

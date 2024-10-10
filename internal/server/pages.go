@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -250,6 +251,28 @@ func (cfg *ApiConfig) handleCompaniesGet(w http.ResponseWriter, r *http.Request)
 	respondWithJSON(w, http.StatusOK, i)
 }
 
+func (cfg *ApiConfig) handleCompanyByIdGet(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	myUrl, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+
+	idString := params.Get("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c, err := cfg.GetCompanyByID(r, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, c)
+}
+
 func (cfg *ApiConfig) handleFilteredCompaniesGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 
@@ -315,6 +338,7 @@ func (cfg *ApiConfig) handleFilteredCompaniesCountGet(w http.ResponseWriter, r *
 
 	respondWithJSON(w, http.StatusOK, i)
 }
+
 func (cfg *ApiConfig) handleCompaniesPost(w http.ResponseWriter, r *http.Request) {
 
 	input := models.NewCompanyInput
@@ -343,6 +367,41 @@ func (cfg *ApiConfig) handleCompaniesPost(w http.ResponseWriter, r *http.Request
 	}
 	company = models.DatabaseCompanyToCompany(databaseCompany)
 
+	respondWithJSON(w, http.StatusOK, company)
+}
+
+func (cfg *ApiConfig) handleCompaniesPut(w http.ResponseWriter, r *http.Request) {
+	log.Printf("handleCompaniesPut\n")
+
+	input := models.CompanyInput
+
+	err := cfg.readJSON(w, r, &input)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	company := models.NewCompany(input.ID, input.Name)
+
+	errs := models.CheckCompany(company)
+	if errs != nil {
+		respondWithError(w, http.StatusInternalServerError, "couldn't update company")
+		return
+	}
+
+	idString := r.PathValue("id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "can't parse uuid")
+		return
+	}
+	company.ID = id
+
+	company, err = cfg.UpdateCompany(r, company)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	log.Printf("updated company")
 	respondWithJSON(w, http.StatusOK, company)
 }
 

@@ -1,11 +1,6 @@
-import {
-  fetchCompanies,
-  fetchConfigurationItems,
-  fetchIncidentById,
-  fetchUsers,
-} from "@/app/lib/actions";
-import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
-import EditForm from "@/app/ui/incidents/edit-form";
+import { fetchCompanyById } from "@/app/lib/actions";
+import EditForm from "@/app/ui/companies/edit-form";
+import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -16,13 +11,8 @@ export const metadata: Metadata = {
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
-  const [incident, companies, users, configurationItems] = await Promise.all([
-    fetchIncidentById(id),
-    fetchCompanies(),
-    fetchUsers(),
-    fetchConfigurationItems(),
-  ]);
-  if (!incident) {
+  const [company] = await Promise.all([fetchCompanyById(id)]);
+  if (!company) {
     notFound();
   }
   return (
@@ -37,12 +27,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           },
         ]}
       />
-      <EditForm
-        incident={incident}
-        companies={companies}
-        users={users}
-        configurationItems={configurationItems}
-      />
+      <EditForm company={company} />
     </main>
   );
 }

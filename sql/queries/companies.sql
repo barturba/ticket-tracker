@@ -6,6 +6,13 @@ RETURNING *;
 -- name: GetCompanies :many
 SELECT * from companies;
 
+-- name: UpdateCompany :one
+UPDATE companies 
+SET updated_at = $2, 
+name = $3
+WHERE ID = $1
+RETURNING *;
+
 -- name: GetCompanyByID :one
 SELECT * from companies
 WHERE id = $1;

@@ -3,7 +3,7 @@ import {
   fetchConfigurationItems,
   fetchUsers,
 } from "@/app/lib/actions";
-import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
+import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/incidents/create-form";
 import { Metadata } from "next";
 

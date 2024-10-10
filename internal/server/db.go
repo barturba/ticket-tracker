@@ -236,6 +236,29 @@ func (cfg *ApiConfig) GetCompanies(r *http.Request) ([]models.Company, error) {
 	return companies, nil
 }
 
+func (cfg *ApiConfig) UpdateCompany(r *http.Request, i models.Company) (models.Company, error) {
+	dbCompany, err := cfg.DB.UpdateCompany(r.Context(), database.UpdateCompanyParams{
+		ID:        i.ID,
+		UpdatedAt: time.Now(),
+		Name:      i.Name,
+	})
+	if err != nil {
+		return models.Company{}, errors.New("couldn't update incident")
+	}
+	incident := models.DatabaseCompanyToCompany(dbCompany)
+
+	return incident, nil
+}
+
+func (cfg *ApiConfig) GetCompanyByID(r *http.Request, id uuid.UUID) (models.Company, error) {
+	databaseCompany, err := cfg.DB.GetCompanyByID(r.Context(), id)
+	if err != nil {
+		return models.Company{}, errors.New("can't find company")
+	}
+	company := models.DatabaseCompanyToCompany(databaseCompany)
+	return company, nil
+}
+
 func (cfg *ApiConfig) GetUsers(r *http.Request) ([]models.User, error) {
 	databaseUsers, err := cfg.DB.GetUsers(r.Context())
 	if err != nil {

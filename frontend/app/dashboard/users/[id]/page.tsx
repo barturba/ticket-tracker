@@ -4,7 +4,7 @@ import {
   fetchIncidentById,
   fetchUsers,
 } from "@/app/lib/actions";
-import Breadcrumbs from "@/app/ui/incidents/breadcrumbs";
+import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import EditForm from "@/app/ui/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";

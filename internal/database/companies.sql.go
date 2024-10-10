@@ -144,3 +144,29 @@ func (q *Queries) GetCompanyByID(ctx context.Context, id uuid.UUID) (Company, er
 	)
 	return i, err
 }
+
+const updateCompany = `-- name: UpdateCompany :one
+UPDATE companies 
+SET updated_at = $2, 
+name = $3
+WHERE ID = $1
+RETURNING id, created_at, updated_at, name
+`
+
+type UpdateCompanyParams struct {
+	ID        uuid.UUID
+	UpdatedAt time.Time
+	Name      string
+}
+
+func (q *Queries) UpdateCompany(ctx context.Context, arg UpdateCompanyParams) (Company, error) {
+	row := q.db.QueryRowContext(ctx, updateCompany, arg.ID, arg.UpdatedAt, arg.Name)
+	var i Company
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+	)
+	return i, err
+}

@@ -73,6 +73,8 @@ export type ConfigurationItemsField = {
   name: string;
 };
 
+// Forms
+
 export type IncidentForm = {
   id: string;
   short_description: string;
@@ -87,4 +89,9 @@ export type IncidentForm = {
     | "Pending"
     | "On Hold"
     | "Resolved";
+};
+
+export type CompanyForm = {
+  id: string;
+  name: string;
 };
