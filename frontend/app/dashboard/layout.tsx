@@ -1,15 +1,3 @@
-// import SideNav from "../ui/dashboard/sidenav";
-
-// export default function Layout({ children }: { children: React.ReactNode }) {
-//   return (
-//     <div className="flex flex-col h-screen md:flex-row md:overflow-hidden">
-//       <div className="flex-none w-full md:w-64">
-//         <SideNav />
-//       </div>
-//       <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
-//     </div>
-//   );
-// }
 "use client";
 
 import { useState } from "react";
@@ -22,48 +10,8 @@ import {
   DialogPanel,
   TransitionChild,
 } from "@headlessui/react";
-import {
-  Bars3Icon,
-  BriefcaseIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  CpuChipIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UserGroupIcon,
-  UsersIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import NavLinks from "@/app/ui/dashboard/nav-links";
-
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
-  {
-    name: "Incidents",
-    href: "/dashboard/incidents",
-    icon: DocumentDuplicateIcon,
-    current: false,
-  },
-  {
-    name: "Companies",
-    href: "/dashboard/companies",
-    icon: BriefcaseIcon,
-    current: false,
-  },
-  {
-    name: "Users",
-    href: "/dashboard/users",
-    icon: UserGroupIcon,
-    current: false,
-  },
-  {
-    name: "Configuration Items",
-    href: "/dashboard/configuration-items",
-    icon: CpuChipIcon,
-    current: false,
-  },
-];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -139,14 +87,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex-1 text-sm font-semibold leading-6 text-gray-900">
             Dashboard
           </div>
-          <a href="#">
+          {/* <a href="#">
             <span className="sr-only">Your profile</span>
             <img
               alt=""
               src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
               className="w-8 h-8 rounded-full bg-gray-50"
             />
-          </a>
+          </a> */}
         </div>
 
         <main className="py-10 lg:pl-72">

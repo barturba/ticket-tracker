@@ -19,8 +19,9 @@ WHERE incidents.id = $1;
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || @query || '%')
-OR (description ILIKE '%' || @query || '%')
+WHERE (short_description ILIKE '%' || @query || '%' or @query is NULL)
+OR (description ILIKE '%' || @query || '%' or @query is NULL)
+ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2;
 
 -- name: GetIncidentsFilteredCount :one

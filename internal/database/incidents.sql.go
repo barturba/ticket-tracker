@@ -496,8 +496,9 @@ const getIncidentsFiltered = `-- name: GetIncidentsFiltered :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $3 || '%')
-OR (description ILIKE '%' || $3 || '%')
+WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (description ILIKE '%' || $3 || '%' or $3 is NULL)
+ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 

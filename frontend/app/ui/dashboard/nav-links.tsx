@@ -46,7 +46,7 @@ export default function NavLinks() {
           </ul>
         </li>
 
-        <li className="mt-auto -mx-6">
+        {/* <li className="mt-auto -mx-6">
           <a
             href="#"
             className="flex items-center px-6 py-3 text-sm font-semibold leading-6 text-gray-900 gap-x-4 hover:bg-gray-50"
@@ -59,7 +59,7 @@ export default function NavLinks() {
             <span className="sr-only">Your profile</span>
             <span aria-hidden="true">Tom Cook</span>
           </a>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );

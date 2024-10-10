@@ -14,9 +14,6 @@ export default async function IncidentTable({
     query,
     currentPage
   );
-  // if (!incidents) {
-  //   return <p>No data</p>;
-  // }
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
