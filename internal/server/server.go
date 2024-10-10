@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/models"
 	"github.com/joho/godotenv"
 )
 
@@ -16,8 +17,11 @@ const (
 )
 
 type ApiConfig struct {
-	DB        *database.Queries
-	JWTSecret string
+	DB                    *database.Queries
+	JWTSecret             string
+	MenuItems             models.MenuItems
+	Logo                  string
+	ProfilePicPlaceholder string
 }
 
 func NewServer() *http.Server {

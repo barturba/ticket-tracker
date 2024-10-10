@@ -1,4 +1,4 @@
 .env
-ticket-tracker
 tmp/
 node_modules
+bin/
