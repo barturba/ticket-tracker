@@ -8,18 +8,6 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	// Page Endpoints
 
-	// - Incidents
-
-	mux.HandleFunc("GET /v1/incidents_latest", cfg.handleIncidentsLatestGet)
-
-	mux.HandleFunc("GET /v1/incidents", cfg.handleIncidentsGet)
-	mux.HandleFunc("GET /v1/filtered_incidents", cfg.handleFilteredIncidentsGet)
-	mux.HandleFunc("GET /v1/filtered_incidents_count", cfg.handleFilteredIncidentsCountGet)
-	mux.HandleFunc("GET /v1/incident_by_id", cfg.handleIncidentByIdGet)
-	mux.HandleFunc("POST /v1/incidents", cfg.handleIncidentsPost)
-	mux.HandleFunc("PUT /v1/incidents/{id}", cfg.handleIncidentsPut)
-	mux.HandleFunc("DELETE /v1/incidents/{id}", cfg.handleIncidentsDelete)
-
 	// - Companies
 
 	mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)

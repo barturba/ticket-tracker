@@ -10,15 +10,21 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/server/incidents"
 	"github.com/barturba/ticket-tracker/models"
 	"github.com/google/uuid"
 )
 
 // Incidents
 
-func (cfg *ApiConfig) handleIncidentsGet(w http.ResponseWriter, r *http.Request) {
+type incidentsApi struct {
+	DB        *database.Queries
+	JWTSecret string
+}
 
-	i, err := cfg.GetIncidents(r)
+func (cfg *incidentsApi) handleIncidentsGet(w http.ResponseWriter, r *http.Request) {
+	incidentConfig := incidents.IncidentRoutes{DB: cfg.DB}
+	i, err := incidentConfig.GetIncidents(r)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "couldn't get incidents")
 		return

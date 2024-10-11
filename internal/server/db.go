@@ -108,11 +108,6 @@ func (cfg *ApiConfig) GetIncidentByID(r *http.Request, id uuid.UUID) (models.Inc
 	incident := models.DatabaseIncidentToIncident(databaseIncident)
 	return incident, nil
 }
-
-//	func (cfg *ApiConfig) GetIncidents(r *http.Request, filters filters.Filter) ([]models.Incident, error) {
-//		databaseIncidentsAsc := []database.GetIncidentsAscRow{}
-//		databaseIncidentsDesc := []database.GetIncidentsDescRow{}
-//		var err error
 func (cfg *ApiConfig) GetIncidents(r *http.Request) ([]models.Incident, error) {
 	databaseIncidents, err := cfg.DB.GetIncidents(r.Context())
 	if err != nil {
@@ -260,10 +255,11 @@ func (cfg *ApiConfig) GetCompanyByID(r *http.Request, id uuid.UUID) (models.Comp
 	company := models.DatabaseCompanyToCompany(databaseCompany)
 	return company, nil
 }
+
 func (cfg *ApiConfig) DeleteCompanyByID(r *http.Request, id uuid.UUID) (models.Company, error) {
 	dbCompany, err := cfg.DB.DeleteCompanyByID(r.Context(), id)
 	if err != nil {
-		return models.Company{}, errors.New("couldn't update company")
+		return models.Company{}, errors.New("couldn't delete company")
 	}
 	company := models.DatabaseCompanyToCompany(dbCompany)
 
