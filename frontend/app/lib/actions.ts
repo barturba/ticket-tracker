@@ -32,8 +32,6 @@ export async function fetchIncidents() {
     const data = await fetch(`http://localhost:8080/v1/incidents`, {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
 
     if (data.ok) {
       const incidents = await data.json();
@@ -61,19 +59,14 @@ export async function fetchFilteredIncidents(
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const incidents = await data.json();
       if (incidents) {
-        console.log(`got these incidents${JSON.stringify(incidents, null, 2)}`);
         return incidents;
       } else {
-        console.log(`fetchFilteredIncidents data not received`);
         return [];
       }
     } else {
-      console.log(`fetchFilteredIncidents data not ok`);
       return [];
     }
   } catch (error) {
@@ -89,8 +82,6 @@ export async function fetchIncidentsPages(query: string) {
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const count = await data.json();
       if (count > 0) {
@@ -103,6 +94,32 @@ export async function fetchIncidentsPages(query: string) {
   } catch (error) {
     console.log(`fetchIncidentsPages error: ${error}`);
     throw new Error("Failed to fetch incidents pages.");
+  }
+}
+
+export async function fetchIncidentById(id: string) {
+  const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
+
+  const searchParams = url.searchParams;
+  searchParams.set("id", id);
+  try {
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    if (data.ok) {
+      const incident = await data.json();
+      if (incident) {
+        return incident;
+      } else {
+        return "";
+      }
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.log(`fetchIncidentById error: ${error}`);
+    throw new Error("Failed to fetch incident data.");
   }
 }
 
@@ -257,7 +274,7 @@ export async function fetchUsers() {
 }
 export async function fetchConfigurationItems() {
   try {
-    const url = new URL(`http://localhost:8080/v1/configuration_items`);
+    const url = new URL(`http://localhost:8080/v1/cis`);
     const data = await fetch(url.toString(), {
       method: "GET",
     });
@@ -274,41 +291,6 @@ export async function fetchConfigurationItems() {
   } catch (error) {
     console.log(`fetchConfigurationItems error: ${error}`);
     throw new Error("Failed to fetch configuration items data.");
-  }
-}
-export async function fetchIncidentById(id: string) {
-  console.log(`fetchIncidentByID getting following data: ${id}`);
-  const url = new URL(`http://localhost:8080/v1/incident_by_id`);
-
-  const searchParams = url.searchParams;
-  searchParams.set("id", id);
-  try {
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const incident = await data.json();
-      console.log(
-        `fetchIncidentByID got the following data: ${JSON.stringify(
-          incident,
-          null,
-          2
-        )}`
-      );
-      if (incident) {
-        return incident;
-      } else {
-        return "";
-      }
-    } else {
-      return "";
-    }
-  } catch (error) {
-    console.log(`fetchIncidentById error: ${error}`);
-    throw new Error("Failed to fetch incident data.");
   }
 }
 
@@ -459,7 +441,7 @@ export async function updateIncident(
       }),
     });
     // Simulate slow load
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
   } catch (error) {
     // If a database error occurs, return a more specific error.
     console.log(`updateIncident error: ${error}`);
