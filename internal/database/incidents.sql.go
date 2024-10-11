@@ -154,8 +154,18 @@ const getIncidents = `-- name: GetIncidents :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
+WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (description ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (incidents.id::text ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY incidents.updated_at DESC
+LIMIT $1 OFFSET $2
 `
+
+type GetIncidentsParams struct {
+	Limit  int32
+	Offset int32
+	Query  sql.NullString
+}
 
 type GetIncidentsRow struct {
 	ID                  uuid.UUID
@@ -176,8 +186,8 @@ type GetIncidentsRow struct {
 	Password            sql.NullString
 }
 
-func (q *Queries) GetIncidents(ctx context.Context) ([]GetIncidentsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidents)
+func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]GetIncidentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getIncidents, arg.Limit, arg.Offset, arg.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -426,6 +436,22 @@ func (q *Queries) GetIncidentsBySearchTermLimitOffset(ctx context.Context, arg G
 	return items, nil
 }
 
+const getIncidentsCount = `-- name: GetIncidentsCount :one
+SELECT count(*) FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getIncidentsCount, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getIncidentsDesc = `-- name: GetIncidentsDesc :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
 LEFT JOIN users
@@ -490,98 +516,6 @@ func (q *Queries) GetIncidentsDesc(ctx context.Context, dollar_1 interface{}) ([
 		return nil, err
 	}
 	return items, nil
-}
-
-const getIncidentsFiltered = `-- name: GetIncidentsFiltered :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
-OR (description ILIKE '%' || $3 || '%' or $3 is NULL)
-OR (incidents.id::text ILIKE '%' || $3 || '%' or $3 is NULL)
-ORDER BY incidents.updated_at DESC
-LIMIT $1 OFFSET $2
-`
-
-type GetIncidentsFilteredParams struct {
-	Limit  int32
-	Offset int32
-	Query  sql.NullString
-}
-
-type GetIncidentsFilteredRow struct {
-	ID                  uuid.UUID
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
-	ShortDescription    string
-	Description         sql.NullString
-	ConfigurationItemID uuid.UUID
-	CompanyID           uuid.UUID
-	State               StateEnum
-	AssignedTo          uuid.NullUUID
-	ID_2                uuid.NullUUID
-	CreatedAt_2         sql.NullTime
-	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
-	Apikey              sql.NullString
-	Email               sql.NullString
-	Password            sql.NullString
-}
-
-func (q *Queries) GetIncidentsFiltered(ctx context.Context, arg GetIncidentsFilteredParams) ([]GetIncidentsFilteredRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsFiltered, arg.Limit, arg.Offset, arg.Query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetIncidentsFilteredRow
-	for rows.Next() {
-		var i GetIncidentsFilteredRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.ShortDescription,
-			&i.Description,
-			&i.ConfigurationItemID,
-			&i.CompanyID,
-			&i.State,
-			&i.AssignedTo,
-			&i.ID_2,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.Name,
-			&i.Apikey,
-			&i.Email,
-			&i.Password,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getIncidentsFilteredCount = `-- name: GetIncidentsFilteredCount :one
-SELECT count(*) FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
-OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
-OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
-`
-
-func (q *Queries) GetIncidentsFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getIncidentsFilteredCount, query)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
 }
 
 const getIncidentsLatest = `-- name: GetIncidentsLatest :many

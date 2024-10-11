@@ -3,19 +3,13 @@ INSERT INTO incidents (id, created_at, updated_at, short_description, descriptio
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
--- name: GetIncidents :many
-SELECT * FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-ORDER BY incidents.updated_at DESC;
-
 -- name: GetIncidentById :one
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE incidents.id = $1;
 
--- name: GetIncidentsFiltered :many
+-- name: GetIncidents :many
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -25,7 +19,7 @@ OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL)
 ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: GetIncidentsFilteredCount :one
+-- name: GetIncidentsCount :one
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id

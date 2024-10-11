@@ -34,7 +34,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Query = data.ReadString(qs, "query", "")
 
 		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{"id"}
@@ -55,16 +55,16 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 }
 
 func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]models.Incident, error) {
-	p := database.GetIncidentsFilteredParams{
+	p := database.GetIncidentsParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	}
-	rows, err := db.GetIncidentsFiltered(r.Context(), p)
+	rows, err := db.GetIncidents(r.Context(), p)
 	if err != nil {
 		return nil, errors.New("couldn't find incidents")
 	}
-	incidents := models.DatabaseIncidentsFilteredRowToIncidents(rows)
+	incidents := models.DatabaseIncidentsRowToIncidents(rows)
 	return incidents, nil
 }
 
@@ -105,7 +105,7 @@ func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
 }
 
 func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetIncidentsFilteredCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	count, err := db.GetIncidentsCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		return 0, errors.New("couldn't find incidents")
 	}

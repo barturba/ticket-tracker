@@ -319,14 +319,14 @@ func NewAlert(message string, alertType AlertEnum, color string) Alert {
 	}
 }
 
-func DatabaseIncidentsFilteredRowToIncidents(incidents []database.GetIncidentsFilteredRow) []Incident {
+func DatabaseIncidentsFilteredRowToIncidents(incidents []database.GetIncidentsRow) []Incident {
 	var items []Incident
 	for _, item := range incidents {
 		items = append(items, DatabaseIncidentFilteredRowToIncident(item))
 	}
 	return items
 }
-func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsFilteredRow) Incident {
+func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsRow) Incident {
 	return Incident{
 		ID:                    incident.ID,
 		CreatedAt:             incident.CreatedAt,
