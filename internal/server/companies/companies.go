@@ -11,7 +11,6 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/errutil"
 	"github.com/barturba/ticket-tracker/internal/helpers"
-	"github.com/barturba/ticket-tracker/models"
 	"github.com/barturba/ticket-tracker/validator"
 	"github.com/google/uuid"
 )
@@ -176,12 +175,12 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.Company, error) {
+func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Company, error) {
 	record, err := db.GetCompanyByID(r.Context(), id)
 	if err != nil {
-		return models.Company{}, errors.New("couldn't find company")
+		return data.Company{}, errors.New("couldn't find company")
 	}
-	company := models.DatabaseCompanyToCompany(record)
+	company := convert(record)
 	return company, nil
 }
 
