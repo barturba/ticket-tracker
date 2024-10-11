@@ -18,35 +18,35 @@ import (
 
 // GET
 
-func Get(logger *slog.Logger, db *database.Queries) http.Handler {
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			i, err := GetFromDB(r, db)
-			if err != nil {
-				errutil.ServerErrorResponse(w, r, logger, err)
-			}
-			logger.Info("msg", "handle", "GET Incidents")
-			helpers.RespondWithJSON(w, http.StatusOK, i)
-		},
-	)
-}
+// func Get(logger *slog.Logger, db *database.Queries) http.Handler {
+// 	return http.HandlerFunc(
+// 		func(w http.ResponseWriter, r *http.Request) {
+// 			i, err := GetFromDB(r, db)
+// 			if err != nil {
+// 				errutil.ServerErrorResponse(w, r, logger, err)
+// 			}
+// 			logger.Info("msg", "handle", "GET Incidents")
+// 			helpers.RespondWithJSON(w, http.StatusOK, i)
+// 		},
+// 	)
+// }
 
-func GetFromDB(r *http.Request, db *database.Queries) ([]models.Incident, error) {
-	rows, err := db.GetIncidents(r.Context())
-	if err != nil {
-		return nil, errors.New("couldn't find incidents")
-	}
-	incidents := models.DatabaseIncidentsRowToIncidents(rows)
+// func GetFromDB(r *http.Request, db *database.Queries) ([]models.Incident, error) {
+// 	rows, err := db.GetIncidents(r.Context())
+// 	if err != nil {
+// 		return nil, errors.New("couldn't find incidents")
+// 	}
+// 	incidents := models.DatabaseIncidentsRowToIncidents(rows)
 
-	for n, i := range incidents {
-		ci, err := db.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
-		if err != nil {
-			return nil, errors.New("couldn't find configuration item name")
-		}
-		incidents[n].ConfigurationItemName = ci.Name
-	}
-	return incidents, nil
-}
+// 	for n, i := range incidents {
+// 		ci, err := db.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
+// 		if err != nil {
+// 			return nil, errors.New("couldn't find configuration item name")
+// 		}
+// 		incidents[n].ConfigurationItemName = ci.Name
+// 	}
+// 	return incidents, nil
+// }
 
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	return incidents, nil
 }
 
-func GetFiltered(logger *slog.Logger, db *database.Queries) http.Handler {
+func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Query  string
@@ -120,17 +120,17 @@ func GetFiltered(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetFilteredFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents_filtered")
+		logger.Info("msg", "handle", "GET /v1/incidents")
 		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-func GetFilteredFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]models.Incident, error) {
+func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]models.Incident, error) {
 	p := database.GetIncidentsFilteredParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
 		Limit:  int32(limit),
@@ -144,7 +144,7 @@ func GetFilteredFromDB(r *http.Request, db *database.Queries, query string, limi
 	return incidents, nil
 }
 
-func GetFilteredCount(logger *slog.Logger, db *database.Queries) http.Handler {
+func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Query  string
@@ -170,17 +170,17 @@ func GetFilteredCount(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		count, err := GetFilteredCountFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		count, err := GetCountFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents_filtered_count")
+		logger.Info("msg", "handle", "GET /v1/incidents_count")
 		helpers.RespondWithJSON(w, http.StatusOK, count)
 	})
 }
 
-func GetFilteredCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
+func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
 	count, err := db.GetIncidentsFilteredCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		return 0, errors.New("couldn't find incidents")
