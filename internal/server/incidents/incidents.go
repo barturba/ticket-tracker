@@ -145,7 +145,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]models.Incident, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {
 	p := database.GetIncidentsLatestParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -154,7 +154,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	if err != nil {
 		return nil, errors.New("couldn't find incidents")
 	}
-	incidents := models.DatabaseIncidentsLatestRowToIncidents(rows)
+	incidents := convertLatestMany(rows)
 	return incidents, nil
 }
 

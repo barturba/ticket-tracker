@@ -54,7 +54,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]models.Company, error) {
+func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.Company, error) {
 	p := database.GetCompaniesParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
 		Limit:  int32(limit),
@@ -64,8 +64,125 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offse
 	if err != nil {
 		return nil, errors.New("couldn't find companies")
 	}
-	companies := models.DatabaseCompaniesRowToCompanies(rows)
+	companies := convertMany(rows)
 	return companies, nil
+}
+
+func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Query  string
+			Limit  int
+			Offset int
+			data.Filters
+		}
+
+		v := validator.New()
+
+		var qs = r.URL.Query()
+
+		input.Query = data.ReadString(qs, "query", "")
+
+		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+
+		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.SortSafelist = []string{"id"}
+
+		if data.ValidateFilters(v, input.Filters); !v.Valid() {
+			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			return
+		}
+
+		count, err := GetCountFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		logger.Info("msg", "handle", "GET /v1/companies_count")
+		helpers.RespondWithJSON(w, http.StatusOK, count)
+	})
+}
+
+func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
+	count, err := db.GetCompaniesCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	if err != nil {
+		return 0, errors.New("couldn't find companies")
+	}
+	return count, nil
+}
+
+func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Limit  int
+			Offset int
+			data.Filters
+		}
+
+		v := validator.New()
+
+		var qs = r.URL.Query()
+
+		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+
+		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.SortSafelist = []string{"id"}
+
+		if data.ValidateFilters(v, input.Filters); !v.Valid() {
+			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			return
+		}
+
+		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		logger.Info("msg", "handle", "GET /v1/companies_latest")
+		helpers.RespondWithJSON(w, http.StatusOK, i)
+	})
+}
+
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Company, error) {
+	p := database.GetCompaniesLatestParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	}
+	rows, err := db.GetCompaniesLatest(r.Context(), p)
+	if err != nil {
+		return nil, errors.New("couldn't find companies")
+	}
+	companies := convertMany(rows)
+	return companies, nil
+}
+
+func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, err := helpers.ReadUUIDPath(*r)
+		if err != nil {
+			errutil.NotFoundResponse(w, r, logger)
+			return
+		}
+
+		count, err := db.GetCompanyByID(r.Context(), id)
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		logger.Info("msg", "handle", "GET /v1/company/{id}")
+		helpers.RespondWithJSON(w, http.StatusOK, count)
+	})
+}
+
+func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.Company, error) {
+	record, err := db.GetCompanyByID(r.Context(), id)
+	if err != nil {
+		return models.Company{}, errors.New("couldn't find company")
+	}
+	company := models.DatabaseCompanyToCompany(record)
+	return company, nil
 }
 
 // POST

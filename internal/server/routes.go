@@ -10,13 +10,13 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 
 	// - Companies
 
-	mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)
-	mux.HandleFunc("GET /v1/filtered_companies", cfg.handleFilteredCompaniesGet)
-	mux.HandleFunc("GET /v1/filtered_companies_count", cfg.handleFilteredCompaniesCountGet)
-	mux.HandleFunc("GET /v1/company_by_id", cfg.handleCompanyByIdGet)
-	mux.HandleFunc("POST /v1/companies", cfg.handleCompaniesPost)
-	mux.HandleFunc("PUT /v1/companies/{id}", cfg.handleCompaniesPut)
-	mux.HandleFunc("DELETE /v1/companies/{id}", cfg.handleCompaniesDelete)
+	// mux.HandleFunc("GET /v1/companies", cfg.handleCompaniesGet)
+	// mux.HandleFunc("GET /v1/filtered_companies", cfg.handleFilteredCompaniesGet)
+	// mux.HandleFunc("GET /v1/filtered_companies_count", cfg.handleFilteredCompaniesCountGet)
+	// mux.HandleFunc("GET /v1/company_by_id", cfg.handleCompanyByIdGet)
+	// mux.HandleFunc("POST /v1/companies", cfg.handleCompaniesPost)
+	// mux.HandleFunc("PUT /v1/companies/{id}", cfg.handleCompaniesPut)
+	// mux.HandleFunc("DELETE /v1/companies/{id}", cfg.handleCompaniesDelete)
 
 	// - Configuration Items
 	mux.HandleFunc("GET /v1/configuration_items", cfg.handleConfigurationItemsGet)

@@ -13,6 +13,11 @@ LIMIT $1 OFFSET $2;
 SELECT count(*) FROM companies
 WHERE (name ILIKE '%' || @query || '%' or @query is NULL);
 
+-- name: GetCompaniesLatest :many
+SELECT * FROM companies 
+ORDER BY companies.updated_at DESC
+LIMIT $1 OFFSET $2;
+
 -- name: UpdateCompany :one
 UPDATE companies 
 SET updated_at = $2, 

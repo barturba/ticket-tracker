@@ -114,6 +114,45 @@ func (q *Queries) GetCompaniesCount(ctx context.Context, query sql.NullString) (
 	return count, err
 }
 
+const getCompaniesLatest = `-- name: GetCompaniesLatest :many
+SELECT id, created_at, updated_at, name FROM companies 
+ORDER BY companies.updated_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetCompaniesLatestParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetCompaniesLatest(ctx context.Context, arg GetCompaniesLatestParams) ([]Company, error) {
+	rows, err := q.db.QueryContext(ctx, getCompaniesLatest, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Company
+	for rows.Next() {
+		var i Company
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCompanyByID = `-- name: GetCompanyByID :one
 SELECT id, created_at, updated_at, name from companies
 WHERE id = $1
