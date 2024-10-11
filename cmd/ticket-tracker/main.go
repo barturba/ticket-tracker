@@ -127,7 +127,6 @@ func addRoutesIncident(mux *http.ServeMux, logger *slog.Logger, config config, d
 	mux.Handle("GET /v1/incidents", incidents.Get(logger, db))
 	mux.Handle("GET /v1/incidents_count", incidents.GetCount(logger, db))
 	mux.Handle("GET /v1/incidents_latest", incidents.GetLatest(logger, db))
-	// mux.Handle("GET /v1/incidents_filtered", incidents.GetFiltered(logger, db))
 	mux.Handle("GET /v1/incidents/{id}", incidents.GetByID(logger, db))
 	mux.Handle("POST /v1/incidents", incidents.Post(logger, db))
 	mux.Handle("PUT /v1/incidents/{id}", incidents.Put(logger, db))

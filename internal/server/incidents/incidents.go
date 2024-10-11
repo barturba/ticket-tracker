@@ -18,82 +18,6 @@ import (
 
 // GET
 
-// func Get(logger *slog.Logger, db *database.Queries) http.Handler {
-// 	return http.HandlerFunc(
-// 		func(w http.ResponseWriter, r *http.Request) {
-// 			i, err := GetFromDB(r, db)
-// 			if err != nil {
-// 				errutil.ServerErrorResponse(w, r, logger, err)
-// 			}
-// 			logger.Info("msg", "handle", "GET Incidents")
-// 			helpers.RespondWithJSON(w, http.StatusOK, i)
-// 		},
-// 	)
-// }
-
-// func GetFromDB(r *http.Request, db *database.Queries) ([]models.Incident, error) {
-// 	rows, err := db.GetIncidents(r.Context())
-// 	if err != nil {
-// 		return nil, errors.New("couldn't find incidents")
-// 	}
-// 	incidents := models.DatabaseIncidentsRowToIncidents(rows)
-
-// 	for n, i := range incidents {
-// 		ci, err := db.GetConfigurationItemByID(r.Context(), i.ConfigurationItemID)
-// 		if err != nil {
-// 			return nil, errors.New("couldn't find configuration item name")
-// 		}
-// 		incidents[n].ConfigurationItemName = ci.Name
-// 	}
-// 	return incidents, nil
-// }
-
-func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Limit  int
-			Offset int
-			data.Filters
-		}
-
-		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
-
-		if data.ValidateFilters(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
-			return
-		}
-
-		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
-		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
-			return
-		}
-		logger.Info("msg", "handle", "GET /v1/incidents_latest")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
-	})
-}
-
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]models.Incident, error) {
-	p := database.GetIncidentsLatestParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
-	}
-	rows, err := db.GetIncidentsLatest(r.Context(), p)
-	if err != nil {
-		return nil, errors.New("couldn't find incidents")
-	}
-	incidents := models.DatabaseIncidentsLatestRowToIncidents(rows)
-	return incidents, nil
-}
-
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -186,6 +110,52 @@ func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, 
 		return 0, errors.New("couldn't find incidents")
 	}
 	return count, nil
+}
+
+func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Limit  int
+			Offset int
+			data.Filters
+		}
+
+		v := validator.New()
+
+		var qs = r.URL.Query()
+
+		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+
+		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.SortSafelist = []string{"id"}
+
+		if data.ValidateFilters(v, input.Filters); !v.Valid() {
+			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			return
+		}
+
+		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		logger.Info("msg", "handle", "GET /v1/incidents_latest")
+		helpers.RespondWithJSON(w, http.StatusOK, i)
+	})
+}
+
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]models.Incident, error) {
+	p := database.GetIncidentsLatestParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	}
+	rows, err := db.GetIncidentsLatest(r.Context(), p)
+	if err != nil {
+		return nil, errors.New("couldn't find incidents")
+	}
+	incidents := models.DatabaseIncidentsLatestRowToIncidents(rows)
+	return incidents, nil
 }
 
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
