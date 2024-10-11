@@ -15,9 +15,6 @@ export default async function Page() {
         Dashboard
       </h1>
       <ul>
-        {/* <Suspense fallback={<RevenueChartSkeleton />}>
-          <IncidentsChart />
-        </Suspense> */}
         <Suspense fallback={<LatestIncidentsSkeleton />}>
           <LatestIncidents />
         </Suspense>

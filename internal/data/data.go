@@ -92,8 +92,8 @@ func WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.He
 
 type Incident struct {
 	ID                  uuid.UUID          `json:"id"`
-	CreatedAt           time.Time          `json:"-"`
-	UpdatedAt           time.Time          `json:"-"`
+	CreatedAt           time.Time          `json:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at"`
 	ShortDescription    string             `json:"short_description"`
 	Description         sql.NullString     `json:"description"`
 	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`

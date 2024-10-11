@@ -10,7 +10,6 @@ import dayjs from "dayjs";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 
 export default async function LatestIncidents() {
-  console.log("LatestIncidents");
   const latestIncidents: Incident[] = await fetchLatestIncidents();
 
   return (

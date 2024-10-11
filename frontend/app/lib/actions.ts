@@ -51,13 +51,12 @@ export async function fetchFilteredIncidents(
   query: string,
   currentPage: number
 ) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
   try {
-    const url = new URL(`http://localhost:8080/v1/filtered_incidents`);
+    const url = new URL(`http://localhost:8080/v1/incidents`);
     const searchParams = url.searchParams;
     searchParams.set("query", query);
-    searchParams.set("limit", ITEMS_PER_PAGE.toString());
-    searchParams.set("offset", offset.toString());
+    searchParams.set("page_size", ITEMS_PER_PAGE.toString());
+    searchParams.set("page", currentPage.toString());
 
     const data = await fetch(url.toString(), {
       method: "GET",
@@ -84,7 +83,7 @@ export async function fetchFilteredIncidents(
 }
 export async function fetchIncidentsPages(query: string) {
   try {
-    const url = new URL(`http://localhost:8080/v1/filtered_incidents_count`);
+    const url = new URL(`http://localhost:8080/v1/incidents_count`);
     const searchParams = url.searchParams;
     searchParams.set("query", query);
     const data = await fetch(url.toString(), {
@@ -473,12 +472,11 @@ export async function updateIncident(
   redirect("/dashboard/incidents");
 }
 export async function fetchLatestIncidents() {
-  const offset = 0;
   try {
     const url = new URL(`http://localhost:8080/v1/incidents_latest`);
     const searchParams = url.searchParams;
-    searchParams.set("limit", ITEMS_PER_PAGE.toString());
-    searchParams.set("offset", offset.toString());
+    searchParams.set("page_size", ITEMS_PER_PAGE.toString());
+    searchParams.set("page", "1");
 
     const data = await fetch(url.toString(), {
       method: "GET",
