@@ -190,8 +190,6 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			CreatedAt           time.Time
-			UpdatedAt           time.Time
 			ShortDescription    string
 			Description         string
 			ConfigurationItemID uuid.UUID

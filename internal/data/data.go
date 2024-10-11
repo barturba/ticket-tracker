@@ -88,6 +88,8 @@ func WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.He
 	return nil
 }
 
+// Incidents
+
 type Incident struct {
 	ID                  uuid.UUID          `json:"id"`
 	CreatedAt           time.Time          `json:"-"`
@@ -128,4 +130,19 @@ func ValidateIncident(v *validator.Validator, incident *Incident) {
 	}
 	v.Check(validator.PermittedValue(string(incident.State), stateStrings...), "state", "invalid state value")
 
+}
+
+// Companies
+type Company struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	Name      string    `json:"name"`
+}
+
+func ValidateCompany(v *validator.Validator, company *Company) {
+	v.Check(company.ID != uuid.UUID{}, "id", "must be provided")
+
+	v.Check(company.Name != "", "name", "must be provided")
+	v.Check(len(company.Name) <= 500, "name", "must not be more than 500 bytes long")
 }
