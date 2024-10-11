@@ -36,7 +36,7 @@ func ReadInt(qs url.Values, key string, defaultValue int, v *validator.Validator
 		return defaultValue
 	}
 
-	i, err := strconv.Atoi(key)
+	i, err := strconv.Atoi(s)
 	if err != nil {
 		v.AddError(key, "must be an integer value")
 		return defaultValue

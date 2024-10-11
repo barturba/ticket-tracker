@@ -406,15 +406,15 @@ func CheckCompany(c Company) map[string]string {
 	return nil
 }
 
-func DatabaseCompaniesFilteredRowToCompanies(incidents []database.Company) []Company {
+func DatabaseCompaniesRowToCompanies(incidents []database.Company) []Company {
 	var items []Company
 	for _, item := range incidents {
-		items = append(items, DatabaseCompanyFilteredRowToCompany(item))
+		items = append(items, DatabaseCompanyRowToCompany(item))
 	}
 	return items
 }
 
-func DatabaseCompanyFilteredRowToCompany(incident database.Company) Company {
+func DatabaseCompanyRowToCompany(incident database.Company) Company {
 	return Company{
 		ID:        incident.ID,
 		CreatedAt: incident.CreatedAt,

@@ -41,7 +41,6 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/companies", "limit", input.Filters.Limit(), "offset", input.Filters.Offset())
 
 		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
@@ -54,15 +53,15 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 }
 
 func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]models.Company, error) {
-	p := database.GetCompaniesFilteredParams{
+	p := database.GetCompaniesParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	}
-	rows, err := db.GetCompaniesFiltered(r.Context(), p)
+	rows, err := db.GetCompanies(r.Context(), p)
 	if err != nil {
 		return nil, errors.New("couldn't find companies")
 	}
-	companies := models.DatabaseCompaniesFilteredRowToCompanies(rows)
+	companies := models.DatabaseCompaniesRowToCompanies(rows)
 	return companies, nil
 }

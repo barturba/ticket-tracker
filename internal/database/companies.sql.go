@@ -62,52 +62,20 @@ func (q *Queries) DeleteCompanyByID(ctx context.Context, id uuid.UUID) (Company,
 }
 
 const getCompanies = `-- name: GetCompanies :many
-SELECT id, created_at, updated_at, name from companies
-`
-
-func (q *Queries) GetCompanies(ctx context.Context) ([]Company, error) {
-	rows, err := q.db.QueryContext(ctx, getCompanies)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Company
-	for rows.Next() {
-		var i Company
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.Name,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getCompaniesFiltered = `-- name: GetCompaniesFiltered :many
 SELECT id, created_at, updated_at, name FROM companies
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
-type GetCompaniesFilteredParams struct {
+type GetCompaniesParams struct {
 	Limit  int32
 	Offset int32
 	Query  sql.NullString
 }
 
-func (q *Queries) GetCompaniesFiltered(ctx context.Context, arg GetCompaniesFilteredParams) ([]Company, error) {
-	rows, err := q.db.QueryContext(ctx, getCompaniesFiltered, arg.Limit, arg.Offset, arg.Query)
+func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]Company, error) {
+	rows, err := q.db.QueryContext(ctx, getCompanies, arg.Limit, arg.Offset, arg.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -134,13 +102,13 @@ func (q *Queries) GetCompaniesFiltered(ctx context.Context, arg GetCompaniesFilt
 	return items, nil
 }
 
-const getCompaniesFilteredCount = `-- name: GetCompaniesFilteredCount :one
+const getCompaniesCount = `-- name: GetCompaniesCount :one
 SELECT count(*) FROM companies
 WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
-func (q *Queries) GetCompaniesFilteredCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getCompaniesFilteredCount, query)
+func (q *Queries) GetCompaniesCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCompaniesCount, query)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
