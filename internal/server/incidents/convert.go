@@ -27,7 +27,7 @@ func convertMany(incidents []database.Incident) []data.Incident {
 	return items
 }
 
-func convertLatest(incident database.GetIncidentsLatestRow) data.Incident {
+func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
 	return data.Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
@@ -41,10 +41,32 @@ func convertLatest(incident database.GetIncidentsLatestRow) data.Incident {
 	}
 }
 
-func convertLatestMany(incidents []database.GetIncidentsLatestRow) []data.Incident {
+func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []data.Incident {
 	var items []data.Incident
 	for _, item := range incidents {
-		items = append(items, convertLatest(item))
+		items = append(items, convertLatestRow(item))
+	}
+	return items
+}
+
+func convertRow(incident database.GetIncidentsRow) data.Incident {
+	return data.Incident{
+		ID:                  incident.ID,
+		CreatedAt:           incident.CreatedAt,
+		UpdatedAt:           incident.UpdatedAt,
+		ShortDescription:    incident.ShortDescription,
+		Description:         incident.Description,
+		ConfigurationItemID: incident.ConfigurationItemID,
+		CompanyID:           incident.CompanyID,
+		AssignedToID:        incident.AssignedTo,
+		State:               incident.State,
+	}
+}
+
+func convertRowMany(incidents []database.GetIncidentsRow) []data.Incident {
+	var items []data.Incident
+	for _, item := range incidents {
+		items = append(items, convertRow(item))
 	}
 	return items
 }

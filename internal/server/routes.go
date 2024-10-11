@@ -22,8 +22,8 @@ func (cfg *ApiConfig) Routes() *http.ServeMux {
 	mux.HandleFunc("GET /v1/configuration_items", cfg.handleConfigurationItemsGet)
 
 	// - Users
-	mux.HandleFunc("GET /v1/users", cfg.handleUsersGet)
-	mux.HandleFunc("GET /v1/users_by_company", cfg.handleUsersByCompanyGet)
+	// mux.HandleFunc("GET /v1/users", cfg.handleUsersGet)
+	// mux.HandleFunc("GET /v1/users_by_company", cfg.handleUsersByCompanyGet)
 
 	// Login Endpoints
 	mux.HandleFunc("POST /v1/login", cfg.handleLogin)

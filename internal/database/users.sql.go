@@ -14,16 +14,20 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO USERS (id, created_at, updated_at, name)
-VALUES ($1, $2, $3, $4)
-RETURNING id, created_at, updated_at, name, apikey, email, password
+INSERT INTO USERS (id, created_at, updated_at, first_name, last_name, apikey, email, password)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
 `
 
 type CreateUserParams struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Name      string
+	FirstName sql.NullString
+	LastName  sql.NullString
+	Apikey    string
+	Email     string
+	Password  sql.NullString
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -31,14 +35,41 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.ID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
-		arg.Name,
+		arg.FirstName,
+		arg.LastName,
+		arg.Apikey,
+		arg.Email,
+		arg.Password,
 	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Name,
+		&i.FirstName,
+		&i.LastName,
+		&i.Apikey,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
+}
+
+const deleteUserByID = `-- name: DeleteUserByID :one
+DELETE FROM users 
+WHERE id = $1
+RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
+`
+
+func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, deleteUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FirstName,
+		&i.LastName,
 		&i.Apikey,
 		&i.Email,
 		&i.Password,
@@ -47,7 +78,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT id, created_at, updated_at, name, apikey, email, password FROM USERS WHERE APIKEY = $1
+SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE APIKEY = $1
 `
 
 func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, error) {
@@ -57,7 +88,8 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, err
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Name,
+		&i.FirstName,
+		&i.LastName,
 		&i.Apikey,
 		&i.Email,
 		&i.Password,
@@ -66,7 +98,7 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, name, apikey, email, password FROM USERS WHERE email = $1
+SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -76,7 +108,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Name,
+		&i.FirstName,
+		&i.LastName,
 		&i.Apikey,
 		&i.Email,
 		&i.Password,
@@ -85,7 +118,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, updated_at, name, apikey, email, password FROM USERS WHERE id = $1
+SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -95,7 +128,8 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Name,
+		&i.FirstName,
+		&i.LastName,
 		&i.Apikey,
 		&i.Email,
 		&i.Password,
@@ -104,12 +138,21 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, created_at, updated_at, name, apikey, email, password FROM users 
-ORDER BY users.name ASC
+SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
+WHERE (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (last_name ILIKE '%' || $3 || '%' or $3 is NULL)
+ORDER BY users.updated_at DESC
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers)
+type GetUsersParams struct {
+	Limit  int32
+	Offset int32
+	Query  sql.NullString
+}
+
+func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsers, arg.Limit, arg.Offset, arg.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +164,8 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -140,7 +184,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 }
 
 const getUsersByCompany = `-- name: GetUsersByCompany :many
-SELECT users.id, users.created_at, users.updated_at, users.name, apikey, email, password, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
+SELECT users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password, companies.id, companies.created_at, companies.updated_at, name FROM users 
 LEFT JOIN companies 
 ON users.assigned_to = users.id
 ORDER BY users.name ASC
@@ -150,14 +194,15 @@ type GetUsersByCompanyRow struct {
 	ID          uuid.UUID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Name        string
+	FirstName   sql.NullString
+	LastName    sql.NullString
 	Apikey      string
 	Email       string
 	Password    sql.NullString
 	ID_2        uuid.NullUUID
 	CreatedAt_2 sql.NullTime
 	UpdatedAt_2 sql.NullTime
-	Name_2      sql.NullString
+	Name        sql.NullString
 }
 
 func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow, error) {
@@ -173,14 +218,15 @@ func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name_2,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -193,4 +239,106 @@ func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUsersCount = `-- name: GetUsersCount :one
+SELECT count(*) FROM users 
+WHERE (first_name ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (last_name ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) GetUsersCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUsersCount, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getUsersLatest = `-- name: GetUsersLatest :many
+SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
+ORDER BY users.updated_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetUsersLatestParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetUsersLatest(ctx context.Context, arg GetUsersLatestParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersLatest, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.FirstName,
+			&i.LastName,
+			&i.Apikey,
+			&i.Email,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users 
+SET updated_at = $2, 
+first_name = $3,
+last_name = $4,
+apikey = $5, 
+email = $6, 
+password = $7
+WHERE ID = $1
+RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
+`
+
+type UpdateUserParams struct {
+	ID        uuid.UUID
+	UpdatedAt time.Time
+	FirstName sql.NullString
+	LastName  sql.NullString
+	Apikey    string
+	Email     string
+	Password  sql.NullString
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.ID,
+		arg.UpdatedAt,
+		arg.FirstName,
+		arg.LastName,
+		arg.Apikey,
+		arg.Email,
+		arg.Password,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FirstName,
+		&i.LastName,
+		&i.Apikey,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/server/companies"
 	"github.com/barturba/ticket-tracker/internal/server/incidents"
+	"github.com/barturba/ticket-tracker/internal/server/users"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -116,14 +117,15 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 func NewServer2(logger *slog.Logger, config config, db *database.Queries) http.Handler {
 	mux := http.NewServeMux()
-	addRoutesIncident(mux, logger, config, db)
-	addRoutesCompany(mux, logger, config, db)
+	addRoutesUsers(mux, logger, config, db)
+	addRoutesIncidents(mux, logger, config, db)
+	addRoutesCompanies(mux, logger, config, db)
 	var handler http.Handler = mux
 	// handler = someMiddleware(handler)
 	return handler
 }
 
-func addRoutesIncident(
+func addRoutesIncidents(
 	mux *http.ServeMux,
 	logger *slog.Logger,
 	config config,
@@ -137,7 +139,7 @@ func addRoutesIncident(
 	mux.Handle("DELETE /v1/incidents/{id}", incidents.Delete(logger, db))
 }
 
-func addRoutesCompany(
+func addRoutesCompanies(
 	mux *http.ServeMux,
 	logger *slog.Logger,
 	config config,
@@ -147,6 +149,20 @@ func addRoutesCompany(
 	mux.Handle("GET /v1/companies/{id}", companies.GetByID(logger, db))
 	mux.Handle("GET /v1/companies_count", companies.GetCount(logger, db))
 	mux.Handle("GET /v1/companies_latest", companies.GetLatest(logger, db))
-	// mux.Handle("PUT /v1/companies/{id}", companies.Put(logger, db))
-	// mux.Handle("DELETE /v1/companies/{id}", companies.Delete(logger, db))
+	mux.Handle("PUT /v1/companies/{id}", companies.Put(logger, db))
+	mux.Handle("DELETE /v1/companies/{id}", companies.Delete(logger, db))
+}
+
+func addRoutesUsers(
+	mux *http.ServeMux,
+	logger *slog.Logger,
+	config config,
+	db *database.Queries) {
+	mux.Handle("GET /v1/users", users.Get(logger, db))
+	mux.Handle("POST /v1/users", users.Post(logger, db))
+	mux.Handle("GET /v1/users/{id}", users.GetByID(logger, db))
+	mux.Handle("GET /v1/users_count", users.GetCount(logger, db))
+	mux.Handle("GET /v1/users_latest", users.GetLatest(logger, db))
+	mux.Handle("PUT /v1/users/{id}", users.Put(logger, db))
+	mux.Handle("DELETE /v1/users/{id}", users.Delete(logger, db))
 }

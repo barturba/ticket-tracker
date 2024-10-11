@@ -51,7 +51,7 @@ func DatabaseUserToUser(user database.User) User {
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-		Name:      user.Name,
+		Name:      user.FirstName.String,
 		APIkey:    user.Apikey,
 	}
 }
@@ -111,81 +111,81 @@ func DatabaseIncidentToIncident(incident database.Incident) Incident {
 	}
 }
 
-func DatabaseIncidentRowToIncident(incident database.GetIncidentsRow) Incident {
-	return Incident{
-		ID:                  incident.ID,
-		CreatedAt:           incident.CreatedAt,
-		UpdatedAt:           incident.UpdatedAt,
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description.String,
-		State:               incident.State,
-		AssignedTo:          incident.AssignedTo.UUID,
-		AssignedToName:      incident.Name.String,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-	}
-}
+// func DatabaseIncidentRowToIncident(incident database.GetIncidentsRow) Incident {
+// 	return Incident{
+// 		ID:                  incident.ID,
+// 		CreatedAt:           incident.CreatedAt,
+// 		UpdatedAt:           incident.UpdatedAt,
+// 		ShortDescription:    incident.ShortDescription,
+// 		Description:         incident.Description.String,
+// 		State:               incident.State,
+// 		AssignedTo:          incident.AssignedTo.UUID,
+// 		AssignedToName:      incident.Name.String,
+// 		ConfigurationItemID: incident.ConfigurationItemID,
+// 		CompanyID:           incident.CompanyID,
+// 	}
+// }
 
-func DatabaseIncidentsRowToIncidents(incidents []database.GetIncidentsRow) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentRowToIncident(item))
-	}
-	return items
-}
+// func DatabaseIncidentsRowToIncidents(incidents []database.GetIncidentsRow) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentRowToIncident(item))
+// 	}
+// 	return items
+// }
 
-func DatabaseIncidentBySearchTermRowToIncident(incident database.GetIncidentsBySearchTermRow) Incident {
-	return Incident{
-		ID:                  incident.ID,
-		CreatedAt:           incident.CreatedAt,
-		UpdatedAt:           incident.UpdatedAt,
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description.String,
-		State:               incident.State,
-		AssignedTo:          incident.AssignedTo.UUID,
-		AssignedToName:      incident.Name.String,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-	}
-}
+// func DatabaseIncidentBySearchTermRowToIncident(incident database.GetIncidentsBySearchTermRow) Incident {
+// 	return Incident{
+// 		ID:                  incident.ID,
+// 		CreatedAt:           incident.CreatedAt,
+// 		UpdatedAt:           incident.UpdatedAt,
+// 		ShortDescription:    incident.ShortDescription,
+// 		Description:         incident.Description.String,
+// 		State:               incident.State,
+// 		AssignedTo:          incident.AssignedTo.UUID,
+// 		AssignedToName:      incident.Name.String,
+// 		ConfigurationItemID: incident.ConfigurationItemID,
+// 		CompanyID:           incident.CompanyID,
+// 	}
+// }
 
-func DatabaseIncidentsBySearchTermToIncidents(incidents []database.GetIncidentsBySearchTermRow) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentBySearchTermRowToIncident(item))
-	}
-	return items
-}
+// func DatabaseIncidentsBySearchTermToIncidents(incidents []database.GetIncidentsBySearchTermRow) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentBySearchTermRowToIncident(item))
+// 	}
+// 	return items
+// }
 
-func DatabaseIncidentsToIncidents(incidents []database.Incident) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentToIncident(item))
-	}
-	return items
-}
+// func DatabaseIncidentsToIncidents(incidents []database.Incident) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentToIncident(item))
+// 	}
+// 	return items
+// }
 
-func DatabaseIncidentBySearchTermLimitOffsetRowToIncident(incident database.GetIncidentsBySearchTermLimitOffsetRow) Incident {
-	return Incident{
-		ID:                  incident.ID,
-		CreatedAt:           incident.CreatedAt,
-		UpdatedAt:           incident.UpdatedAt,
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description.String,
-		State:               incident.State,
-		AssignedTo:          incident.AssignedTo.UUID,
-		AssignedToName:      incident.Name.String,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-	}
-}
-func DatabaseIncidentsBySearchTermLimitOffsetRowToIncidents(incidents []database.GetIncidentsBySearchTermLimitOffsetRow) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentBySearchTermLimitOffsetRowToIncident(item))
-	}
-	return items
-}
+// func DatabaseIncidentBySearchTermLimitOffsetRowToIncident(incident database.GetIncidentsBySearchTermLimitOffsetRow) Incident {
+// 	return Incident{
+// 		ID:                  incident.ID,
+// 		CreatedAt:           incident.CreatedAt,
+// 		UpdatedAt:           incident.UpdatedAt,
+// 		ShortDescription:    incident.ShortDescription,
+// 		Description:         incident.Description.String,
+// 		State:               incident.State,
+// 		AssignedTo:          incident.AssignedTo.UUID,
+// 		AssignedToName:      incident.Name.String,
+// 		ConfigurationItemID: incident.ConfigurationItemID,
+// 		CompanyID:           incident.CompanyID,
+// 	}
+// }
+// func DatabaseIncidentsBySearchTermLimitOffsetRowToIncidents(incidents []database.GetIncidentsBySearchTermLimitOffsetRow) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentBySearchTermLimitOffsetRowToIncident(item))
+// 	}
+// 	return items
+// }
 
 type MenuItem struct {
 	Name string
@@ -319,51 +319,51 @@ func NewAlert(message string, alertType AlertEnum, color string) Alert {
 	}
 }
 
-func DatabaseIncidentsFilteredRowToIncidents(incidents []database.GetIncidentsRow) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentFilteredRowToIncident(item))
-	}
-	return items
-}
-func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsRow) Incident {
-	return Incident{
-		ID:                    incident.ID,
-		CreatedAt:             incident.CreatedAt,
-		UpdatedAt:             incident.UpdatedAt,
-		ShortDescription:      incident.ShortDescription,
-		Description:           incident.Description.String,
-		State:                 incident.State,
-		AssignedTo:            incident.AssignedTo.UUID,
-		AssignedToName:        incident.Name.String,
-		ConfigurationItemID:   incident.ConfigurationItemID,
-		ConfigurationItemName: "",
-		CompanyID:             incident.CompanyID,
-	}
-}
+// func DatabaseIncidentsFilteredRowToIncidents(incidents []database.GetIncidentsRow) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentFilteredRowToIncident(item))
+// 	}
+// 	return items
+// }
+// func DatabaseIncidentFilteredRowToIncident(incident database.GetIncidentsRow) Incident {
+// 	return Incident{
+// 		ID:                    incident.ID,
+// 		CreatedAt:             incident.CreatedAt,
+// 		UpdatedAt:             incident.UpdatedAt,
+// 		ShortDescription:      incident.ShortDescription,
+// 		Description:           incident.Description.String,
+// 		State:                 incident.State,
+// 		AssignedTo:            incident.AssignedTo.UUID,
+// 		AssignedToName:        incident.Name.String,
+// 		ConfigurationItemID:   incident.ConfigurationItemID,
+// 		ConfigurationItemName: "",
+// 		CompanyID:             incident.CompanyID,
+// 	}
+// }
 
-func DatabaseIncidentsLatestRowToIncidents(incidents []database.GetIncidentsLatestRow) []Incident {
-	var items []Incident
-	for _, item := range incidents {
-		items = append(items, DatabaseIncidentLatestRowToIncident(item))
-	}
-	return items
-}
-func DatabaseIncidentLatestRowToIncident(incident database.GetIncidentsLatestRow) Incident {
-	return Incident{
-		ID:                    incident.ID,
-		CreatedAt:             incident.CreatedAt,
-		UpdatedAt:             incident.UpdatedAt,
-		ShortDescription:      incident.ShortDescription,
-		Description:           incident.Description.String,
-		State:                 incident.State,
-		AssignedTo:            incident.AssignedTo.UUID,
-		AssignedToName:        incident.Name.String,
-		ConfigurationItemID:   incident.ConfigurationItemID,
-		ConfigurationItemName: "",
-		CompanyID:             incident.CompanyID,
-	}
-}
+// func DatabaseIncidentsLatestRowToIncidents(incidents []database.GetIncidentsLatestRow) []Incident {
+// 	var items []Incident
+// 	for _, item := range incidents {
+// 		items = append(items, DatabaseIncidentLatestRowToIncident(item))
+// 	}
+// 	return items
+// }
+// func DatabaseIncidentLatestRowToIncident(incident database.GetIncidentsLatestRow) Incident {
+// 	return Incident{
+// 		ID:                    incident.ID,
+// 		CreatedAt:             incident.CreatedAt,
+// 		UpdatedAt:             incident.UpdatedAt,
+// 		ShortDescription:      incident.ShortDescription,
+// 		Description:           incident.Description.String,
+// 		State:                 incident.State,
+// 		AssignedTo:            incident.AssignedTo.UUID,
+// 		AssignedToName:        incident.Name.String,
+// 		ConfigurationItemID:   incident.ConfigurationItemID,
+// 		ConfigurationItemName: "",
+// 		CompanyID:             incident.CompanyID,
+// 	}
+// }
 
 // Companies
 

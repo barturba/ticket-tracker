@@ -1,4 +1,4 @@
-package incidents
+package users
 
 import (
 	"database/sql"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/barturba/ticket-tracker/internal/auth"
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/errutil"
@@ -48,23 +49,23 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents")
+		logger.Info("msg", "handle", "GET /v1/users")
 		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.Incident, error) {
-	p := database.GetIncidentsParams{
+func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.User, error) {
+	p := database.GetUsersParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	}
-	rows, err := db.GetIncidents(r.Context(), p)
+	rows, err := db.GetUsers(r.Context(), p)
 	if err != nil {
-		return nil, errors.New("couldn't find incidents")
+		return nil, errors.New("couldn't find users")
 	}
-	incidents := convertRowMany(rows)
-	return incidents, nil
+	users := convertMany(rows)
+	return users, nil
 }
 
 func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
@@ -98,15 +99,15 @@ func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents_count")
+		logger.Info("msg", "handle", "GET /v1/users_count")
 		helpers.RespondWithJSON(w, http.StatusOK, count)
 	})
 }
 
 func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetIncidentsCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	count, err := db.GetUsersCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
-		return 0, errors.New("couldn't find incidents")
+		return 0, errors.New("couldn't find users")
 	}
 	return count, nil
 }
@@ -139,22 +140,22 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents_latest")
+		logger.Info("msg", "handle", "GET /v1/users_latest")
 		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {
-	p := database.GetIncidentsLatestParams{
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.User, error) {
+	p := database.GetUsersLatestParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
 	}
-	rows, err := db.GetIncidentsLatest(r.Context(), p)
+	rows, err := db.GetUsersLatest(r.Context(), p)
 	if err != nil {
-		return nil, errors.New("couldn't find incidents")
+		return nil, errors.New("couldn't find users")
 	}
-	incidents := convertLatestRowMany(rows)
-	return incidents, nil
+	users := convertMany(rows)
+	return users, nil
 }
 
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
@@ -165,23 +166,23 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		count, err := db.GetIncidentByID(r.Context(), id)
+		count, err := db.GetUserByID(r.Context(), id)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incident/{id}")
+		logger.Info("msg", "handle", "GET /v1/user/{id}")
 		helpers.RespondWithJSON(w, http.StatusOK, count)
 	})
 }
 
-func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
-	record, err := db.GetIncidentByID(r.Context(), id)
+func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
+	record, err := db.GetUserByID(r.Context(), id)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
+		return data.User{}, errors.New("couldn't find user")
 	}
-	incident := convert(record)
-	return incident, nil
+	user := convert(record)
+	return user, nil
 }
 
 // POST
@@ -189,12 +190,12 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.In
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			ShortDescription    string
-			Description         string
+			FirstName           string
+			LastName            string
 			ConfigurationItemID uuid.UUID
-			CompanyID           uuid.UUID
-			AssignedToID        uuid.UUID
-			State               database.StateEnum
+			ApiKey              string
+			Email               string
+			Password            string
 		}
 
 		err := helpers.ReadJSON(w, r, &input)
@@ -203,49 +204,54 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incident := &data.Incident{
-			ID:                  uuid.New(),
-			CreatedAt:           time.Now(),
-			UpdatedAt:           time.Now(),
-			ShortDescription:    input.ShortDescription,
-			Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
-			ConfigurationItemID: input.ConfigurationItemID,
-			CompanyID:           input.CompanyID,
-			AssignedToID:        uuid.NullUUID{UUID: input.AssignedToID, Valid: input.AssignedToID != uuid.Nil},
-			State:               input.State,
+		user := &data.User{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			FirstName: input.FirstName,
+			LastName:  input.LastName,
+			APIkey:    input.ApiKey,
+			Password:  input.Password,
 		}
 
 		v := validator.New()
 
-		if data.ValidateIncident(v, incident); !v.Valid() {
+		if data.ValidateUser(v, user); !v.Valid() {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PostToDB(r, db, *incident)
+		i, err := PostToDB(r, db, *user)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "POST /v1/incident")
+		logger.Info("msg", "handle", "POST /v1/user")
 		helpers.RespondWithJSON(w, http.StatusCreated, i)
 	})
 }
 
-func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
-	i, err := db.CreateIncident(r.Context(), database.CreateIncidentParams{
-		ID:                  incident.ID,
-		CreatedAt:           time.Now(),
-		UpdatedAt:           time.Now(),
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description,
-		State:               incident.State,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
+func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
+
+	password := auth.Password{}
+	err := auth.Set(&password, user.Password)
+	if err != nil {
+		return data.User{}, errors.New("couldn't set password")
+	}
+
+	i, err := db.CreateUser(r.Context(), database.CreateUserParams{
+		ID:        user.ID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
+		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
+		Apikey:    user.APIkey,
+		Email:     user.Email,
+		Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	response := convert(i)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
+		return data.User{}, errors.New("couldn't find user")
 	}
 	return response, nil
 }
@@ -261,14 +267,13 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			CreatedAt           time.Time
-			UpdatedAt           time.Time
-			ShortDescription    string
-			Description         string
-			ConfigurationItemID uuid.UUID
-			CompanyID           uuid.UUID
-			AssignedToID        uuid.UUID
-			State               database.StateEnum
+			CreatedAt time.Time
+			UpdatedAt time.Time
+			FirstName string
+			LastName  string
+			APIKey    string
+			Email     string
+			Password  string
 		}
 
 		err = helpers.ReadJSON(w, r, &input)
@@ -277,48 +282,53 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incident := &data.Incident{
-			ID:                  id,
-			CreatedAt:           time.Now(),
-			UpdatedAt:           time.Now(),
-			ShortDescription:    input.ShortDescription,
-			Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
-			ConfigurationItemID: input.ConfigurationItemID,
-			CompanyID:           input.CompanyID,
-			AssignedToID:        uuid.NullUUID{UUID: input.AssignedToID, Valid: input.AssignedToID != uuid.Nil},
-			State:               input.State,
+		user := &data.User{
+			ID:        id,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			FirstName: input.FirstName,
+			LastName:  input.LastName,
+			APIkey:    input.APIKey,
+			Email:     input.Email,
+			Password:  input.Password,
 		}
 
 		v := validator.New()
 
-		if data.ValidateIncident(v, incident); !v.Valid() {
+		if data.ValidateUser(v, user); !v.Valid() {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PutToDB(r, db, *incident)
+		i, err := PutToDB(r, db, *user)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/incident", "id", id)
+		logger.Info("msg", "handle", "PUT /v1/user", "id", id)
 		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
-	i, err := db.UpdateIncident(r.Context(), database.UpdateIncidentParams{
-		ID:                  incident.ID,
-		UpdatedAt:           time.Now(),
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description,
-		State:               incident.State,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-		AssignedTo:          incident.AssignedToID,
+func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
+
+	password := auth.Password{}
+	err := auth.Set(&password, user.Password)
+	if err != nil {
+		return data.User{}, errors.New("couldn't set password")
+	}
+
+	i, err := db.UpdateUser(r.Context(), database.UpdateUserParams{
+		ID:        user.ID,
+		UpdatedAt: time.Now(),
+		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
+		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
+		Apikey:    user.APIkey,
+		Email:     user.Email,
+		Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't update incident")
+		return data.User{}, errors.New("couldn't update user")
 	}
 
 	response := convert(i)
@@ -342,15 +352,15 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		logger.Info("msg", "handle", "DELETE /v1/incident", "id", id)
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "incident successfully deleted"})
+		logger.Info("msg", "handle", "DELETE /v1/user", "id", id)
+		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "user successfully deleted"})
 	})
 }
 
-func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
-	i, err := db.DeleteIncidentByID(r.Context(), id)
+func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
+	i, err := db.DeleteUserByID(r.Context(), id)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't delete incident")
+		return data.User{}, errors.New("couldn't delete user")
 	}
 
 	response := convert(i)

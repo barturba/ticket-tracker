@@ -236,3 +236,96 @@ func PostToDB(r *http.Request, db *database.Queries, company data.Company) (data
 	}
 	return response, nil
 }
+
+// PUT
+
+func Put(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, err := helpers.ReadUUIDPath(*r)
+		if err != nil {
+			errutil.NotFoundResponse(w, r, logger)
+			return
+		}
+
+		var input struct {
+			CreatedAt time.Time
+			UpdatedAt time.Time
+			Name      string
+		}
+
+		err = helpers.ReadJSON(w, r, &input)
+		if err != nil {
+			errutil.BadRequestResponse(w, r, logger, err)
+			return
+		}
+
+		company := &data.Company{
+			ID:        id,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      input.Name,
+		}
+
+		v := validator.New()
+
+		if data.ValidateCompany(v, company); !v.Valid() {
+			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			return
+		}
+		i, err := PutToDB(r, db, *company)
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+
+		logger.Info("msg", "handle", "PUT /v1/companies", "id", id)
+		helpers.RespondWithJSON(w, http.StatusOK, i)
+	})
+}
+
+func PutToDB(r *http.Request, db *database.Queries, company data.Company) (data.Company, error) {
+	i, err := db.UpdateCompany(r.Context(), database.UpdateCompanyParams{
+		ID:        company.ID,
+		UpdatedAt: time.Now(),
+		Name:      company.Name,
+	})
+	if err != nil {
+		return data.Company{}, errors.New("couldn't update company")
+	}
+
+	response := convert(i)
+
+	return response, nil
+}
+
+// DELETE
+
+func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, err := helpers.ReadUUIDPath(*r)
+		if err != nil {
+			errutil.NotFoundResponse(w, r, logger)
+			return
+		}
+
+		_, err = DeleteFromDB(r, db, id)
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+
+		logger.Info("msg", "handle", "DELETE /v1/companies", "id", id)
+		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "company successfully deleted"})
+	})
+}
+
+func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Company, error) {
+	i, err := db.DeleteCompanyByID(r.Context(), id)
+	if err != nil {
+		return data.Company{}, errors.New("couldn't delete company")
+	}
+
+	response := convert(i)
+
+	return response, nil
+}

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetAPIKey(h http.Header) (string, error) {
@@ -13,4 +15,19 @@ func GetAPIKey(h http.Header) (string, error) {
 	}
 	authorization = strings.TrimPrefix(authorization, "ApiKey ")
 	return authorization, nil
+}
+
+type Password struct {
+	Plaintext *string
+	Hash      []byte
+}
+
+func Set(p *Password, plaintextPassword string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plaintextPassword), 12)
+	if err != nil {
+		return err
+	}
+	p.Plaintext = &plaintextPassword
+	p.Hash = hash
+	return nil
 }

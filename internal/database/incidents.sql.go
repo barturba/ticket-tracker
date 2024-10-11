@@ -101,7 +101,7 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 }
 
 const getIncidentById = `-- name: GetIncidentById :one
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE incidents.id = $1
@@ -120,7 +120,8 @@ type GetIncidentByIdRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -142,7 +143,8 @@ func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetInciden
 		&i.ID_2,
 		&i.CreatedAt_2,
 		&i.UpdatedAt_2,
-		&i.Name,
+		&i.FirstName,
+		&i.LastName,
 		&i.Apikey,
 		&i.Email,
 		&i.Password,
@@ -151,7 +153,7 @@ func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetInciden
 }
 
 const getIncidents = `-- name: GetIncidents :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -180,7 +182,8 @@ type GetIncidentsRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -208,7 +211,8 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -227,7 +231,7 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 }
 
 const getIncidentsAsc = `-- name: GetIncidentsAsc :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY $1 ASC, id ASC
@@ -246,7 +250,8 @@ type GetIncidentsAscRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -274,7 +279,8 @@ func (q *Queries) GetIncidentsAsc(ctx context.Context, dollar_1 interface{}) ([]
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -293,7 +299,7 @@ func (q *Queries) GetIncidentsAsc(ctx context.Context, dollar_1 interface{}) ([]
 }
 
 const getIncidentsBySearchTerm = `-- name: GetIncidentsBySearchTerm :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE short_description like $1
@@ -313,7 +319,8 @@ type GetIncidentsBySearchTermRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -341,7 +348,8 @@ func (q *Queries) GetIncidentsBySearchTerm(ctx context.Context, shortDescription
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -360,7 +368,7 @@ func (q *Queries) GetIncidentsBySearchTerm(ctx context.Context, shortDescription
 }
 
 const getIncidentsBySearchTermLimitOffset = `-- name: GetIncidentsBySearchTermLimitOffset :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password, count(*) OVER() AS full_count 
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password, count(*) OVER() AS full_count 
 FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -388,7 +396,8 @@ type GetIncidentsBySearchTermLimitOffsetRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -417,7 +426,8 @@ func (q *Queries) GetIncidentsBySearchTermLimitOffset(ctx context.Context, arg G
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -453,7 +463,7 @@ func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (
 }
 
 const getIncidentsDesc = `-- name: GetIncidentsDesc :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY $1 DESC, id ASC
@@ -472,7 +482,8 @@ type GetIncidentsDescRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -500,7 +511,8 @@ func (q *Queries) GetIncidentsDesc(ctx context.Context, dollar_1 interface{}) ([
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
@@ -519,7 +531,7 @@ func (q *Queries) GetIncidentsDesc(ctx context.Context, dollar_1 interface{}) ([
 }
 
 const getIncidentsLatest = `-- name: GetIncidentsLatest :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, name, apikey, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC
@@ -544,7 +556,8 @@ type GetIncidentsLatestRow struct {
 	ID_2                uuid.NullUUID
 	CreatedAt_2         sql.NullTime
 	UpdatedAt_2         sql.NullTime
-	Name                sql.NullString
+	FirstName           sql.NullString
+	LastName            sql.NullString
 	Apikey              sql.NullString
 	Email               sql.NullString
 	Password            sql.NullString
@@ -572,7 +585,8 @@ func (q *Queries) GetIncidentsLatest(ctx context.Context, arg GetIncidentsLatest
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.FirstName,
+			&i.LastName,
 			&i.Apikey,
 			&i.Email,
 			&i.Password,
