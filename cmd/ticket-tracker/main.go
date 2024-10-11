@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/server/companies"
 	"github.com/barturba/ticket-tracker/internal/server/incidents"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -115,13 +116,14 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 func NewServer2(logger *slog.Logger, config config, db *database.Queries) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(mux, logger, config, db)
+	addRoutesIncident(mux, logger, config, db)
+	addRoutesCompany(mux, logger, config, db)
 	var handler http.Handler = mux
 	// handler = someMiddleware(handler)
 	return handler
 }
 
-func addRoutes(mux *http.ServeMux, logger *slog.Logger, config config, db *database.Queries) {
+func addRoutesIncident(mux *http.ServeMux, logger *slog.Logger, config config, db *database.Queries) {
 	mux.Handle("GET /v1/incidents", incidents.Get(logger, db))
 	mux.Handle("GET /v1/incidents_latest", incidents.GetLatest(logger, db))
 	mux.Handle("GET /v1/incidents_filtered", incidents.GetFiltered(logger, db))
@@ -130,4 +132,15 @@ func addRoutes(mux *http.ServeMux, logger *slog.Logger, config config, db *datab
 	mux.Handle("POST /v1/incidents", incidents.Post(logger, db))
 	mux.Handle("PUT /v1/incidents/{id}", incidents.Put(logger, db))
 	mux.Handle("DELETE /v1/incidents/{id}", incidents.Delete(logger, db))
+}
+
+func addRoutesCompany(mux *http.ServeMux, logger *slog.Logger, config config, db *database.Queries) {
+	mux.Handle("GET /v1/companies", companies.Get(logger, db))
+	// mux.Handle("GET /v1/incidents_latest", incidents.GetLatest(logger, db))
+	// mux.Handle("GET /v1/incidents_filtered", incidents.GetFiltered(logger, db))
+	// mux.Handle("GET /v1/incidents_filtered_count", incidents.GetFilteredCount(logger, db))
+	// mux.Handle("GET /v1/incidents/{id}", incidents.GetByID(logger, db))
+	// mux.Handle("POST /v1/incidents", incidents.Post(logger, db))
+	// mux.Handle("PUT /v1/incidents/{id}", incidents.Put(logger, db))
+	// mux.Handle("DELETE /v1/incidents/{id}", incidents.Delete(logger, db))
 }
