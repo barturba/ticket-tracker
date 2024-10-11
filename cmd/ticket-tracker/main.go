@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/server/cis"
 	"github.com/barturba/ticket-tracker/internal/server/companies"
 	"github.com/barturba/ticket-tracker/internal/server/incidents"
 	"github.com/barturba/ticket-tracker/internal/server/users"
@@ -117,9 +118,10 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 func NewServer2(logger *slog.Logger, config config, db *database.Queries) http.Handler {
 	mux := http.NewServeMux()
-	addRoutesUsers(mux, logger, config, db)
 	addRoutesIncidents(mux, logger, config, db)
 	addRoutesCompanies(mux, logger, config, db)
+	addRoutesUsers(mux, logger, config, db)
+	addRoutesConfigurationItems(mux, logger, config, db)
 	var handler http.Handler = mux
 	// handler = someMiddleware(handler)
 	return handler
@@ -165,4 +167,18 @@ func addRoutesUsers(
 	mux.Handle("GET /v1/users_latest", users.GetLatest(logger, db))
 	mux.Handle("PUT /v1/users/{id}", users.Put(logger, db))
 	mux.Handle("DELETE /v1/users/{id}", users.Delete(logger, db))
+}
+
+func addRoutesConfigurationItems(
+	mux *http.ServeMux,
+	logger *slog.Logger,
+	config config,
+	db *database.Queries) {
+	mux.Handle("GET /v1/cis", cis.Get(logger, db))
+	mux.Handle("POST /v1/cis", cis.Post(logger, db))
+	mux.Handle("GET /v1/cis/{id}", cis.GetByID(logger, db))
+	mux.Handle("GET /v1/cis_count", cis.GetCount(logger, db))
+	mux.Handle("GET /v1/cis_latest", cis.GetLatest(logger, db))
+	mux.Handle("PUT /v1/cis/{id}", cis.Put(logger, db))
+	mux.Handle("DELETE /v1/cis/{id}", cis.Delete(logger, db))
 }
