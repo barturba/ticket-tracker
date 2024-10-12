@@ -27,28 +27,8 @@ export async function authenticate(
 
 // Incidents
 
-export async function fetchIncidents() {
-  try {
-    const data = await fetch(`http://localhost:8080/v1/incidents`, {
-      method: "GET",
-    });
-
-    if (data.ok) {
-      const incidents = await data.json();
-      if (incidents) {
-        return incidents;
-      }
-    }
-  } catch (error) {
-    throw new Error(`Failed to fetch incidents. ${error}`);
-  }
-}
-
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredIncidents(
-  query: string,
-  currentPage: number
-) {
+export async function fetchIncidents(query: string, currentPage: number) {
   try {
     const url = new URL(`http://localhost:8080/v1/incidents`);
     const searchParams = url.searchParams;
@@ -70,10 +50,11 @@ export async function fetchFilteredIncidents(
       return [];
     }
   } catch (error) {
-    console.log(`fetchFilteredIncidents error: ${error}`);
+    console.log(`fetchIncidents error: ${error}`);
     throw new Error("Failed to fetch incidents.");
   }
 }
+
 export async function fetchIncidentsPages(query: string) {
   try {
     const url = new URL(`http://localhost:8080/v1/incidents_count`);
@@ -94,6 +75,66 @@ export async function fetchIncidentsPages(query: string) {
   } catch (error) {
     console.log(`fetchIncidentsPages error: ${error}`);
     throw new Error("Failed to fetch incidents pages.");
+  }
+}
+
+export async function fetchUsers() {
+  try {
+    const url = new URL(`http://localhost:8080/v1/users`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("sort", "last_name");
+    searchParams.set("page", "1");
+    searchParams.set("page_size", "100");
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const users = await data.json();
+      if (users) {
+        return users;
+      } else {
+        return [];
+      }
+    }
+  } catch (error) {
+    console.log(`fetchUsers error: ${error}`);
+    throw new Error("Failed to fetch users data.");
+  }
+}
+
+export async function fetchCIs() {
+  try {
+    const url = new URL(`http://localhost:8080/v1/cis`);
+    const searchParams = url.searchParams;
+    searchParams.set("sort", "name");
+    searchParams.set("page", "1");
+    searchParams.set("page_size", "100");
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const configurationItems = await data.json();
+      if (configurationItems) {
+        console.log(
+          `fetchCIs configurationItems: ${JSON.stringify(
+            configurationItems,
+            null,
+            2
+          )}`
+        );
+        return configurationItems;
+      } else {
+        return [];
+      }
+    }
+  } catch (error) {
+    console.log(`fetchCIs error: ${error}`);
+    throw new Error("Failed to fetch configuration items data.");
   }
 }
 
@@ -249,52 +290,6 @@ export async function deleteCompany(id: string) {
     return {
       message: "Database Error: Failed to Delete Company.",
     };
-  }
-}
-export async function fetchUsers() {
-  try {
-    const url = new URL(`http://localhost:8080/v1/users`);
-
-    const searchParams = url.searchParams;
-    searchParams.set("page", "1");
-    searchParams.set("page_size", "100");
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const users = await data.json();
-      if (users) {
-        return users;
-      } else {
-        return [];
-      }
-    }
-  } catch (error) {
-    console.log(`fetchUsers error: ${error}`);
-    throw new Error("Failed to fetch users data.");
-  }
-}
-export async function fetchConfigurationItems() {
-  try {
-    const url = new URL(`http://localhost:8080/v1/cis`);
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const configurationItems = await data.json();
-      if (configurationItems) {
-        return configurationItems;
-      } else {
-        return [];
-      }
-    }
-  } catch (error) {
-    console.log(`fetchConfigurationItems error: ${error}`);
-    throw new Error("Failed to fetch configuration items data.");
   }
 }
 
@@ -484,43 +479,6 @@ export async function fetchLatestIncidents() {
     throw new Error("Failed to fetch incidents.");
   }
 }
-export async function fetchUsersByCompany(id: string) {
-  const url = new URL(`http://localhost:8080/v1/users`);
-
-  const searchParams = url.searchParams;
-  searchParams.set("page", "1");
-  searchParams.set("page_size", "100");
-  try {
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const users = await data.json();
-      console.log(
-        `fetchUsersByCompany got the following data: ${JSON.stringify(
-          users,
-          null,
-          2
-        )}`
-      );
-      if (users) {
-        return users;
-      } else {
-        return "";
-      }
-    } else {
-      console.log(`data not ok: ${JSON.stringify(data, null, 2)}`);
-      return "";
-    }
-  } catch (error) {
-    console.log(`fetchUsersByCompany error: ${error}`);
-    throw new Error("Failed to fetch users data.");
-  }
-}
-
 const FormSchemaCompany = z.object({
   id: z.string(),
   name: z.string({

@@ -52,24 +52,24 @@ export default function EditForm({
     updateIncidentWithId,
     initialState
   );
-  const [users, setUsers] = useState(initialUsers);
-  const [selectedCompany, setSelectedCompany] = useState(incident.company_id);
+  const [users] = useState(initialUsers);
+  const [setSelectedCompany] = useState(incident.company_id);
 
-  const handleChange = (event) => {
-    setSelectedCompany(event.target.value);
-  };
+  // const handleChange = (event) => {
+  //   setSelectedCompany(event.target.value);
+  // };
 
-  useEffect(() => {
-    console.log(`selectedCompany: ${selectedCompany}`);
-    const fetchData = async () => {
-      const data = await fetchUsersByCompany(selectedCompany);
-      // console.log(`data.length: ${data.length}`);
-      setUsers(data);
-    };
-    fetchData()
-      // make sure to catch any error
-      .catch(console.error);
-  }, [selectedCompany]);
+  // useEffect(() => {
+  //   console.log(`selectedCompany: ${selectedCompany}`);
+  //   const fetchData = async () => {
+  //     const data = await fetchUsersByCompany(selectedCompany);
+  //     // console.log(`data.length: ${data.length}`);
+  //     setUsers(data);
+  //   };
+  //   fetchData()
+  //     // make sure to catch any error
+  //     .catch(console.error);
+  // }, [selectedCompany]);
 
   // TODO [ ]: Get users and configuration items for selected company
 
@@ -89,7 +89,7 @@ export default function EditForm({
   //   };
   //   fetchData();
   // }, []);
-  console.log(`got incident: ${JSON.stringify(incident)}`);
+  // console.log(`got incident: ${JSON.stringify(incident)}`);
 
   return (
     <form action={formAction}>
@@ -107,7 +107,6 @@ export default function EditForm({
               // defaultValue={incident.company_id}
               // defaultValue={selectedCompany}
               aria-describedby="company-error"
-              onChange={handleChange}
             >
               <option value="" disabled>
                 Select a company

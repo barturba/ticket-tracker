@@ -1,4 +1,5 @@
 import {
+  fetchCIs,
   fetchCompanies,
   fetchConfigurationItems,
   fetchIncidentById,
@@ -20,17 +21,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     fetchIncidentById(id),
     fetchUsers(),
     fetchCompanies(),
-    fetchConfigurationItems(),
+    fetchCIs(),
   ]);
-  console.log(
-    `dashboard/incidents/[id]/edit/incident: ${JSON.stringify(
-      incident,
-      null,
-      2
-    )}`
-  );
   if (!incident) {
-    console.log(`calling notFound`);
     notFound();
   }
   return (

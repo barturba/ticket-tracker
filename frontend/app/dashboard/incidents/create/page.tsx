@@ -1,4 +1,5 @@
 import {
+  fetchCIs,
   fetchCompanies,
   fetchConfigurationItems,
   fetchUsers,
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const companies = await fetchCompanies();
   const users = await fetchUsers();
-  const configurationItems = await fetchConfigurationItems();
+  const configurationItems = await fetchCIs();
   return (
     <main>
       <Breadcrumbs

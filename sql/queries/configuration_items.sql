@@ -6,7 +6,16 @@ RETURNING *;
 -- name: GetConfigurationItems :many
 SELECT * FROM configuration_items 
 WHERE (name ILIKE '%' || @query || '%' or @query is NULL)
-ORDER BY configuration_items.updated_at DESC
+ORDER BY
+CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'ASC') THEN id END ASC,
+CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'DESC') THEN id END DESC,
+CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'ASC') THEN created_at END ASC,
+CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'DESC') THEN created_at END DESC,
+CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'ASC') THEN updated_at END ASC,
+CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'DESC') THEN updated_at END DESC,
+CASE WHEN (@order_by::varchar = 'name' AND @order_dir::varchar = 'ASC') THEN name END ASC,
+CASE WHEN (@order_by::varchar = 'name' AND @order_dir::varchar = 'DESC') THEN name END DESC,
+id ASC 
 LIMIT $1 OFFSET $2;
 
 -- name: GetConfigurationItemsCount :one

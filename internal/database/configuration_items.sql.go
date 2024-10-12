@@ -68,18 +68,35 @@ func (q *Queries) DeleteConfigurationItems(ctx context.Context, id uuid.UUID) (C
 const getConfigurationItems = `-- name: GetConfigurationItems :many
 SELECT id, created_at, updated_at, name, company_id FROM configuration_items 
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
-ORDER BY configuration_items.updated_at DESC
+ORDER BY
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'ASC') THEN id END ASC,
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'DESC') THEN id END DESC,
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'ASC') THEN created_at END ASC,
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'DESC') THEN created_at END DESC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'ASC') THEN updated_at END ASC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'DESC') THEN updated_at END DESC,
+CASE WHEN ($4::varchar = 'name' AND $5::varchar = 'ASC') THEN name END ASC,
+CASE WHEN ($4::varchar = 'name' AND $5::varchar = 'DESC') THEN name END DESC,
+id ASC 
 LIMIT $1 OFFSET $2
 `
 
 type GetConfigurationItemsParams struct {
-	Limit  int32
-	Offset int32
-	Query  sql.NullString
+	Limit    int32
+	Offset   int32
+	Query    sql.NullString
+	OrderBy  string
+	OrderDir string
 }
 
 func (q *Queries) GetConfigurationItems(ctx context.Context, arg GetConfigurationItemsParams) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getConfigurationItems, arg.Limit, arg.Offset, arg.Query)
+	rows, err := q.db.QueryContext(ctx, getConfigurationItems,
+		arg.Limit,
+		arg.Offset,
+		arg.Query,
+		arg.OrderBy,
+		arg.OrderDir,
+	)
 	if err != nil {
 		return nil, err
 	}

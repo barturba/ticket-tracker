@@ -3,6 +3,7 @@ package incidents
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -61,6 +62,7 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offse
 	}
 	rows, err := db.GetIncidents(r.Context(), p)
 	if err != nil {
+		log.Printf("ERROR >>>>> ", err)
 		return nil, errors.New("couldn't find incidents")
 	}
 	incidents := convertRowMany(rows)

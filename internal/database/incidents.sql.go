@@ -156,17 +156,32 @@ const getIncidents = `-- name: GetIncidents :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $3 || '%' or $3 is NULL)
-OR (description ILIKE '%' || $3 || '%' or $3 is NULL)
+WHERE (incidents.short_description ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (incidents.description ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (incidents.id::text ILIKE '%' || $3 || '%' or $3 is NULL)
-ORDER BY incidents.updated_at DESC
+ORDER BY
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'ASC') THEN incidents.created_at END ASC,
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'DESC') THEN incidents.created_at END DESC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'ASC') THEN incidents.updated_at END ASC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'DESC') THEN incidents.updated_at END DESC,
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'ASC') THEN incidents.id END ASC,
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'DESC') THEN incidents.id END DESC,
+CASE WHEN ($4::varchar = 'short_description' AND $5::varchar = 'ASC') THEN incidents.short_description END ASC,
+CASE WHEN ($4::varchar = 'short_description' AND $5::varchar = 'DESC') THEN incidents.short_description END DESC,
+CASE WHEN ($4::varchar = 'description' AND $5::varchar = 'ASC') THEN incidents.description END ASC,
+CASE WHEN ($4::varchar = 'description' AND $5::varchar = 'DESC') THEN incidents.description END DESC,
+CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'ASC') THEN first_name END ASC,
+CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'DESC') THEN first_name END DESC,
+incidents.id ASC 
 LIMIT $1 OFFSET $2
 `
 
 type GetIncidentsParams struct {
-	Limit  int32
-	Offset int32
-	Query  sql.NullString
+	Limit    int32
+	Offset   int32
+	Query    sql.NullString
+	OrderBy  string
+	OrderDir string
 }
 
 type GetIncidentsRow struct {
@@ -190,7 +205,13 @@ type GetIncidentsRow struct {
 }
 
 func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]GetIncidentsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidents, arg.Limit, arg.Offset, arg.Query)
+	rows, err := q.db.QueryContext(ctx, getIncidents,
+		arg.Limit,
+		arg.Offset,
+		arg.Query,
+		arg.OrderBy,
+		arg.OrderDir,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -231,6 +252,7 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 }
 
 const getIncidentsCount = `-- name: GetIncidentsCount :one
+
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -239,6 +261,27 @@ OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
 OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
+// SELECT * FROM incidents
+// LEFT JOIN users
+// ON incidents.assigned_to = users.id
+// WHERE (incidents.short_description ILIKE '%' || @query || '%' or @query is NULL)
+// OR (incidents.description ILIKE '%' || @query || '%' or @query is NULL)
+// OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL)
+// ORDER BY
+// CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'ASC') THEN incidents.created_at END ASC,
+// CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'DESC') THEN incidents.created_at END DESC,
+// CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'ASC') THEN incidents.updated_at END ASC,
+// CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'DESC') THEN incidents.updated_at END DESC,
+// CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'ASC') THEN incidents.id END ASC,
+// CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'DESC') THEN incidents. id END DESC,
+// CASE WHEN (@order_by::varchar = 'short_description' AND @order_dir::varchar = 'ASC') THEN incidents.short_description END ASC,
+// CASE WHEN (@order_by::varchar = 'short_description' AND @order_dir::varchar = 'DESC') THEN incidents.short_description END DESC,
+// CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'ASC') THEN incidents.description END ASC,
+// CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'DESC') THEN incidents.description END DESC,
+// CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'ASC') THEN first_name END ASC,
+// CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') THEN first_name END DESC,
+// id ASC
+// LIMIT $1 OFFSET $2;
 func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getIncidentsCount, query)
 	var count int64
