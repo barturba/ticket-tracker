@@ -1,7 +1,7 @@
 import { lusitana } from "@/app/ui/fonts";
 import { Suspense } from "react";
-import { LatestIncidentsSkeleton } from "@/app/ui/skeletons";
 import LatestIncidents from "@/app/ui/dashboard/latest-incidents";
+import { LatestIncidentsSkeleton } from "@/app/ui/skeletons/incidents";
 
 export default async function Page() {
   return (

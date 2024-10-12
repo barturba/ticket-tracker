@@ -3,8 +3,6 @@ import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
 import { CompanyData } from "@/app/lib/definitions/companies";
 import { fetchCompanies } from "@/app/lib/actions/companies";
-import { fetchUsers } from "@/app/lib/actions/users";
-import { fetchCIs } from "@/app/lib/actions/cis";
 
 export const metadata: Metadata = {
   title: "Create Company",

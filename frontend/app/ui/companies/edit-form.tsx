@@ -1,11 +1,12 @@
 "use client";
-import { State, updateCompany } from "@/app/lib/actions";
+import { State } from "@/app/lib/actions";
 import Link from "next/link";
 import { Button } from "../button";
 import { useFormStatus } from "react-dom";
 import { useActionState } from "react";
-import { CompanyForm } from "@/app/lib/definitions";
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline";
+import { updateCompany } from "@/app/lib/actions/companies";
+import { CompanyForm } from "@/app/lib/definitions/companies";
 
 function SubmitButton() {
   const { pending } = useFormStatus();

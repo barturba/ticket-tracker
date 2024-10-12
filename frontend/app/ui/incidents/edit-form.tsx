@@ -14,10 +14,10 @@ import { Button } from "../button";
 import { useFormStatus } from "react-dom";
 import { useActionState, useState } from "react";
 import { updateIncident } from "@/app/lib/actions/incidents";
-import { CompaniesField } from "@/app/lib/definitions/companies";
 import { IncidentForm } from "@/app/lib/definitions/incidents";
-import { UsersField } from "@/app/lib/definitions/users";
-import { ConfigurationItemsField } from "@/app/lib/definitions/cis";
+import { CI } from "@/app/lib/definitions/cis";
+import { User } from "@/app/lib/definitions/users";
+import { Company } from "@/app/lib/definitions/companies";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -33,12 +33,12 @@ export default function EditForm({
   incident,
   initialUsers,
   companies,
-  configurationItems,
+  cis,
 }: {
   incident: IncidentForm;
-  companies: CompaniesField[];
-  initialUsers: UsersField[];
-  configurationItems: ConfigurationItemsField[];
+  initialUsers: User[];
+  companies: Company[];
+  cis: CI[];
 }) {
   const initialState: State = { message: null, errors: {} };
   const updateIncidentWithId = updateIncident.bind(null, incident.id);
@@ -145,7 +145,7 @@ export default function EditForm({
               </option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.first_name} {user.last_name}
+                  {`${user.first_name} ${user.last_name}`}
                 </option>
               ))}
             </select>
@@ -181,7 +181,7 @@ export default function EditForm({
               <option value="" disabled>
                 Select a configuration item
               </option>
-              {configurationItems.map((ci) => (
+              {cis.map((ci) => (
                 <option key={ci.id} value={ci.id}>
                   {ci.name}
                 </option>

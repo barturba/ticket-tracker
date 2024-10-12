@@ -1,4 +1,4 @@
-import { shimmer } from "@/app/ui/skeletons";
+import { shimmer, TableRowSkeleton } from "@/app/ui/skeletons";
 export function IncidentSkeleton() {
   return (
     <div className="flex flex-row items-center justify-between border-b border-gray-100 py-4">

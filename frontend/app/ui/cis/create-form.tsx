@@ -1,23 +1,21 @@
 "use client";
+import { State } from "@/app/lib/actions";
+import { createCI } from "@/app/lib/actions/cis";
+import { CIField } from "@/app/lib/definitions/cis";
+import { CompaniesField } from "@/app/lib/definitions/companies";
+import { UsersField } from "@/app/lib/definitions/users";
 import {
   BuildingOffice2Icon,
-  ChatBubbleLeftIcon,
   CheckIcon,
   ClockIcon,
   CpuChipIcon,
   DocumentIcon,
   PencilIcon,
-  PlayCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Button } from "../button";
 import { useFormState } from "react-dom";
-import { State } from "@/app/lib/actions";
-import { createCI } from "@/app/lib/actions/cis";
-import { CompaniesField } from "@/app/lib/definitions/companies";
-import { UsersField } from "@/app/lib/definitions/users";
-import { CIField } from "@/app/lib/definitions/cis";
+import { Button } from "../button";
 
 export default function Form({
   companies,

@@ -21,7 +21,7 @@ export default function Form() {
     <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="company" className="mb-2 block text-sm font-medium">
             Choose company
           </label>
@@ -53,9 +53,9 @@ export default function Form() {
                 </p>
               ))}
           </div>
-        </div>
+        </div> */}
 
-        {/* Assigned To Name */}
+        {/* Assigned To Name
         <div className="mb-4">
           <label
             htmlFor="assignedToId"
@@ -94,7 +94,7 @@ export default function Form() {
         </div>
 
         {/* Configuration Item Name */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label
             htmlFor="configurationItemId"
             className="mb-2 block text-sm font-medium"
@@ -129,10 +129,10 @@ export default function Form() {
                 </p>
               ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Short Description */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label
             htmlFor="short-description"
             className="mb-2 block text-sm font-medium"
@@ -165,10 +165,10 @@ export default function Form() {
                 </p>
               ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Description */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label
             htmlFor="description"
             className="mb-2 block text-sm font-medium"
@@ -201,10 +201,10 @@ export default function Form() {
                 </p>
               ))}
           </div>
-        </div>
+        </div> */}
 
         {/* User State */}
-        <fieldset>
+        {/* <fieldset>
           <legend className="mb-2 block text-sm font-medium">
             Set the user state
           </legend>
@@ -300,7 +300,7 @@ export default function Form() {
                 </p>
               ))}
           </div>
-        </fieldset>
+        </fieldset> */}
         <div aria-live="polite" aria-atomic="true">
           <div>
             {state.message ? (

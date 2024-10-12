@@ -1,4 +1,3 @@
-import CIStatus from "@/app/ui/cis/status";
 import { DeleteCI, UpdateCI } from "@/app/ui/cis/buttons";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 import { CI } from "@/app/lib/definitions/cis";
@@ -16,7 +15,7 @@ export default async function CITable({ cis }: { cis: CI[] }) {
                       <p>{ci.id}</p>
                     </div>
                   </div>
-                  <CIStatus status={ci.state} />
+                  {/* <CIStatus status={ci.state} /> */}
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <p className="text-xl font-medium">
@@ -65,16 +64,14 @@ export default async function CITable({ cis }: { cis: CI[] }) {
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {truncate(ci.short_description, true)}
+                    {truncate(ci.name, true)}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {ci.assigned_to_name}
-                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">{/* {ci.} */}</td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatDateToLocal(ci.updated_at)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    <CIStatus status={ci.state} />
+                    {/* <CIStatus status={ci.state} /> */}
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">

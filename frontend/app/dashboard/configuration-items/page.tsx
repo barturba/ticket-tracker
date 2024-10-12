@@ -1,15 +1,15 @@
 import { lusitana } from "@/app/ui/fonts";
-import { CreateCI } from "@/app/ui/cis/buttons";
 import Pagination from "@/app/ui/utils/pagination";
-import Table from "@/app/ui/cis/table";
 import Search from "@/app/ui/search";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { ConfigurationItemsTableSkeleton } from "@/app/ui/skeletons/cis";
 import { fetchCIs } from "@/app/lib/actions/cis";
+import { CIsTableSkeleton } from "@/app/ui/skeletons/cis";
+import Table from "@/app/ui/cis/table";
+import { CreateCI } from "@/app/ui/cis/buttons";
 
 export const metadata: Metadata = {
-  title: "ConfigurationItems",
+  title: "Configuration Items",
 };
 
 export default async function Page(props: {
@@ -30,17 +30,16 @@ export default async function Page(props: {
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>ConfigurationItems</h1>
+        <h1 className={`${lusitana.className} text-2xl`}>
+          Configuration Items
+        </h1>
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search cis..." />
         <CreateCI />
       </div>
-      <Suspense
-        key={query + currentPage}
-        fallback={<ConfigurationItemsTableSkeleton />}
-      >
+      <Suspense key={query + currentPage} fallback={<CIsTableSkeleton />}>
         <Table cis={cis} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">

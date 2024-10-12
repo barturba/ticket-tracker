@@ -1,33 +1,30 @@
 "use client";
-import { createIncident, State } from "@/app/lib/actions";
-import {
-  CompaniesField,
-  ConfigurationItemsField,
-  UsersField,
-} from "@/app/lib/definitions";
+import { State } from "@/app/lib/actions";
 import {
   BuildingOffice2Icon,
-  ChatBubbleLeftIcon,
   CheckIcon,
   ClockIcon,
   CpuChipIcon,
   DocumentIcon,
   PencilIcon,
-  PlayCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "../button";
 import { useFormState } from "react-dom";
+import { createIncident } from "@/app/lib/actions/incidents";
+import { User } from "@/app/lib/definitions/users";
+import { CI } from "@/app/lib/definitions/cis";
+import { Company } from "@/app/lib/definitions/companies";
 
 export default function Form({
   companies,
   users,
-  configurationItems,
+  cis,
 }: {
-  companies: CompaniesField[];
-  users: UsersField[];
-  configurationItems: ConfigurationItemsField[];
+  companies: Company[];
+  users: User[];
+  cis: CI[];
 }) {
   const initialState: State = { message: null, errors: {} };
   const [state, formAction] = useFormState(createIncident, initialState);
@@ -51,11 +48,12 @@ export default function Form({
               <option value="" disabled>
                 Select a company
               </option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
+              {companies &&
+                companies?.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
             </select>
             <BuildingOffice2Icon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
@@ -91,7 +89,7 @@ export default function Form({
               </option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.name}
+                  {user.first_name}
                 </option>
               ))}
             </select>
@@ -127,7 +125,7 @@ export default function Form({
               <option value="" disabled>
                 Select a configuration item
               </option>
-              {configurationItems.map((ci) => (
+              {cis.map((ci) => (
                 <option key={ci.id} value={ci.id}>
                   {ci.name}
                 </option>
