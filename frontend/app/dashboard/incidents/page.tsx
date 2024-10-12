@@ -1,4 +1,3 @@
-import { fetchIncidentsPages } from "@/app/lib/actions";
 import { lusitana } from "@/app/ui/fonts";
 import { CreateIncident } from "@/app/ui/incidents/buttons";
 import Pagination from "@/app/ui/utils/pagination";
@@ -7,6 +6,7 @@ import Search from "@/app/ui/search";
 import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { fetchIncidentsPages } from "@/app/lib/actions/incidents";
 
 export const metadata: Metadata = {
   title: "Incidents",

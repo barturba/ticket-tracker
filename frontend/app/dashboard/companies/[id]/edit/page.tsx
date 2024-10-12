@@ -1,4 +1,4 @@
-import { fetchCompanyById } from "@/app/lib/actions";
+import { fetchCompanyById } from "@/app/lib/actions/companies";
 import EditForm from "@/app/ui/companies/edit-form";
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import { Metadata } from "next";
