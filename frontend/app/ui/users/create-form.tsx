@@ -1,17 +1,9 @@
 "use client";
 import { State } from "@/app/lib/actions";
-import {
-  BuildingOffice2Icon,
-  CheckIcon,
-  ClockIcon,
-  CpuChipIcon,
-  DocumentIcon,
-  PencilIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "../button";
 import { useFormState } from "react-dom";
+import { createUser } from "@/app/lib/actions/users";
 
 export default function Form() {
   const initialState: State = { message: null, errors: {} };

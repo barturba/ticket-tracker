@@ -5,10 +5,10 @@ import { Button } from "../button";
 import { useFormStatus } from "react-dom";
 import { useActionState, useState } from "react";
 import { updateIncident } from "@/app/lib/actions/incidents";
-import { CompaniesField } from "@/app/lib/definitions/companies";
+import { Company } from "@/app/lib/definitions/companies";
 import { IncidentForm } from "@/app/lib/definitions/incidents";
-import { UsersField } from "@/app/lib/definitions/users";
-import { CIsField } from "@/app/lib/definitions/cis";
+import { User } from "@/app/lib/definitions/users";
+import { CI } from "@/app/lib/definitions/cis";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -27,9 +27,9 @@ export default function EditForm({
   cis,
 }: {
   incident: IncidentForm;
-  companies: CompaniesField[];
-  initialUsers: UsersField[];
-  cis: CIsField;
+  initialUsers: User[];
+  companies: Company[];
+  cis: CI[];
 }) {
   const initialState: State = { message: null, errors: {} };
   const updateIncidentWithId = updateIncident.bind(null, incident.id);

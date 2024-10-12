@@ -1,7 +1,7 @@
 "use client";
 import { State } from "@/app/lib/actions";
 import { createCI } from "@/app/lib/actions/cis";
-import { CIField } from "@/app/lib/definitions/cis";
+import { CIsField } from "@/app/lib/definitions/cis";
 import { CompaniesField } from "@/app/lib/definitions/companies";
 import { UsersField } from "@/app/lib/definitions/users";
 import {
@@ -24,7 +24,7 @@ export default function Form({
 }: {
   companies: CompaniesField[];
   users: UsersField[];
-  configurationItems: CIField[];
+  configurationItems: CIsField[];
 }) {
   const initialState: State = { message: null, errors: {} };
   const [state, formAction] = useFormState(createCI, initialState);

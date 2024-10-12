@@ -21,7 +21,7 @@ export const Links = [
   { name: "Users", href: "/dashboard/users", icon: UserGroupIcon },
   {
     name: "Configuration Items",
-    href: "/dashboard/configuration-items",
+    href: "/dashboard/cis",
     icon: CpuChipIcon,
   },
 ];

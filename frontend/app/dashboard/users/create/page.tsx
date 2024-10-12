@@ -1,36 +1,34 @@
-import {
-  fetchCompanies,
-  fetchConfigurationItems,
-  fetchUsers,
-} from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
-import Form from "@/app/ui/incidents/create-form";
+import Form from "@/app/ui/users/create-form";
 import { Metadata } from "next";
+import { fetchCompanies } from "@/app/lib/actions/companies";
+import { fetchUsers } from "@/app/lib/actions/users";
+import { fetchCIs } from "@/app/lib/actions/cis";
 
 export const metadata: Metadata = {
-  title: "Create Incident",
+  title: "Create User",
 };
 
 export default async function Page() {
-  const companies = await fetchCompanies();
-  const users = await fetchUsers();
-  const configurationItems = await fetchConfigurationItems();
+  const companiesData = await fetchCompanies("", 1);
+  const usersData = await fetchUsers("", 1);
+  const cisData = await fetchCIs("", 1);
   return (
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Incidents", href: "/dashboard/incidents" },
+          { label: "Users", href: "/dashboard/users" },
           {
-            label: "Create Incident",
-            href: "/dashboard/incidents/create",
+            label: "Create User",
+            href: "/dashboard/users/create",
             active: true,
           },
         ]}
       />
       <Form
-        companies={companies}
-        users={users}
-        configurationItems={configurationItems}
+      // companies={companiesData.companies}
+      // users={usersData.users}
+      // cis={cisData.cis}
       />
     </main>
   );
