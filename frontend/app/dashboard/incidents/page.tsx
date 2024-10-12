@@ -3,11 +3,11 @@ import { CreateIncident } from "@/app/ui/incidents/buttons";
 import Pagination from "@/app/ui/utils/pagination";
 import Table from "@/app/ui/incidents/table";
 import Search from "@/app/ui/search";
-import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { fetchIncidents } from "@/app/lib/actions/incidents";
 import { IncidentData } from "@/app/lib/definitions/incidents";
+import { IncidentsTableSkeleton } from "@/app/ui/skeletons/incidents";
 
 export const metadata: Metadata = {
   title: "Incidents",

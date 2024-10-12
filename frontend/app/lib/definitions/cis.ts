@@ -1,6 +1,6 @@
 import { Metadata } from "@/app/lib/definitions";
 
-export type ConfigurationItem = {
+export type CI = {
   id: string;
   created_at: string;
   updated_at: string;
@@ -14,19 +14,19 @@ export type ConfigurationItem = {
   assigned_to_name: string;
 };
 
-export type ConfigurationItemData = {
-  incidents: ConfigurationItem[];
+export type CIData = {
+  cis: CI[];
   metadata: Metadata;
 };
 
-export type ConfigurationItemsField = {
+export type CIField = {
   id: string;
   created_at: string;
   updated_at: string;
   name: string;
 };
 
-export type ConfigurationItemForm = {
+export type CIForm = {
   id: string;
   short_description: string;
   description: string;

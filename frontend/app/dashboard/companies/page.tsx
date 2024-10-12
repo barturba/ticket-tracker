@@ -3,11 +3,11 @@ import Table from "@/app/ui/companies/table";
 import { lusitana } from "@/app/ui/fonts";
 import Pagination from "@/app/ui/utils/pagination";
 import Search from "@/app/ui/search";
-import { CompaniesTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { fetchCompanies } from "@/app/lib/actions/companies";
 import { CompanyData } from "@/app/lib/definitions/companies";
+import { CompaniesTableSkeleton } from "@/app/ui/skeletons/companies";
 
 export const metadata: Metadata = {
   title: "Companies",

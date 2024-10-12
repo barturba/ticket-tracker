@@ -3,11 +3,11 @@ import { CreateUser } from "@/app/ui/users/buttons";
 import Pagination from "@/app/ui/utils/pagination";
 import Table from "@/app/ui/users/table";
 import Search from "@/app/ui/search";
-import { UsersTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { fetchUsers } from "@/app/lib/actions/users";
 import { UserData } from "@/app/lib/definitions/users";
+import { UsersTableSkeleton } from "@/app/ui/skeletons/users";
 
 export const metadata: Metadata = {
   title: "Users",
