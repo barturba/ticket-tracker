@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -27,6 +28,22 @@ func (f Filters) Limit() int {
 
 func (f Filters) Offset() int {
 	return (f.Page - 1) * f.PageSize
+}
+
+func (f Filters) SortColumn() string {
+	for _, safeValue := range f.SortSafelist {
+		if f.Sort == safeValue {
+			return strings.TrimPrefix(f.Sort, "-")
+		}
+	}
+	panic("unsafe sort parameter: " + f.Sort)
+}
+
+func (f Filters) SortDirection() string {
+	if strings.HasPrefix(f.Sort, "-") {
+		return "DESC"
+	}
+	return "ASC"
 }
 
 func ReadInt(qs url.Values, key string, defaultValue int, v *validator.Validator) int {

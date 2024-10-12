@@ -152,7 +152,7 @@ export default function EditForm({
               </option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {user.name}
+                  {user.first_name} {user.last_name}
                 </option>
               ))}
             </select>

@@ -7,7 +7,16 @@ RETURNING *;
 SELECT * FROM users 
 WHERE (first_name ILIKE '%' || @query || '%' or @query is NULL)
 OR (last_name ILIKE '%' || @query || '%' or @query is NULL)
-ORDER BY users.updated_at DESC
+ORDER BY
+CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'ASC') THEN created_at END ASC,
+CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'DESC') THEN created_at END DESC,
+CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'ASC') THEN id END ASC,
+CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'DESC') THEN id END DESC,
+CASE WHEN (@order_by::varchar = 'last_name' AND @order_dir::varchar = 'ASC') THEN last_name END ASC,
+CASE WHEN (@order_by::varchar = 'last_name' AND @order_dir::varchar = 'DESC') THEN last_name END DESC,
+CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'ASC') THEN first_name END ASC,
+CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') THEN first_name END DESC,
+id ASC 
 LIMIT $1 OFFSET $2;
 
 -- name: GetUsersCount :one

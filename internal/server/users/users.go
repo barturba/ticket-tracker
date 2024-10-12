@@ -3,6 +3,7 @@ package users
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -37,14 +38,19 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input.Filters.SortSafelist = []string{
+			"id", "-id",
+			"created_at", "-created_at",
+			"-last_name", "last_name",
+			"-first_name", "first_name",
+		}
 
 		if data.ValidateFilters(v, input.Filters); !v.Valid() {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset(), input.SortColumn(), input.SortDirection())
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
@@ -54,11 +60,15 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.User, error) {
+func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int, sortColumn, sortDirection string) ([]data.User, error) {
+	fmt.Printf("sorting by %s\n", sortColumn)
+	fmt.Printf("sorting dir %s\n", sortDirection)
 	p := database.GetUsersParams{
-		Query:  sql.NullString{String: query, Valid: query != ""},
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Query:    sql.NullString{String: query, Valid: query != ""},
+		Limit:    int32(limit),
+		Offset:   int32(offset),
+		OrderBy:  sortColumn,
+		OrderDir: sortDirection,
 	}
 	rows, err := db.GetUsers(r.Context(), p)
 	if err != nil {

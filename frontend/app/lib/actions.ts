@@ -254,6 +254,10 @@ export async function deleteCompany(id: string) {
 export async function fetchUsers() {
   try {
     const url = new URL(`http://localhost:8080/v1/users`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("page", "1");
+    searchParams.set("page_size", "100");
     const data = await fetch(url.toString(), {
       method: "GET",
     });
@@ -481,10 +485,11 @@ export async function fetchLatestIncidents() {
   }
 }
 export async function fetchUsersByCompany(id: string) {
-  const url = new URL(`http://localhost:8080/v1/users_by_company`);
+  const url = new URL(`http://localhost:8080/v1/users`);
 
   const searchParams = url.searchParams;
-  searchParams.set("id", id);
+  searchParams.set("page", "1");
+  searchParams.set("page_size", "100");
   try {
     const data = await fetch(url.toString(), {
       method: "GET",
@@ -494,7 +499,13 @@ export async function fetchUsersByCompany(id: string) {
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const users = await data.json();
-      // console.log(`got the following data: ${JSON.stringify(users, null, 2)}`);
+      console.log(
+        `fetchUsersByCompany got the following data: ${JSON.stringify(
+          users,
+          null,
+          2
+        )}`
+      );
       if (users) {
         return users;
       } else {

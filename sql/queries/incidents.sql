@@ -34,34 +34,6 @@ ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: GetIncidentsAsc :many
-SELECT * FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-ORDER BY $1 ASC, id ASC;
-
--- name: GetIncidentsDesc :many
-SELECT * FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-ORDER BY $1 DESC, id ASC;
-
--- name: GetIncidentsBySearchTerm :many
-SELECT * FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE short_description like $1
-ORDER BY incidents.updated_at DESC;
-
--- name: GetIncidentsBySearchTermLimitOffset :many
-SELECT *, count(*) OVER() AS full_count 
-FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE short_description like $1 or short_description is NULL
-ORDER BY incidents.updated_at DESC
-LIMIT $2 OFFSET $3;
-
 -- name: GetIncidentByID :one
 SELECT * FROM incidents WHERE id = $1;
 
