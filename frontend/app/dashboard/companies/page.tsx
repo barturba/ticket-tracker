@@ -1,4 +1,4 @@
-import { fetchCompaniesPages } from "@/app/lib/actions";
+import { fetchCompanies } from "@/app/lib/actions";
 import { CreateCompany } from "@/app/ui/companies/buttons";
 import Table from "@/app/ui/companies/table";
 import { lusitana } from "@/app/ui/fonts";
@@ -7,6 +7,7 @@ import Search from "@/app/ui/search";
 import { CompaniesTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { CompanyData } from "@/app/lib/definitions";
 
 export const metadata: Metadata = {
   title: "Companies",
@@ -22,7 +23,8 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchCompaniesPages(query);
+  const companydata: CompanyData = await fetchCompanies(query, currentPage);
+  const totalPages = companydata.metadata.last_page;
 
   return (
     <div className="w-full">

@@ -5,6 +5,7 @@ import { AuthError } from "next-auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { CompanyData, Metadata } from "@/app/lib/definitions";
 
 export async function authenticate(
   prevState: string | undefined,
@@ -198,7 +199,10 @@ export type State = {
 
 // Companies
 
-export async function fetchCompanies() {
+export async function fetchCompanies(
+  query: string,
+  currentPage: number
+): Promise<CompanyData> {
   try {
     const url = new URL(`http://localhost:8080/v1/companies`);
     const data = await fetch(url.toString(), {
@@ -207,12 +211,17 @@ export async function fetchCompanies() {
     // Simulate slow load
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const companies = await data.json();
-      if (companies) {
-        return companies;
+      const companyData: CompanyData = await data.json();
+      if (companyData) {
+        return {
+          companies: companyData.companies,
+          metadata: companyData.metadata,
+        };
       } else {
-        return [];
+        return { companies: [], metadata: {} as Metadata };
       }
+    } else {
+      return { companies: [], metadata: {} as Metadata };
     }
   } catch (error) {
     console.log(`fetchCompanies error: ${error}`);
@@ -241,47 +250,47 @@ export async function fetchCompaniesPages(query: string) {
     throw new Error("Failed to fetch companies pages.");
   }
 }
-export async function fetchFilteredCompanies(
-  query: string,
-  currentPage: number
-) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  try {
-    const url = new URL(`http://localhost:8080/v1/companies`);
-    const searchParams = url.searchParams;
-    searchParams.set("query", query);
-    searchParams.set("limit", ITEMS_PER_PAGE.toString());
-    searchParams.set("offset", offset.toString());
+// export async function fetchFilteredCompanies(
+//   query: string,
+//   currentPage: number
+// ) {
+//   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+//   try {
+//     const url = new URL(`http://localhost:8080/v1/companies`);
+//     const searchParams = url.searchParams;
+//     searchParams.set("query", query);
+//     searchParams.set("limit", ITEMS_PER_PAGE.toString());
+//     searchParams.set("offset", offset.toString());
 
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const companies = await data.json();
-      if (companies) {
-        console.log(
-          `fetchFilteredCompanies data received: ${JSON.stringify(
-            companies.length,
-            null,
-            2
-          )}`
-        );
-        return companies;
-      } else {
-        console.log(`fetchFilteredCompanies data not received`);
-        return [];
-      }
-    } else {
-      console.log(`fetchFilteredCompanies data not ok`);
-      return [];
-    }
-  } catch (error) {
-    console.log(`fetchFilteredCompanies error: ${error}`);
-    throw new Error("Failed to fetch companies.");
-  }
-}
+//     const data = await fetch(url.toString(), {
+//       method: "GET",
+//     });
+//     // Simulate slow load
+//     // await new Promise((resolve) => setTimeout(resolve, 1000));
+//     if (data.ok) {
+//       const companies = await data.json();
+//       if (companies) {
+//         console.log(
+//           `fetchFilteredCompanies data received: ${JSON.stringify(
+//             companies.length,
+//             null,
+//             2
+//           )}`
+//         );
+//         return companies;
+//       } else {
+//         console.log(`fetchFilteredCompanies data not received`);
+//         return [];
+//       }
+//     } else {
+//       console.log(`fetchFilteredCompanies data not ok`);
+//       return [];
+//     }
+//   } catch (error) {
+//     console.log(`fetchFilteredCompanies error: ${error}`);
+//     throw new Error("Failed to fetch companies.");
+//   }
+// }
 export async function deleteCompany(id: string) {
   // Prepare data for sending to the API.
   try {

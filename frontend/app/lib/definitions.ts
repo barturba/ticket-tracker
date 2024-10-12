@@ -45,11 +45,28 @@ export type Incident = {
   assigned_to_name: string;
 };
 
+// Metadata
+
+export type Metadata = {
+  current_page: number;
+  page_size: number;
+  first_page: number;
+  last_page: number;
+  total_records: number;
+};
+
+// Company
+
 export type Company = {
   id: string;
   created_at: string;
   updated_at: string;
   name: string;
+};
+
+export type CompanyData = {
+  companies: Company[];
+  metadata: Metadata;
 };
 
 export type CompaniesField = {

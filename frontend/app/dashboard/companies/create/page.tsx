@@ -1,8 +1,4 @@
-import {
-  fetchCompanies,
-  fetchConfigurationItems,
-  fetchUsers,
-} from "@/app/lib/actions";
+import { fetchCompanies, fetchCIs, fetchUsers } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
@@ -12,9 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const companies = await fetchCompanies();
+  const companydata = await fetchCompanies();
   const users = await fetchUsers();
-  const configurationItems = await fetchConfigurationItems();
+  const configurationItems = await fetchCIs();
   return (
     <main>
       <Breadcrumbs
@@ -28,7 +24,7 @@ export default async function Page() {
         ]}
       />
       <Form
-        companies={companies}
+        companies={companydata.companies}
         users={users}
         configurationItems={configurationItems}
       />
