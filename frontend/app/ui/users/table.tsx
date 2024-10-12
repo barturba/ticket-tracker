@@ -1,6 +1,4 @@
-import UserStatus from "@/app/ui/users/status";
 import { DeleteUser, UpdateUser } from "@/app/ui/users/buttons";
-import { formatDateToLocal, truncate } from "@/app/lib/utils";
 import { User } from "@/app/lib/definitions/users";
 export default async function UserTable({ users }: { users: User[] }) {
   return (

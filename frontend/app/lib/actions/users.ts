@@ -16,7 +16,7 @@ export async function fetchUsers(
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
-    searchParams.set("sort", "name");
+    searchParams.set("sort", "-updated_at");
     searchParams.set("page", currentPage.toString());
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
@@ -38,12 +38,12 @@ export async function fetchUsers(
         throw new Error("Failed to fetch users data: !userData");
       }
     } else {
-      //   console.log(`fetchUsers url: ${url.toString()}`);
-      //   console.log(
-      //     `fetchUsers error: !data.ok ${data.status} ${JSON.stringify(
-      //       data.statusText
-      //     )}`
-      //   );
+      console.log(`fetchUsers url: ${url.toString()}`);
+      console.log(
+        `fetchUsers error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
       throw new Error("Failed to fetch users data: !data.ok");
     }
   } catch (error) {

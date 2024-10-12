@@ -37,6 +37,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Filters.SortSafelist = []string{
 			"id", "-id",
 			"created_at", "-created_at",
+			"updated_at", "-updated_at",
 			"-first_name", "first_name",
 			"-last_name", "last_name",
 		}
