@@ -53,29 +53,6 @@ export async function fetchIncidents(
   }
 }
 
-export async function fetchIncidentsPages(query: string) {
-  try {
-    const url = new URL(`http://localhost:8080/v1/incidents_count`);
-    const searchParams = url.searchParams;
-    searchParams.set("query", query);
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-    if (data.ok) {
-      const count = await data.json();
-      if (count > 0) {
-        const totalPages = Math.ceil(Number(count) / ITEMS_PER_PAGE);
-        return totalPages;
-      } else {
-        return 0;
-      }
-    }
-  } catch (error) {
-    console.log(`fetchIncidentsPages error: ${error}`);
-    throw new Error("Failed to fetch incidents pages.");
-  }
-}
-
 export async function fetchLatestIncidents() {
   try {
     console.log(`calling fetchLatestIncidents()`);

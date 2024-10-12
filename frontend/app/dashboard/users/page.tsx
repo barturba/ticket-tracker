@@ -1,12 +1,13 @@
-import { fetchIncidentsPages } from "@/app/lib/actions";
 import { lusitana } from "@/app/ui/fonts";
-import { CreateIncident } from "@/app/ui/incidents/buttons";
+import { CreateUser } from "@/app/ui/users/buttons";
 import Pagination from "@/app/ui/utils/pagination";
-import Table from "@/app/ui/incidents/table";
+import Table from "@/app/ui/users/table";
 import Search from "@/app/ui/search";
-import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
+import { UsersTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { fetchUsers } from "@/app/lib/actions/users";
+import { UserData } from "@/app/lib/definitions/users";
 
 export const metadata: Metadata = {
   title: "Users",
@@ -22,7 +23,10 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = (await fetchIncidentsPages(query)) ?? 0;
+  const userData: UserData = await fetchUsers(query, currentPage);
+
+  const totalPages = userData.metadata.last_page;
+  const users = userData.users;
 
   return (
     <div className="w-full">
@@ -32,10 +36,10 @@ export default async function Page(props: {
 
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search users..." />
-        <CreateIncident />
+        <CreateUser />
       </div>
-      <Suspense key={query + currentPage} fallback={<IncidentsTableSkeleton />}>
-        <Table query={query} currentPage={currentPage} />
+      <Suspense key={query + currentPage} fallback={<UsersTableSkeleton />}>
+        <Table users={users} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
