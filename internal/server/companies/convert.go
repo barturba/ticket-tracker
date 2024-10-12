@@ -40,7 +40,7 @@ func convertRowAndCount(row database.GetCompaniesRow, count *int64) data.Company
 		UpdatedAt: row.UpdatedAt,
 		Name:      row.Name,
 	}
-	count = &row.Count
+	*count = row.Count
 
 	return outputRow
 }
