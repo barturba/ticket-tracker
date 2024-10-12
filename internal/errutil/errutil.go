@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/data"
+	"github.com/barturba/ticket-tracker/internal/helpers"
 )
 
 func ErrorResponse(w http.ResponseWriter, r *http.Request, logger *slog.Logger, status int, message any) {
 	env := data.Envelope{"error": message}
 
-	err := data.WriteJSON(w, status, env, nil)
+	err := helpers.WriteJSON(w, status, env, nil)
 	if err != nil {
 		LogError(r, logger, err)
 		w.WriteHeader(500)

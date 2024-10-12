@@ -34,7 +34,10 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input.Filters.SortSafelist = []string{"id", "-id",
+			"created_at", "-created_at",
+			"updated_at", "-updated_at",
+			"name", "-name"}
 
 		if data.ValidateFilters(v, input.Filters); !v.Valid() {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)

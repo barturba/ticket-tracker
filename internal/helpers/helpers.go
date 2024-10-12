@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/google/uuid"
 )
 
@@ -44,6 +45,7 @@ func ReadUUIDPath(r http.Request) (uuid.UUID, error) {
 	}
 	return id, nil
 }
+
 func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
@@ -93,6 +95,25 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	if !errors.Is(err, io.EOF) {
 		return errors.New("body must only contain a single JSON value")
 	}
+
+	return nil
+}
+
+func WriteJSON(w http.ResponseWriter, status int, data data.Envelope, headers http.Header) error {
+	js, err := json.MarshalIndent(data, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	js = append(js, '\n')
+
+	for key, value := range headers {
+		w.Header()[key] = value
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(js)
 
 	return nil
 }

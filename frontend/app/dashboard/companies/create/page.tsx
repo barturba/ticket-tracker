@@ -1,8 +1,10 @@
-import { fetchCompanies, fetchCIs, fetchUsers } from "@/app/lib/actions";
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
-import { CompanyData } from "@/app/lib/definitions";
+import { CompanyData } from "@/app/lib/definitions/companies";
+import { fetchCompanies } from "@/app/lib/actions/companies";
+import { fetchUsers } from "@/app/lib/actions/users";
+import { fetchCIs } from "@/app/lib/actions/cis";
 
 export const metadata: Metadata = {
   title: "Create Company",
@@ -10,9 +12,6 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const companydata: CompanyData = await fetchCompanies("", 1);
-  const companies = companydata.companies;
-  const users = await fetchUsers();
-  const configurationItems = await fetchCIs();
   return (
     <main>
       <Breadcrumbs
@@ -25,11 +24,7 @@ export default async function Page() {
           },
         ]}
       />
-      <Form
-        companies={companies}
-        users={users}
-        configurationItems={configurationItems}
-      />
+      <Form />
     </main>
   );
 }
