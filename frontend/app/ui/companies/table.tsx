@@ -11,6 +11,7 @@ export default async function CompanyTable({
   currentPage: number;
 }) {
   const companies: Company[] = await fetchFilteredCompanies(query, currentPage);
+  console.log(`companies ${JSON.stringify(companies, null, 2)}`);
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">

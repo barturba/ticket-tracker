@@ -14,16 +14,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
-
-type config struct {
-	Host string
-	Port string
-	Env  string
-}
 
 func main() {
 	ctx := context.Background()
@@ -48,7 +43,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	}
 
 	// Create a config
-	var config config
+	var config data.Config
 
 	// Get the host name
 	host := os.Getenv("HOST")
@@ -113,7 +108,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	return nil
 }
 
-func NewServer(logger *slog.Logger, config config, db *database.Queries) http.Handler {
+func NewServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
 	mux := http.NewServeMux()
 	addRoutesIncidents(mux, logger, config, db)
 	addRoutesCompanies(mux, logger, config, db)

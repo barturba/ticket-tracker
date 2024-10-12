@@ -4,7 +4,7 @@ VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetCompanies :many
-SELECT * FROM companies
+SELECT count(*) OVER(), * FROM companies
 WHERE (name ILIKE '%' || @query || '%' or @query is NULL)
 ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2;

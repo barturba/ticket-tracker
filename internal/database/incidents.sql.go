@@ -252,7 +252,6 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 }
 
 const getIncidentsCount = `-- name: GetIncidentsCount :one
-
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -261,27 +260,6 @@ OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
 OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
 `
 
-// SELECT * FROM incidents
-// LEFT JOIN users
-// ON incidents.assigned_to = users.id
-// WHERE (incidents.short_description ILIKE '%' || @query || '%' or @query is NULL)
-// OR (incidents.description ILIKE '%' || @query || '%' or @query is NULL)
-// OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL)
-// ORDER BY
-// CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'ASC') THEN incidents.created_at END ASC,
-// CASE WHEN (@order_by::varchar = 'created_at' AND @order_dir::varchar = 'DESC') THEN incidents.created_at END DESC,
-// CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'ASC') THEN incidents.updated_at END ASC,
-// CASE WHEN (@order_by::varchar = 'updated_at' AND @order_dir::varchar = 'DESC') THEN incidents.updated_at END DESC,
-// CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'ASC') THEN incidents.id END ASC,
-// CASE WHEN (@order_by::varchar = 'id' AND @order_dir::varchar = 'DESC') THEN incidents. id END DESC,
-// CASE WHEN (@order_by::varchar = 'short_description' AND @order_dir::varchar = 'ASC') THEN incidents.short_description END ASC,
-// CASE WHEN (@order_by::varchar = 'short_description' AND @order_dir::varchar = 'DESC') THEN incidents.short_description END DESC,
-// CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'ASC') THEN incidents.description END ASC,
-// CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'DESC') THEN incidents.description END DESC,
-// CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'ASC') THEN first_name END ASC,
-// CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') THEN first_name END DESC,
-// id ASC
-// LIMIT $1 OFFSET $2;
 func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getIncidentsCount, query)
 	var count int64

@@ -152,8 +152,16 @@ func ValidateIncident(v *validator.Validator, incident *Incident) {
 // Companies
 type Company struct {
 	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Name      string    `json:"name"`
+}
+
+type CompanyRow struct {
+	Count     int64     `json:"count"`
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	Name      string    `json:"name"`
 }
 
@@ -204,4 +212,39 @@ func ValidateCI(v *validator.Validator, ci *CI) {
 	v.Check(ci.ID != uuid.UUID{}, "id", "must be provided")
 
 	v.Check(len(ci.Name) <= 50, "name", "must not be more than 50 bytes long")
+}
+
+// Config
+
+type Config struct {
+	Host     string
+	Port     string
+	Env      string
+	PageSize int
+}
+
+// Define a struct to keep track of page metadata
+type Metadata struct {
+	CurrentPage  int `json:"current_page,omitempty"`
+	PageSize     int `json:"page_size,omitempty"`
+	FirstPage    int `json:"first_page,omitempty"`
+	LastPage     int `json:"last_page,omitempty"`
+	TotalRecords int `json:"total_records,omitempty"`
+}
+
+// CalculateMetadata() calculates the pagination metadata values given the total
+// number of records, current page, and page size values.
+func CalculateMetadata(totalRecords, page, pageSize int) Metadata {
+	if totalRecords == 0 {
+		// Return an empty Metadata struct if there are no records
+		return Metadata{}
+	}
+
+	return Metadata{
+		CurrentPage:  page,
+		PageSize:     pageSize,
+		FirstPage:    1,
+		LastPage:     (totalRecords + pageSize - 1) / pageSize,
+		TotalRecords: totalRecords,
+	}
 }

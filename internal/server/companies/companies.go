@@ -33,7 +33,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Query = data.ReadString(qs, "query", "")
 
 		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{"id"}
@@ -43,28 +43,30 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		companies, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/companies")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"companies": companies, "metadata": metadata})
 	})
 }
 
-func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.Company, error) {
+func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.Company, data.Metadata, error) {
 	p := database.GetCompaniesParams{
 		Query:  sql.NullString{String: query, Valid: query != ""},
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:  int32(filters.Limit()),
+		Offset: int32(filters.Offset()),
 	}
 	rows, err := db.GetCompanies(r.Context(), p)
 	if err != nil {
-		return nil, errors.New("couldn't find companies")
+		return nil, data.Metadata{}, errors.New("couldn't find companies")
 	}
-	companies := convertMany(rows)
-	return companies, nil
+
+	companies, metadata := convertRowsAndMetadata(rows, filters)
+
+	return companies, metadata, nil
 }
 
 func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {

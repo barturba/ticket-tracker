@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/server/cis"
 	"github.com/barturba/ticket-tracker/internal/server/companies"
@@ -14,7 +15,7 @@ import (
 func addRoutesIncidents(
 	mux *http.ServeMux,
 	logger *slog.Logger,
-	config config,
+	config data.Config,
 	db *database.Queries) {
 	mux.Handle("GET /v1/incidents", incidents.Get(logger, db))
 	mux.Handle("POST /v1/incidents", incidents.Post(logger, db))
@@ -28,7 +29,7 @@ func addRoutesIncidents(
 func addRoutesCompanies(
 	mux *http.ServeMux,
 	logger *slog.Logger,
-	config config,
+	config data.Config,
 	db *database.Queries) {
 	mux.Handle("GET /v1/companies", companies.Get(logger, db))
 	mux.Handle("POST /v1/companies", companies.Post(logger, db))
@@ -42,7 +43,7 @@ func addRoutesCompanies(
 func addRoutesUsers(
 	mux *http.ServeMux,
 	logger *slog.Logger,
-	config config,
+	config data.Config,
 	db *database.Queries) {
 	mux.Handle("GET /v1/users", users.Get(logger, db))
 	mux.Handle("POST /v1/users", users.Post(logger, db))
@@ -56,7 +57,7 @@ func addRoutesUsers(
 func addRoutesConfigurationItems(
 	mux *http.ServeMux,
 	logger *slog.Logger,
-	config config,
+	config data.Config,
 	db *database.Queries) {
 	mux.Handle("GET /v1/cis", cis.Get(logger, db))
 	mux.Handle("POST /v1/cis", cis.Post(logger, db))

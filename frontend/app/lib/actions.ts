@@ -247,7 +247,7 @@ export async function fetchFilteredCompanies(
 ) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
   try {
-    const url = new URL(`http://localhost:8080/v1/filtered_companies`);
+    const url = new URL(`http://localhost:8080/v1/companies`);
     const searchParams = url.searchParams;
     searchParams.set("query", query);
     searchParams.set("limit", ITEMS_PER_PAGE.toString());
@@ -261,6 +261,13 @@ export async function fetchFilteredCompanies(
     if (data.ok) {
       const companies = await data.json();
       if (companies) {
+        console.log(
+          `fetchFilteredCompanies data received: ${JSON.stringify(
+            companies.length,
+            null,
+            2
+          )}`
+        );
         return companies;
       } else {
         console.log(`fetchFilteredCompanies data not received`);

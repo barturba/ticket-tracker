@@ -62,7 +62,7 @@ func (q *Queries) DeleteCompanyByID(ctx context.Context, id uuid.UUID) (Company,
 }
 
 const getCompanies = `-- name: GetCompanies :many
-SELECT id, created_at, updated_at, name FROM companies
+SELECT count(*) OVER(), id, created_at, updated_at, name FROM companies
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2
@@ -74,16 +74,25 @@ type GetCompaniesParams struct {
 	Query  sql.NullString
 }
 
-func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]Company, error) {
+type GetCompaniesRow struct {
+	Count     int64
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+}
+
+func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]GetCompaniesRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCompanies, arg.Limit, arg.Offset, arg.Query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Company
+	var items []GetCompaniesRow
 	for rows.Next() {
-		var i Company
+		var i GetCompaniesRow
 		if err := rows.Scan(
+			&i.Count,
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
