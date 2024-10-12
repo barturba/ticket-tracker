@@ -4,7 +4,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: GetUsers :many
-SELECT * FROM users 
+SELECT count(*) OVER(), * FROM users 
 WHERE (email ILIKE '%' || @query || '%' or @query is NULL)
 OR (first_name ILIKE '%' || @query || '%' or @query is NULL)
 OR (last_name ILIKE '%' || @query || '%' or @query is NULL)

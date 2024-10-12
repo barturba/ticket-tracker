@@ -23,3 +23,28 @@ func convertMany(users []database.User) []data.User {
 	}
 	return items
 }
+
+func convertRowsAndMetadata(rows []database.GetUsersRow, filters data.Filters) ([]data.User, data.Metadata) {
+	var output []data.User
+	var totalRecords int64 = 0
+	for _, row := range rows {
+		outputRow := convertRowAndCount(row, &totalRecords)
+		output = append(output, outputRow)
+	}
+	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
+	return output, metadata
+}
+
+func convertRowAndCount(row database.GetUsersRow, count *int64) data.User {
+	outputRow := data.User{
+		ID:        row.ID,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		FirstName: row.FirstName.String,
+		LastName:  row.LastName.String,
+		APIkey:    row.Apikey,
+	}
+	*count = row.Count
+
+	return outputRow
+}

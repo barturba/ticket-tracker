@@ -46,7 +46,6 @@ func addRoutesUsers(
 	mux.Handle("GET /v1/users", users.Get(logger, db))
 	mux.Handle("POST /v1/users", users.Post(logger, db))
 	mux.Handle("GET /v1/users/{id}", users.GetByID(logger, db))
-	mux.Handle("GET /v1/users_count", users.GetCount(logger, db))
 	mux.Handle("GET /v1/users_latest", users.GetLatest(logger, db))
 	mux.Handle("PUT /v1/users/{id}", users.Put(logger, db))
 	mux.Handle("DELETE /v1/users/{id}", users.Delete(logger, db))

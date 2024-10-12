@@ -138,7 +138,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
+SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
 WHERE (email ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (last_name ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -165,7 +165,19 @@ type GetUsersParams struct {
 	OrderDir string
 }
 
-func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, error) {
+type GetUsersRow struct {
+	Count     int64
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	FirstName sql.NullString
+	LastName  sql.NullString
+	Apikey    string
+	Email     string
+	Password  sql.NullString
+}
+
+func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersRow, error) {
 	rows, err := q.db.QueryContext(ctx, getUsers,
 		arg.Limit,
 		arg.Offset,
@@ -177,10 +189,11 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, err
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []GetUsersRow
 	for rows.Next() {
-		var i User
+		var i GetUsersRow
 		if err := rows.Scan(
+			&i.Count,
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
