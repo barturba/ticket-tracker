@@ -1,6 +1,5 @@
 "use server";
 
-import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -471,6 +470,7 @@ export async function updateIncident(
 }
 export async function fetchLatestIncidents() {
   try {
+    console.log(`calling fetchLatestIncidents()`);
     const url = new URL(`http://localhost:8080/v1/incidents_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());

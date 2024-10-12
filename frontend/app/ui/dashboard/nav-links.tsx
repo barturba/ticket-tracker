@@ -1,15 +1,6 @@
 "use client";
-import {
-  BriefcaseIcon,
-  CpuChipIcon,
-  DocumentDuplicateIcon,
-  HomeIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { Links } from "@/app/lib/definitions";
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
 import { classNames } from "@/app/lib/utils";
 
 export default function NavLinks() {
