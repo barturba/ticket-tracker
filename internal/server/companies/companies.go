@@ -33,7 +33,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Query = data.ReadString(qs, "query", "")
 
 		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{"id"}

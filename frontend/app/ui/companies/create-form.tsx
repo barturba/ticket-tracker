@@ -2,8 +2,8 @@
 import { createCompany, State } from "@/app/lib/actions";
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Button } from "../button";
 import { useFormState } from "react-dom";
+import { Button } from "../button";
 
 export default function Form() {
   const initialState: State = { message: null, errors: {} };

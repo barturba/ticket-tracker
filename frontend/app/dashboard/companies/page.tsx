@@ -24,6 +24,7 @@ export default async function Page(props: {
   const currentPage = Number(searchParams?.page) || 1;
 
   const companydata: CompanyData = await fetchCompanies(query, currentPage);
+
   const totalPages = companydata.metadata.last_page;
   const companies = companydata.companies;
 
