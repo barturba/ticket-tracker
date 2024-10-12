@@ -1,14 +1,9 @@
 import { lusitana } from "@/app/ui/fonts";
 import { Suspense } from "react";
-import {
-  LatestIncidentsSkeleton,
-  RevenueChartSkeleton,
-} from "@/app/ui/skeletons";
-import IncidentsChart from "../incidents-chart";
+import { LatestIncidentsSkeleton } from "@/app/ui/skeletons";
 import LatestIncidents from "@/app/ui/dashboard/latest-incidents";
 
 export default async function Page() {
-  // const incidents = await fetchIncidents();
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
