@@ -15,9 +15,11 @@ import (
 
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.Incident, data.Metadata, error) {
 	p := database.GetIncidentsParams{
-		Query:  sql.NullString{String: query, Valid: query != ""},
-		Limit:  int32(filters.Limit()),
-		Offset: int32(filters.Offset()),
+		Query:    sql.NullString{String: query, Valid: query != ""},
+		Limit:    int32(filters.Limit()),
+		Offset:   int32(filters.Offset()),
+		OrderBy:  filters.SortColumn(),
+		OrderDir: filters.SortDirection(),
 	}
 	rows, err := db.GetIncidents(r.Context(), p)
 	if err != nil {
