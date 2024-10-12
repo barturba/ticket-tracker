@@ -113,7 +113,7 @@ export function TableRowSkeleton() {
       </td>
       {/* Short Description */}
       <td className="whitespace-nowrap px-3 py-3">
-        <div className="h-6 w-64 rounded bg-gray-100"></div>
+        <div className="h-6 w-58 rounded bg-gray-100"></div>
       </td>
       {/* Amount */}
       <td className="whitespace-nowrap px-3 py-3">

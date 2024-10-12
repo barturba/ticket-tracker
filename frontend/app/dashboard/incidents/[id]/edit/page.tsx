@@ -1,7 +1,6 @@
 import {
   fetchCIs,
   fetchCompanies,
-  fetchConfigurationItems,
   fetchIncidentById,
   fetchUsers,
 } from "@/app/lib/actions";

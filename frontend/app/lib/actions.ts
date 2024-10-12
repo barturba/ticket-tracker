@@ -42,6 +42,7 @@ export async function fetchIncidents(query: string, currentPage: number) {
     if (data.ok) {
       const incidents = await data.json();
       if (incidents) {
+        // await new Promise((resolve) => setTimeout(resolve, 60000));
         return incidents;
       } else {
         return [];
