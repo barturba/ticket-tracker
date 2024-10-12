@@ -22,16 +22,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     fetchUsers(),
     fetchConfigurationItems(),
   ]);
-  console.log(
-    `dashboard/incidents/[id]/edit/incident: ${JSON.stringify(
-      incident,
-      null,
-      2
-    )}`
-  );
-  console.log(`!incident: ${JSON.stringify(!incident, null, 2)}`);
   if (!incident) {
-    console.log(`calling notFound`);
     notFound();
   }
   return (

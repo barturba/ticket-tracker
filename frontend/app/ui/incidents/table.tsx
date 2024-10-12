@@ -2,7 +2,7 @@ import IncidentStatus from "@/app/ui/incidents/status";
 import { DeleteIncident, UpdateIncident } from "@/app/ui/incidents/buttons";
 import { Incident } from "@/app/lib/definitions";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
-import { fetchIncidents } from "@/app/lib/actions";
+import { fetchIncidents } from "@/app/lib/actions/incidents";
 export default async function IncidentTable({
   query,
   currentPage,
