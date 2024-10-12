@@ -34,7 +34,6 @@ func addRoutesCompanies(
 	mux.Handle("GET /v1/companies", companies.Get(logger, db))
 	mux.Handle("POST /v1/companies", companies.Post(logger, db))
 	mux.Handle("GET /v1/companies/{id}", companies.GetByID(logger, db))
-	mux.Handle("GET /v1/companies_count", companies.GetCount(logger, db))
 	mux.Handle("GET /v1/companies_latest", companies.GetLatest(logger, db))
 	mux.Handle("PUT /v1/companies/{id}", companies.Put(logger, db))
 	mux.Handle("DELETE /v1/companies/{id}", companies.Delete(logger, db))

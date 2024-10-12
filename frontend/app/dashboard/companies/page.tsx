@@ -25,6 +25,7 @@ export default async function Page(props: {
 
   const companydata: CompanyData = await fetchCompanies(query, currentPage);
   const totalPages = companydata.metadata.last_page;
+  const companies = companydata.companies;
 
   return (
     <div className="w-full">
@@ -37,7 +38,7 @@ export default async function Page(props: {
         <CreateCompany />
       </div>
       <Suspense key={query + currentPage} fallback={<CompaniesTableSkeleton />}>
-        <Table query={query} currentPage={currentPage} />
+        <Table companies={companies} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />

@@ -1,22 +1,20 @@
 import { fetchCompanies, fetchFilteredCompanies } from "@/app/lib/actions";
 // import CompanyStatus from "@/app/ui/companies/status";
 import { DeleteCompany, UpdateCompany } from "@/app/ui/companies/buttons";
-import { CompanyData } from "@/app/lib/definitions";
+import { Company, CompanyData } from "@/app/lib/definitions";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 export default async function CompanyTable({
-  query,
-  currentPage,
+  companies,
 }: {
-  query: string;
-  currentPage: number;
+  companies: Company[];
 }) {
-  const companydata: CompanyData = await fetchCompanies(query, currentPage);
+  // const companydata: CompanyData = await fetchCompanies(query, currentPage);
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {companydata?.companies?.map((company) => (
+            {companies?.map((company) => (
               <div
                 key={company.id}
                 className="mb-2 w-full rounded-md bg-white p-4"
@@ -56,7 +54,7 @@ export default async function CompanyTable({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {companydata?.companies?.map((company) => (
+              {companies?.map((company) => (
                 <tr
                   key={company.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"

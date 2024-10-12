@@ -69,50 +69,6 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return companies, metadata, nil
 }
 
-func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			data.Filters
-		}
-
-		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Query = data.ReadString(qs, "query", "")
-
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
-
-		if data.ValidateFilters(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
-			return
-		}
-
-		count, err := GetCountFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
-		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
-			return
-		}
-		logger.Info("msg", "handle", "GET /v1/companies_count")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
-	})
-}
-
-func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetCompaniesCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
-	if err != nil {
-		return 0, errors.New("couldn't find companies")
-	}
-	return count, nil
-}
-
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
