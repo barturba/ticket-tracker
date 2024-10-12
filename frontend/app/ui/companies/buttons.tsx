@@ -1,4 +1,4 @@
-import { deleteCompany } from "@/app/lib/actions";
+import { deleteCompany } from "@/app/lib/actions/companies";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
@@ -24,10 +24,11 @@ export function UpdateCompany({ id }: { id: string }) {
   );
 }
 export function DeleteCompany({ id }: { id: string }) {
-  const deleteCompanyWithId = deleteCompany.bind(null, id);
+  // const deleteCompanyWithId = deleteCompany.bind(null, id);
 
   return (
-    <form action={deleteCompanyWithId}>
+    // <form action={deleteCompanyWithId}>
+    <form>
       <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />

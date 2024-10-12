@@ -1,4 +1,3 @@
-import { fetchCompanies } from "@/app/lib/actions";
 import { CreateCompany } from "@/app/ui/companies/buttons";
 import Table from "@/app/ui/companies/table";
 import { lusitana } from "@/app/ui/fonts";
@@ -7,7 +6,8 @@ import Search from "@/app/ui/search";
 import { CompaniesTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { CompanyData } from "@/app/lib/definitions";
+import { fetchCompanies } from "@/app/lib/actions/companies";
+import { CompanyData } from "@/app/lib/definitions/companies";
 
 export const metadata: Metadata = {
   title: "Companies",

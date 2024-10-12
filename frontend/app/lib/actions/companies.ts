@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { State } from "@/app/lib/actions";
-import { CompanyData } from "@/app/lib/definitions";
 import { ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { CompanyData } from "@/app/lib/definitions/companies";
 
 export async function fetchCompanies(
   query: string,
