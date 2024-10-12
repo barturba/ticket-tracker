@@ -59,7 +59,6 @@ func addRoutesConfigurationItems(
 	mux.Handle("GET /v1/cis", cis.Get(logger, db))
 	mux.Handle("POST /v1/cis", cis.Post(logger, db))
 	mux.Handle("GET /v1/cis/{id}", cis.GetByID(logger, db))
-	mux.Handle("GET /v1/cis_count", cis.GetCount(logger, db))
 	mux.Handle("GET /v1/cis_latest", cis.GetLatest(logger, db))
 	mux.Handle("PUT /v1/cis/{id}", cis.Put(logger, db))
 	mux.Handle("DELETE /v1/cis/{id}", cis.Delete(logger, db))

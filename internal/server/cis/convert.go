@@ -21,3 +21,26 @@ func convertMany(cis []database.ConfigurationItem) []data.CI {
 	}
 	return items
 }
+
+func convertRowsAndMetadata(rows []database.GetCIsRow, filters data.Filters) ([]data.CI, data.Metadata) {
+	var output []data.CI
+	var totalRecords int64 = 0
+	for _, row := range rows {
+		outputRow := convertRowAndCount(row, &totalRecords)
+		output = append(output, outputRow)
+	}
+	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
+	return output, metadata
+}
+
+func convertRowAndCount(row database.GetCIsRow, count *int64) data.CI {
+	outputRow := data.CI{
+		ID:        row.ID,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		Name:      row.Name,
+	}
+	*count = row.Count
+
+	return outputRow
+}

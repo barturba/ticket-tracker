@@ -13,13 +13,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const createConfigurationItems = `-- name: CreateConfigurationItems :one
+const createCIs = `-- name: CreateCIs :one
 INSERT INTO configuration_items (id, created_at, updated_at, name, company_id)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id, created_at, updated_at, name, company_id
 `
 
-type CreateConfigurationItemsParams struct {
+type CreateCIsParams struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -27,8 +27,8 @@ type CreateConfigurationItemsParams struct {
 	CompanyID uuid.UUID
 }
 
-func (q *Queries) CreateConfigurationItems(ctx context.Context, arg CreateConfigurationItemsParams) (ConfigurationItem, error) {
-	row := q.db.QueryRowContext(ctx, createConfigurationItems,
+func (q *Queries) CreateCIs(ctx context.Context, arg CreateCIsParams) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, createCIs,
 		arg.ID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
@@ -46,14 +46,14 @@ func (q *Queries) CreateConfigurationItems(ctx context.Context, arg CreateConfig
 	return i, err
 }
 
-const deleteConfigurationItems = `-- name: DeleteConfigurationItems :one
+const deleteCIs = `-- name: DeleteCIs :one
 DELETE FROM configuration_items 
 WHERE id = $1
 RETURNING id, created_at, updated_at, name, company_id
 `
 
-func (q *Queries) DeleteConfigurationItems(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
-	row := q.db.QueryRowContext(ctx, deleteConfigurationItems, id)
+func (q *Queries) DeleteCIs(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, deleteCIs, id)
 	var i ConfigurationItem
 	err := row.Scan(
 		&i.ID,
@@ -65,8 +65,8 @@ func (q *Queries) DeleteConfigurationItems(ctx context.Context, id uuid.UUID) (C
 	return i, err
 }
 
-const getConfigurationItems = `-- name: GetConfigurationItems :many
-SELECT id, created_at, updated_at, name, company_id FROM configuration_items 
+const getCIs = `-- name: GetCIs :many
+SELECT count(*) OVER(), id, created_at, updated_at, name, company_id FROM configuration_items 
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY
 CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'ASC') THEN id END ASC,
@@ -81,7 +81,7 @@ id ASC
 LIMIT $1 OFFSET $2
 `
 
-type GetConfigurationItemsParams struct {
+type GetCIsParams struct {
 	Limit    int32
 	Offset   int32
 	Query    sql.NullString
@@ -89,8 +89,17 @@ type GetConfigurationItemsParams struct {
 	OrderDir string
 }
 
-func (q *Queries) GetConfigurationItems(ctx context.Context, arg GetConfigurationItemsParams) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getConfigurationItems,
+type GetCIsRow struct {
+	Count     int64
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	CompanyID uuid.UUID
+}
+
+func (q *Queries) GetCIs(ctx context.Context, arg GetCIsParams) ([]GetCIsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCIs,
 		arg.Limit,
 		arg.Offset,
 		arg.Query,
@@ -101,10 +110,11 @@ func (q *Queries) GetConfigurationItems(ctx context.Context, arg GetConfiguratio
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ConfigurationItem
+	var items []GetCIsRow
 	for rows.Next() {
-		var i ConfigurationItem
+		var i GetCIsRow
 		if err := rows.Scan(
+			&i.Count,
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -124,13 +134,13 @@ func (q *Queries) GetConfigurationItems(ctx context.Context, arg GetConfiguratio
 	return items, nil
 }
 
-const getConfigurationItemsByCompanyID = `-- name: GetConfigurationItemsByCompanyID :many
+const getCIsByCompanyID = `-- name: GetCIsByCompanyID :many
 SELECT id, created_at, updated_at, name, company_id FROM configuration_items
 WHERE company_id = $1
 `
 
-func (q *Queries) GetConfigurationItemsByCompanyID(ctx context.Context, companyID uuid.UUID) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getConfigurationItemsByCompanyID, companyID)
+func (q *Queries) GetCIsByCompanyID(ctx context.Context, companyID uuid.UUID) ([]ConfigurationItem, error) {
+	rows, err := q.db.QueryContext(ctx, getCIsByCompanyID, companyID)
 	if err != nil {
 		return nil, err
 	}
@@ -158,13 +168,13 @@ func (q *Queries) GetConfigurationItemsByCompanyID(ctx context.Context, companyI
 	return items, nil
 }
 
-const getConfigurationItemsByID = `-- name: GetConfigurationItemsByID :one
+const getCIsByID = `-- name: GetCIsByID :one
 SELECT id, created_at, updated_at, name, company_id FROM configuration_items
 WHERE id = $1
 `
 
-func (q *Queries) GetConfigurationItemsByID(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
-	row := q.db.QueryRowContext(ctx, getConfigurationItemsByID, id)
+func (q *Queries) GetCIsByID(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, getCIsByID, id)
 	var i ConfigurationItem
 	err := row.Scan(
 		&i.ID,
@@ -176,31 +186,19 @@ func (q *Queries) GetConfigurationItemsByID(ctx context.Context, id uuid.UUID) (
 	return i, err
 }
 
-const getConfigurationItemsCount = `-- name: GetConfigurationItemsCount :one
-SELECT count(*) FROM configuration_items 
-WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
-`
-
-func (q *Queries) GetConfigurationItemsCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getConfigurationItemsCount, query)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getConfigurationItemsLatest = `-- name: GetConfigurationItemsLatest :many
+const getCIsLatest = `-- name: GetCIsLatest :many
 SELECT id, created_at, updated_at, name, company_id FROM configuration_items 
 ORDER BY configuration_items.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
-type GetConfigurationItemsLatestParams struct {
+type GetCIsLatestParams struct {
 	Limit  int32
 	Offset int32
 }
 
-func (q *Queries) GetConfigurationItemsLatest(ctx context.Context, arg GetConfigurationItemsLatestParams) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getConfigurationItemsLatest, arg.Limit, arg.Offset)
+func (q *Queries) GetCIsLatest(ctx context.Context, arg GetCIsLatestParams) ([]ConfigurationItem, error) {
+	rows, err := q.db.QueryContext(ctx, getCIsLatest, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +226,7 @@ func (q *Queries) GetConfigurationItemsLatest(ctx context.Context, arg GetConfig
 	return items, nil
 }
 
-const updateConfigurationItems = `-- name: UpdateConfigurationItems :one
+const updateCIs = `-- name: UpdateCIs :one
 UPDATE configuration_items
 SET name = $2,
 updated_at = $3
@@ -236,14 +234,14 @@ WHERE id = $1
 RETURNING id, created_at, updated_at, name, company_id
 `
 
-type UpdateConfigurationItemsParams struct {
+type UpdateCIsParams struct {
 	ID        uuid.UUID
 	Name      string
 	UpdatedAt time.Time
 }
 
-func (q *Queries) UpdateConfigurationItems(ctx context.Context, arg UpdateConfigurationItemsParams) (ConfigurationItem, error) {
-	row := q.db.QueryRowContext(ctx, updateConfigurationItems, arg.ID, arg.Name, arg.UpdatedAt)
+func (q *Queries) UpdateCIs(ctx context.Context, arg UpdateCIsParams) (ConfigurationItem, error) {
+	row := q.db.QueryRowContext(ctx, updateCIs, arg.ID, arg.Name, arg.UpdatedAt)
 	var i ConfigurationItem
 	err := row.Scan(
 		&i.ID,

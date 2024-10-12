@@ -44,20 +44,3 @@ func convertRowAndCount(row database.GetCompaniesRow, count *int64) data.Company
 
 	return outputRow
 }
-
-// func convertLatest(company database.GetCompaniesLatestRow) data.Company {
-// 	return data.Company{
-// 		ID:        company.ID,
-// 		CreatedAt: company.CreatedAt,
-// 		UpdatedAt: company.UpdatedAt,
-// 		Name:      company.Name,
-// 	}
-// }
-
-// func convertLatestMany(companies []database.GetCompaniesLatestRow) []data.Company {
-// 	var items []data.Company
-// 	for _, item := range companies {
-// 		items = append(items, convertLatest(item))
-// 	}
-// 	return items
-// }
