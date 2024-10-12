@@ -25,25 +25,6 @@ export const Links = [
     icon: CpuChipIcon,
   },
 ];
-export type User = {
-  id: string;
-  email: string;
-  password: string;
-};
-
-export type Incident = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  short_description: string;
-  description: string;
-  configuration_item_id: string;
-  configuration_item_id_name: string;
-  company_id: string;
-  state: string;
-  assigned_to: string;
-  assigned_to_name: string;
-};
 
 // Metadata
 
@@ -53,63 +34,4 @@ export type Metadata = {
   first_page: number;
   last_page: number;
   total_records: number;
-};
-
-// Company
-
-export type Company = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  name: string;
-};
-
-export type CompanyData = {
-  companies: Company[];
-  metadata: Metadata;
-};
-
-export type CompaniesField = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  name: string;
-};
-
-export type UsersField = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  first_name: string;
-  last_name: string;
-};
-
-export type ConfigurationItemsField = {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  name: string;
-};
-
-// Forms
-
-export type IncidentForm = {
-  id: string;
-  short_description: string;
-  description: string;
-  company_id: string;
-  assigned_to_id: string;
-  configuration_item_id: string;
-  state:
-    | "New"
-    | "Assigned"
-    | "In Progress"
-    | "Pending"
-    | "On Hold"
-    | "Resolved";
-};
-
-export type CompanyForm = {
-  id: string;
-  name: string;
 };

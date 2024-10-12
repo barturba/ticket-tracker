@@ -2,8 +2,6 @@ package incidents
 
 import (
 	"database/sql"
-	"errors"
-	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -37,80 +35,29 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
 
 		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input.Filters.SortSafelist = []string{
+			"id", "-id",
+			"created_at", "-created_at",
+			"updated_at", "-updated_at",
+			"short_description", "-short_description",
+			"description", "-description",
+			"first_name", "-first_name",
+			"last_name", "-last_name",
+		}
 
 		if data.ValidateFilters(v, input.Filters); !v.Valid() {
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		i, err := GetFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
+		incidents, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/incidents")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"incidents": incidents, "metadata": metadata})
 	})
-}
-
-func GetFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) ([]data.Incident, error) {
-	p := database.GetIncidentsParams{
-		Query:  sql.NullString{String: query, Valid: query != ""},
-		Limit:  int32(limit),
-		Offset: int32(offset),
-	}
-	rows, err := db.GetIncidents(r.Context(), p)
-	if err != nil {
-		log.Printf("ERROR >>>>> ", err)
-		return nil, errors.New("couldn't find incidents")
-	}
-	incidents := convertRowMany(rows)
-	return incidents, nil
-}
-
-func GetCount(logger *slog.Logger, db *database.Queries) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			data.Filters
-		}
-
-		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Query = data.ReadString(qs, "query", "")
-
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
-
-		if data.ValidateFilters(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
-			return
-		}
-
-		count, err := GetCountFromDB(r, db, input.Query, input.Filters.Limit(), input.Filters.Offset())
-		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
-			return
-		}
-		logger.Info("msg", "handle", "GET /v1/incidents_count")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
-	})
-}
-
-func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetIncidentsCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
-	if err != nil {
-		return 0, errors.New("couldn't find incidents")
-	}
-	return count, nil
 }
 
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
@@ -146,19 +93,6 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {
-	p := database.GetIncidentsLatestParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
-	}
-	rows, err := db.GetIncidentsLatest(r.Context(), p)
-	if err != nil {
-		return nil, errors.New("couldn't find incidents")
-	}
-	incidents := convertLatestRowMany(rows)
-	return incidents, nil
-}
-
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := helpers.ReadUUIDPath(*r)
@@ -175,15 +109,6 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 		logger.Info("msg", "handle", "GET /v1/incident/{id}")
 		helpers.RespondWithJSON(w, http.StatusOK, count)
 	})
-}
-
-func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
-	record, err := db.GetIncidentByID(r.Context(), id)
-	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
-	}
-	incident := convert(record)
-	return incident, nil
 }
 
 // POST
@@ -232,24 +157,6 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		logger.Info("msg", "handle", "POST /v1/incident")
 		helpers.RespondWithJSON(w, http.StatusCreated, i)
 	})
-}
-
-func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
-	i, err := db.CreateIncident(r.Context(), database.CreateIncidentParams{
-		ID:                  incident.ID,
-		CreatedAt:           time.Now(),
-		UpdatedAt:           time.Now(),
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description,
-		State:               incident.State,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-	})
-	response := convert(i)
-	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
-	}
-	return response, nil
 }
 
 // PUT
@@ -308,26 +215,6 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
-	i, err := db.UpdateIncident(r.Context(), database.UpdateIncidentParams{
-		ID:                  incident.ID,
-		UpdatedAt:           time.Now(),
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description,
-		State:               incident.State,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-		AssignedTo:          incident.AssignedToID,
-	})
-	if err != nil {
-		return data.Incident{}, errors.New("couldn't update incident")
-	}
-
-	response := convert(i)
-
-	return response, nil
-}
-
 // DELETE
 
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
@@ -347,15 +234,4 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 		logger.Info("msg", "handle", "DELETE /v1/incident", "id", id)
 		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "incident successfully deleted"})
 	})
-}
-
-func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
-	i, err := db.DeleteIncidentByID(r.Context(), id)
-	if err != nil {
-		return data.Incident{}, errors.New("couldn't delete incident")
-	}
-
-	response := convert(i)
-
-	return response, nil
 }

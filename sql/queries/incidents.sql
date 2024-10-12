@@ -10,7 +10,7 @@ ON incidents.assigned_to = users.id
 WHERE incidents.id = $1;
 
 -- name: GetIncidents :many
-SELECT * FROM incidents
+SELECT count(*) OVER(), * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (incidents.short_description ILIKE '%' || @query || '%' or @query is NULL)
@@ -29,6 +29,8 @@ CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'ASC') T
 CASE WHEN (@order_by::varchar = 'description' AND @order_dir::varchar = 'DESC') THEN incidents.description END DESC,
 CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'ASC') THEN first_name END ASC,
 CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') THEN first_name END DESC,
+CASE WHEN (@order_by::varchar = 'last_name' AND @order_dir::varchar = 'ASC') THEN last_name END ASC,
+CASE WHEN (@order_by::varchar = 'last_name' AND @order_dir::varchar = 'DESC') THEN last_name END DESC,
 incidents.id ASC 
 LIMIT $1 OFFSET $2;
 

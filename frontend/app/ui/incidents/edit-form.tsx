@@ -1,15 +1,5 @@
 "use client";
-import {
-  fetchUsers,
-  fetchUsersByCompany,
-  State,
-  updateIncident,
-} from "@/app/lib/actions";
-import {
-  CompaniesField,
-  ConfigurationItemsField,
-  UsersField,
-} from "@/app/lib/definitions";
+import { State } from "@/app/lib/actions";
 import {
   BuildingOffice2Icon,
   CheckIcon,
@@ -21,9 +11,13 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "../button";
-import { IncidentForm } from "@/app/lib/definitions";
 import { useFormStatus } from "react-dom";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
+import { updateIncident } from "@/app/lib/actions/incidents";
+import { CompaniesField } from "@/app/lib/definitions/companies";
+import { IncidentForm } from "@/app/lib/definitions/incidents";
+import { UsersField } from "@/app/lib/definitions/users";
+import { ConfigurationItemsField } from "@/app/lib/definitions/cis";
 
 function SubmitButton() {
   const { pending } = useFormStatus();

@@ -1,14 +1,11 @@
-import { fetchCompanies, fetchFilteredCompanies } from "@/app/lib/actions";
-// import CompanyStatus from "@/app/ui/companies/status";
 import { DeleteCompany, UpdateCompany } from "@/app/ui/companies/buttons";
-import { Company, CompanyData } from "@/app/lib/definitions";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
+import { Company } from "@/app/lib/definitions/companies";
 export default async function CompanyTable({
   companies,
 }: {
   companies: Company[];
 }) {
-  // const companydata: CompanyData = await fetchCompanies(query, currentPage);
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">

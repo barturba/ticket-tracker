@@ -6,7 +6,8 @@ import Search from "@/app/ui/search";
 import { IncidentsTableSkeleton } from "@/app/ui/skeletons";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { fetchIncidentsPages } from "@/app/lib/actions/incidents";
+import { fetchIncidents } from "@/app/lib/actions/incidents";
+import { IncidentData } from "@/app/lib/definitions/incidents";
 
 export const metadata: Metadata = {
   title: "Incidents",
@@ -22,7 +23,10 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = (await fetchIncidentsPages(query)) ?? 0;
+  const incidentData: IncidentData = await fetchIncidents(query, currentPage);
+
+  const totalPages = incidentData.metadata.last_page;
+  const incidents = incidentData.incidents;
 
   return (
     <div className="w-full">
@@ -35,7 +39,7 @@ export default async function Page(props: {
         <CreateIncident />
       </div>
       <Suspense key={query + currentPage} fallback={<IncidentsTableSkeleton />}>
-        <Table query={query} currentPage={currentPage} />
+        <Table incidents={incidents} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />

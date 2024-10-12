@@ -70,3 +70,31 @@ func convertRowMany(incidents []database.GetIncidentsRow) []data.Incident {
 	}
 	return items
 }
+
+func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filters) ([]data.Incident, data.Metadata) {
+	var output []data.Incident
+	var totalRecords int64 = 0
+	for _, row := range rows {
+		outputRow := convertRowAndCount(row, &totalRecords)
+		output = append(output, outputRow)
+	}
+	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
+	return output, metadata
+}
+
+func convertRowAndCount(row database.GetIncidentsRow, count *int64) data.Incident {
+	outputRow := data.Incident{
+		ID:                  row.ID,
+		CreatedAt:           row.CreatedAt,
+		UpdatedAt:           row.UpdatedAt,
+		ShortDescription:    row.ShortDescription,
+		Description:         row.Description,
+		ConfigurationItemID: row.ConfigurationItemID,
+		CompanyID:           row.CompanyID,
+		AssignedToID:        row.AssignedTo,
+		State:               row.State,
+	}
+	*count = row.Count
+
+	return outputRow
+}

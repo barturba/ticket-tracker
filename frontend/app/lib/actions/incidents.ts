@@ -3,35 +3,53 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { State } from "@/app/lib/actions";
 import { ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { IncidentData } from "@/app/lib/definitions/incidents";
 
 // Incidents
 
 // GET
-export async function fetchIncidents(query: string, currentPage: number) {
+export async function fetchIncidents(
+  query: string,
+  currentPage: number
+): Promise<IncidentData> {
   try {
     const url = new URL(`http://localhost:8080/v1/incidents`);
+
     const searchParams = url.searchParams;
     searchParams.set("query", query);
-    searchParams.set("page_size", ITEMS_PER_PAGE.toString());
+    searchParams.set("sort", "-updated_at");
     searchParams.set("page", currentPage.toString());
+    searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
     const data = await fetch(url.toString(), {
       method: "GET",
     });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const incidents = await data.json();
-      if (incidents) {
-        // await new Promise((resolve) => setTimeout(resolve, 60000));
-        return incidents;
+      const incidentData: IncidentData = await data.json();
+      if (incidentData) {
+        return {
+          incidents: incidentData.incidents,
+          metadata: incidentData.metadata,
+        };
       } else {
-        return [];
+        // console.log(`fetchIncidents url: ${url.toString()}`);
+        // console.log(`fetchIncidents error: !incidentData`);
+        throw new Error("Failed to fetch incidents data: !incidentData");
       }
     } else {
-      return [];
+      console.log(`fetchIncidents url: ${url.toString()}`);
+      console.log(
+        `fetchIncidents error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      throw new Error("Failed to fetch incidents data: !data.ok");
     }
   } catch (error) {
     console.log(`fetchIncidents error: ${error}`);
-    throw new Error("Failed to fetch incidents.");
+    throw new Error(`Failed to fetch incidents data: ${error}`);
   }
 }
 
@@ -121,8 +139,8 @@ const FormSchemaIncident = z.object({
   description: z.string({
     required_error: "Please enter a description.",
   }),
-  companyId: z.string({
-    invalid_type_error: "Please select a company.",
+  incidentId: z.string({
+    invalid_type_error: "Please select a incident.",
   }),
   assignedToId: z.string({
     invalid_type_error: "Please select a user to assign to.",
@@ -143,7 +161,7 @@ export async function createIncident(prevState: State, formData: FormData) {
   const validatedFields = CreateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
-    companyId: formData.get("company_id"),
+    incidentId: formData.get("incident_id"),
     assignedToId: formData.get("assigned_to_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
@@ -168,7 +186,7 @@ export async function createIncident(prevState: State, formData: FormData) {
   const {
     shortDescription,
     description,
-    companyId,
+    incidentId,
     assignedToId,
     configurationItemId,
     state,
@@ -180,7 +198,7 @@ export async function createIncident(prevState: State, formData: FormData) {
       body: JSON.stringify({
         short_description: shortDescription,
         description: description,
-        company_id: companyId,
+        incident_id: incidentId,
         assigned_to_id: assignedToId,
         configuration_item_id: configurationItemId,
         state: state,
@@ -218,7 +236,7 @@ export async function updateIncident(
   const validatedFields = UpdateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
-    companyId: formData.get("company_id"),
+    incidentId: formData.get("incident_id"),
     assignedToId: formData.get("assigned_to_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
@@ -242,7 +260,7 @@ export async function updateIncident(
   const {
     shortDescription,
     description,
-    companyId,
+    incidentId,
     assignedToId,
     configurationItemId,
     state,
@@ -257,7 +275,7 @@ export async function updateIncident(
         id: id,
         short_description: shortDescription,
         description: description,
-        company_id: companyId,
+        incident_id: incidentId,
         assigned_to_id: assignedToId,
         configuration_item_id: configurationItemId,
         state: state,

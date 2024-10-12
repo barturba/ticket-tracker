@@ -33,18 +33,18 @@ export async function fetchCompanies(
           metadata: companyData.metadata,
         };
       } else {
-        console.log(`fetchCompanies url: ${url.toString()}`);
-        console.log(`fetchCompanies error: !companyData`);
-        throw new Error("Failed to fetch companies data.");
+        // console.log(`fetchCompanies url: ${url.toString()}`);
+        // console.log(`fetchCompanies error: !companyData`);
+        throw new Error("Failed to fetch companies data: !companyData");
       }
     } else {
-      console.log(`fetchCompanies url: ${url.toString()}`);
-      console.log(
-        `fetchCompanies error: !data.ok ${data.status} ${JSON.stringify(
-          data.statusText
-        )}`
-      );
-      throw new Error("Failed to fetch companies data.");
+      //   console.log(`fetchCompanies url: ${url.toString()}`);
+      //   console.log(
+      //     `fetchCompanies error: !data.ok ${data.status} ${JSON.stringify(
+      //       data.statusText
+      //     )}`
+      //   );
+      throw new Error("Failed to fetch companies data: !data.ok");
     }
   } catch (error) {
     console.log(`fetchCompanies error: ${error}`);

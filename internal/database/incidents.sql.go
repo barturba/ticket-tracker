@@ -153,7 +153,7 @@ func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetInciden
 }
 
 const getIncidents = `-- name: GetIncidents :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
+SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (incidents.short_description ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -172,6 +172,8 @@ CASE WHEN ($4::varchar = 'description' AND $5::varchar = 'ASC') THEN incidents.d
 CASE WHEN ($4::varchar = 'description' AND $5::varchar = 'DESC') THEN incidents.description END DESC,
 CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'ASC') THEN first_name END ASC,
 CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'DESC') THEN first_name END DESC,
+CASE WHEN ($4::varchar = 'last_name' AND $5::varchar = 'ASC') THEN last_name END ASC,
+CASE WHEN ($4::varchar = 'last_name' AND $5::varchar = 'DESC') THEN last_name END DESC,
 incidents.id ASC 
 LIMIT $1 OFFSET $2
 `
@@ -185,6 +187,7 @@ type GetIncidentsParams struct {
 }
 
 type GetIncidentsRow struct {
+	Count               int64
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
@@ -220,6 +223,7 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 	for rows.Next() {
 		var i GetIncidentsRow
 		if err := rows.Scan(
+			&i.Count,
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,

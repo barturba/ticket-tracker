@@ -1,16 +1,12 @@
 import IncidentStatus from "@/app/ui/incidents/status";
 import { DeleteIncident, UpdateIncident } from "@/app/ui/incidents/buttons";
-import { Incident } from "@/app/lib/definitions";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
-import { fetchIncidents } from "@/app/lib/actions/incidents";
+import { Incident } from "@/app/lib/definitions/incidents";
 export default async function IncidentTable({
-  query,
-  currentPage,
+  incidents,
 }: {
-  query: string;
-  currentPage: number;
+  incidents: Incident[];
 }) {
-  const incidents: Incident[] = await fetchIncidents(query, currentPage);
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
