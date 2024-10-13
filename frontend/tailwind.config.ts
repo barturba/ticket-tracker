@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 const config: Config = {
   content: [
@@ -9,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter, sans-serif", { fontFeatureSettings: '"cv11"' }],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
     },
   },

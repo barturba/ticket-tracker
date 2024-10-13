@@ -1,3 +1,4 @@
+import AppHeading from "@/app/application-components/heading";
 import { Badge } from "@/app/components/badge";
 import { Button } from "@/app/components/button";
 import { Heading } from "@/app/components/heading";
@@ -39,10 +40,13 @@ export default async function Incidents(props: {
 
   return (
     <>
-      <div className="flex items-end justify-between gap-4">
+      <AppHeading name="Incidents" createLink="/dashboard/incidents/create" />
+      {/* <div className="flex items-end justify-between gap-4">
         <Heading>Incidents</Heading>
-        <Button className="-my-0.5">Create incident</Button>
-      </div>
+        <Button href={`/dashboard/incidents/create`} className="-my-0.5">
+          Create incident
+        </Button>
+      </div> */}
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
