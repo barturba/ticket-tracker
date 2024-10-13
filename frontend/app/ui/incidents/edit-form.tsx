@@ -31,6 +31,7 @@ type State = {
     shortDescription?: string[];
     description?: string[];
     incidentId?: string[];
+    companyID?: string[];
     assignedToId?: string[];
     configurationItemId?: string[];
     state?: string[];
@@ -74,7 +75,10 @@ export default function EditForm({
               placeholder="Select a company"
               inputs={companies}
               defaultValue={incident.company_id}
-              state={state}
+              invalid={
+                state.errors?.companyId && state.errors.companyId.length > 0
+              }
+              errorMessage={state.errors?.shortDescription?.join(", ")}
             />
             {/* <Field>
               <Label>Company</Label>

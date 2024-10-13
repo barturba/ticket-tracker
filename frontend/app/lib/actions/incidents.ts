@@ -121,6 +121,9 @@ const FormSchemaIncident = z.object({
   assignedToId: z.string({
     invalid_type_error: "Please select a user to assign to.",
   }),
+  companyId: z.string({
+    invalid_type_error: "Please select a company.",
+  }),
   configurationItemId: z.string({
     invalid_type_error: "Please select a configuration item to assign to.",
   }),
@@ -217,6 +220,7 @@ export async function updateIncident(
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
     assignedToId: formData.get("assigned_to_id"),
+    companyID: formData.get("company_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
   });

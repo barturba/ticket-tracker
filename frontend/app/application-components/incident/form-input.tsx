@@ -9,7 +9,8 @@ export default function FormInput({
   placeholder,
   inputs,
   defaultValue,
-  state,
+  invalid,
+  errorMessage,
 }: {
   label: string;
   id: string;
@@ -17,19 +18,13 @@ export default function FormInput({
   placeholder: string;
   inputs: any[];
   defaultValue?: string;
-  state: State;
+  invalid?: boolean;
+  errorMessage?: string;
 }) {
   return (
     <Field>
       <Label>{label}</Label>
-      <Select
-        id={id}
-        name={name}
-        invalid={
-          state.errors?.shortDescription &&
-          state.errors.shortDescription.length > 0
-        }
-      >
+      <Select id={id} name={name} invalid={!!invalid}>
         <option value="" disabled>
           {placeholder}
         </option>
@@ -39,6 +34,9 @@ export default function FormInput({
           </option>
         ))}
       </Select>
+      {!!invalid && (
+        <ErrorMessage key={ErrorMessage}>{ErrorMessage}</ErrorMessage>
+      )}
     </Field>
   );
 }
