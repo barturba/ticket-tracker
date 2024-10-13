@@ -1,25 +1,38 @@
-import "@/app/ui/global.css";
-
-import { inter } from "./ui/fonts";
-import { Metadata } from "next";
+// import { getEvents } from '@/data'
+import "@/styles/tailwind.css";
+import type { Metadata } from "next";
+import type React from "react";
+import { ApplicationLayout } from "@/app/application-layout";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Ticket Tracker",
+    template: "%s - Ticket Tracker",
     default: "Ticket Tracker",
   },
   description: "Ticket Tracker for IT incident tracking.",
   metadataBase: new URL("https://bartas.co/ticket-tracker"),
 };
-export default function RootLayout({
+
+export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  // let events = await getEvents();
+
   return (
-    <html lang="en" className="h-full bg-white">
-      <body className={`${inter.className} antialiased h-full`}>
-        {children}
+    <html
+      lang="en"
+      className="text-zinc-950 antialiased lg:bg-zinc-100 dark:bg-zinc-900 dark:text-white dark:lg:bg-zinc-950"
+    >
+      <head>
+        <link rel="preconnect" href="https://rsms.me/" />
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+      </head>
+      <body>
+        <ApplicationLayout events={undefined} children={undefined}>
+          {children}
+        </ApplicationLayout>
       </body>
     </html>
   );

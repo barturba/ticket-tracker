@@ -1,14 +1,15 @@
-import { lusitana } from "@/app/ui/fonts";
 import { Suspense } from "react";
 import LatestIncidents from "@/app/ui/dashboard/latest-incidents";
 import { LatestIncidentsSkeleton } from "@/app/ui/skeletons/incidents";
+import { Heading, Subheading } from "@/app/components/heading";
 
 export default async function Page() {
   return (
     <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Dashboard
-      </h1>
+      <Heading>Dashboard</Heading>
+      <div className="mt-8 flex items-end justify-between">
+        <Subheading>Overview</Subheading>
+      </div>
       <ul>
         <Suspense fallback={<LatestIncidentsSkeleton />}>
           <LatestIncidents />
