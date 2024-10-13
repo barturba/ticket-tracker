@@ -1,4 +1,5 @@
 "use client";
+import logo from "@/public/static/images/logo.png";
 import {
   ChevronDownIcon,
   Cog8ToothIcon,
@@ -14,7 +15,13 @@ import {
   LightBulbIcon,
   ShieldCheckIcon,
   UserCircleIcon,
+  CpuChipIcon,
+  UserGroupIcon,
+  DocumentDuplicateIcon,
+  BriefcaseIcon,
+  BuildingOffice2Icon,
 } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Navbar,
@@ -26,6 +33,7 @@ import { SidebarLayout } from "@/app/components/sidebar-layout";
 import {
   Sidebar,
   SidebarBody,
+  SidebarHeader,
   SidebarHeading,
   SidebarItem,
   SidebarLabel,
@@ -95,11 +103,23 @@ export function ApplicationLayout({
       }
       sidebar={
         <Sidebar>
-          {/* <SidebarHeader>
+          <SidebarHeader>
             <Dropdown>
               <DropdownButton as={SidebarItem}>
+                <Image
+                  height={24}
+                  width={24}
+                  src={logo}
+                  alt="Ticket Tracker Logo"
+                />
+                <SidebarLabel>Ticket Tracker</SidebarLabel>
+                {/* <ChevronDownIcon /> */}
+              </DropdownButton>
+            </Dropdown>
+            {/* <Dropdown>
+              <DropdownButton as={SidebarItem}>
                 <Avatar src="/teams/catalyst.svg" />
-                <SidebarLabel>Catalyst</SidebarLabel>
+                <SidebarLabel>Ticket Tracker</SidebarLabel>
                 <ChevronDownIcon />
               </DropdownButton>
               <DropdownMenu
@@ -129,8 +149,8 @@ export function ApplicationLayout({
                   <DropdownLabel>New team&hellip;</DropdownLabel>
                 </DropdownItem>
               </DropdownMenu>
-            </Dropdown>
-          </SidebarHeader> */}
+            </Dropdown> */}
+          </SidebarHeader>
 
           <SidebarBody>
             <SidebarSection>
@@ -154,7 +174,7 @@ export function ApplicationLayout({
                 href="/dashboard/companies"
                 current={pathname.startsWith("/dashboard/companies")}
               >
-                <TicketIcon />
+                <BuildingOffice2Icon />
                 <SidebarLabel>Companies</SidebarLabel>
               </SidebarItem>
 
@@ -162,7 +182,7 @@ export function ApplicationLayout({
                 href="/dashboardusers"
                 current={pathname.startsWith("/dashboard/users")}
               >
-                <TicketIcon />
+                <UserGroupIcon />
                 <SidebarLabel>Users</SidebarLabel>
               </SidebarItem>
 
@@ -170,7 +190,7 @@ export function ApplicationLayout({
                 href="/dashboard/cis"
                 current={pathname.startsWith("/dashboard/cis")}
               >
-                <TicketIcon />
+                <CpuChipIcon />
                 <SidebarLabel>CIs</SidebarLabel>
               </SidebarItem>
 

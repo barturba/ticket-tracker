@@ -1,5 +1,13 @@
+import { Badge } from "@/app/components/badge";
 import { Button } from "@/app/components/button";
 import { Heading } from "@/app/components/heading";
+import {
+  Pagination,
+  PaginationGap,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+} from "@/app/components/pagination";
 import {
   Table,
   TableBody,
@@ -58,11 +66,21 @@ export default async function Incidents(props: {
               </TableCell>
               <TableCell>{incident.assigned_to}</TableCell>
               <TableCell>{truncate(incident.short_description)}</TableCell>
-              <TableCell>{incident.state}</TableCell>
+              <TableCell>
+                <Badge className="max-sm:hidden" state={incident.state}>
+                  {incident.state}
+                </Badge>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Pagination>
+        <PaginationPrevious />
+        <PaginationGap />
+        <PaginationNext />
+      </Pagination>
     </>
   );
 }

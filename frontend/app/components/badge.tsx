@@ -1,7 +1,7 @@
 import * as Headless from "@headlessui/react";
 import clsx from "clsx";
 import React, { forwardRef } from "react";
-import { TouchTarget } from "@/app/componentsbutton";
+import { TouchTarget } from "@/app/components/button";
 import { Link } from "@/app/components/link";
 
 const colors = {
@@ -34,13 +34,35 @@ const colors = {
   zinc: "bg-zinc-600/10 text-zinc-700 group-data-[hover]:bg-zinc-600/20 dark:bg-white/5 dark:text-zinc-400 dark:group-data-[hover]:bg-white/10",
 };
 
-type BadgeProps = { color?: keyof typeof colors };
+const states = {
+  New: "zinc",
+  "In Progress": "blue",
+  "On Hold": "yellow",
+  Resolved: "emerald",
+};
+
+type BadgeProps = { color?: keyof typeof colors; state?: keyof typeof states };
 
 export function Badge({
   color = "zinc",
+  state = "New",
   className,
   ...props
 }: BadgeProps & React.ComponentPropsWithoutRef<"span">) {
+  switch (state) {
+    case "New":
+      color = "zinc";
+      break;
+    case "In Progress":
+      color = "blue";
+      break;
+    case "On Hold":
+      color = "yellow";
+      break;
+    case "Resolved":
+      color = "green";
+      break;
+  }
   return (
     <span
       {...props}
