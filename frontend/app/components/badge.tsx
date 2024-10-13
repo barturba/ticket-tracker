@@ -36,6 +36,7 @@ const colors = {
 
 const states = {
   New: "zinc",
+  Assigned: "teal",
   "In Progress": "blue",
   "On Hold": "yellow",
   Resolved: "emerald",
@@ -52,6 +53,9 @@ export function Badge({
   switch (state) {
     case "New":
       color = "zinc";
+      break;
+    case "Assigned":
+      color = "teal";
       break;
     case "In Progress":
       color = "blue";

@@ -86,7 +86,10 @@ export default function EditForm({
   // console.log(`got incident: ${JSON.stringify(incident)}`);
 
   return (
-    <form action={formAction}>
+    <form
+      action={formAction}
+      className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]"
+    >
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Company Name */}
         <div className="mb-4">
