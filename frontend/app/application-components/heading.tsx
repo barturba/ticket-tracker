@@ -16,7 +16,7 @@ export default function AppHeading({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="max-sm:w-full sm:flex-1">
         <Heading>{name}</Heading>
-        <div className="mt-4 flex max-w-xl gap-4">
+        {/* <div className="mt-4 flex max-w-xl gap-4">
           <div className="flex-1">
             <InputGroup>
               <MagnifyingGlassIcon />
@@ -30,7 +30,7 @@ export default function AppHeading({
               <option value="status">Sort by status</option>
             </Select>
           </div>
-        </div>
+        </div> */}
       </div>
       <Button href={createLink}>Create {name}</Button>
     </div>

@@ -7,6 +7,11 @@ export type CI = {
   name: string;
 };
 
+export type CIField = {
+  id: string;
+  name: string;
+};
+
 export type CIData = {
   cis: CI[];
   metadata: Metadata;

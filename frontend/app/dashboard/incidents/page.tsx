@@ -5,6 +5,7 @@ import { Heading } from "@/app/components/heading";
 import {
   Pagination,
   PaginationGap,
+  PaginationList,
   PaginationNext,
   PaginationPage,
   PaginationPrevious,
@@ -41,12 +42,6 @@ export default async function Incidents(props: {
   return (
     <>
       <AppHeading name="Incidents" createLink="/dashboard/incidents/create" />
-      {/* <div className="flex items-end justify-between gap-4">
-        <Heading>Incidents</Heading>
-        <Button href={`/dashboard/incidents/create`} className="-my-0.5">
-          Create incident
-        </Button>
-      </div> */}
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>
@@ -81,9 +76,19 @@ export default async function Incidents(props: {
       </Table>
 
       <Pagination>
-        <PaginationPrevious />
-        <PaginationGap />
-        <PaginationNext />
+        <PaginationPrevious href="?page=2" />
+        <PaginationList>
+          <PaginationPage href="?page=1">1</PaginationPage>
+          <PaginationPage href="?page=2">2</PaginationPage>
+          <PaginationPage href="?page=3" current>
+            3
+          </PaginationPage>
+          <PaginationPage href="?page=4">4</PaginationPage>
+          <PaginationGap />
+          <PaginationPage href="?page=65">65</PaginationPage>
+          <PaginationPage href="?page=66">66</PaginationPage>
+        </PaginationList>
+        <PaginationNext href="?page=4" />
       </Pagination>
     </>
   );

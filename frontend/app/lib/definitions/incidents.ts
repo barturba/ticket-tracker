@@ -14,6 +14,11 @@ export type Incident = {
   assigned_to_name: string;
 };
 
+export type IncidentField = {
+  id: string;
+  name: string;
+};
+
 export type IncidentData = {
   incidents: Incident[];
   metadata: Metadata;
@@ -29,7 +34,10 @@ export type IncidentsField = {
 export type IncidentForm = {
   id: string;
   short_description: string;
-  description: string;
+  description: {
+    String: string;
+    Valid: boolean;
+  };
   company_id: string;
   assigned_to_id: string;
   configuration_item_id: string;

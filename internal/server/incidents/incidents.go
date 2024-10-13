@@ -100,14 +100,13 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.NotFoundResponse(w, r, logger)
 			return
 		}
-
-		count, err := db.GetIncidentByID(r.Context(), id)
+		i, err := GetByIDFromDB(r, db, id)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/incident/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
+		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 

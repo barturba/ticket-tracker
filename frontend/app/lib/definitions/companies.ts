@@ -7,6 +7,11 @@ export type Company = {
   name: string;
 };
 
+export type CompanyField = {
+  id: string;
+  name: string;
+};
+
 export type CompanyData = {
   companies: Company[];
   metadata: Metadata;

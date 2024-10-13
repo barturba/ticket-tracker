@@ -9,5 +9,5 @@ export type State = {
     configurationItemId?: string[];
     state?: string[];
   };
-  message?: string | null;
+  message?: string;
 };

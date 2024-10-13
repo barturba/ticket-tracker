@@ -2,14 +2,13 @@ import { Metadata } from "@/app/lib/definitions";
 
 export type User = {
   id: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  password: string;
 };
 
-export type UsersField = {
+export type UserField = {
   id: string;
-  created_at: string;
-  updated_at: string;
   first_name: string;
   last_name: string;
 };

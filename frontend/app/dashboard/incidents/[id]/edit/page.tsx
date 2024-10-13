@@ -10,6 +10,8 @@ import { Heading, Subheading } from "@/app/components/heading";
 import { Badge } from "@/app/components/badge";
 import { BanknotesIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import HeadingEdit from "@/app/application-components/heading-edit";
+import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 
 export const metadata: Metadata = {
   title: "Edit Incident",
@@ -27,33 +29,15 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   if (!incident) {
     notFound();
   }
-  console.log(`incident`, incident);
+
   return (
-    <main>
-      <div className="max-lg:hidden">
-        <Link
-          href="/incidents"
-          className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 dark:text-zinc-400"
-        >
-          <ChevronLeftIcon className="size-4 fill-zinc-400 dark:fill-zinc-500" />
-          Incidents
-        </Link>
-      </div>
-      <div className="mt-4 lg:mt-8">
-        <div className="flex items-center gap-4">
-          <Heading>Incident #{incident.id}</Heading>
-          <Badge color="lime" state={incident.state}>
-            {incident.state}
-          </Badge>
-        </div>
-        <div className="isolate mt-2.5 flex flex-wrap justify-between gap-x-6 gap-y-4">
-          <div className="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
-            <span className="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
-              <BanknotesIcon className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
-            </span>
-          </div>
-        </div>
-      </div>
+    <>
+      <HeadingEdit name="Incidents" backLink="/dashboard/incidents" />
+      <HeadingSubEdit
+        name={`Incident #${incident.id}`}
+        badgeState={incident.state}
+        badgeText={incident.state}
+      />
       <div className="mt-12">
         <EditForm
           incident={incident}
@@ -62,6 +46,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           cis={cisData.cis}
         />
       </div>
-    </main>
+    </>
   );
 }

@@ -110,14 +110,13 @@ export async function fetchIncidentById(id: string) {
 
 const FormSchemaIncident = z.object({
   id: z.string(),
-  shortDescription: z.string({
-    required_error: "Please enter a short description.",
-  }),
+  shortDescription: z
+    .string({
+      required_error: "Please enter a short description.",
+    })
+    .min(1, { message: "Short description must be at least 1 character." }),
   description: z.string({
     required_error: "Please enter a description.",
-  }),
-  incidentId: z.string({
-    invalid_type_error: "Please select a incident.",
   }),
   assignedToId: z.string({
     invalid_type_error: "Please select a user to assign to.",
@@ -210,10 +209,13 @@ export async function updateIncident(
   prevState: State,
   formData: FormData
 ) {
+  console.log(
+    `updateIncident(${id}, ${JSON.stringify(prevState)}, ${formData})`
+  );
+  console.log(`calling updateIncident id: ${id}`);
   const validatedFields = UpdateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
-    incidentId: formData.get("incident_id"),
     assignedToId: formData.get("assigned_to_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
@@ -221,7 +223,7 @@ export async function updateIncident(
 
   if (!validatedFields.success) {
     console.log(
-      `updateIncident error: ${JSON.stringify(
+      `updateIncident() !validatedFields.success : ${JSON.stringify(
         validatedFields.error.flatten().fieldErrors,
         null,
         2
@@ -237,7 +239,6 @@ export async function updateIncident(
   const {
     shortDescription,
     description,
-    incidentId,
     assignedToId,
     configurationItemId,
     state,
@@ -252,7 +253,6 @@ export async function updateIncident(
         id: id,
         short_description: shortDescription,
         description: description,
-        incident_id: incidentId,
         assigned_to_id: assignedToId,
         configuration_item_id: configurationItemId,
         state: state,
