@@ -22,6 +22,8 @@ import {
 import { Select } from "@/app/components/select";
 import { Listbox, ListboxLabel, ListboxOption } from "@/app/components/listbox";
 import { useFormStatus } from "react-dom";
+import CompanyInput from "@/app/application-components/incident/form-input";
+import FormInput from "@/app/application-components/incident/form-input";
 
 type State = {
   message: string;
@@ -65,7 +67,16 @@ export default function EditForm({
         <Fieldset aria-label="Incident details">
           <FieldGroup>
             {/* Company */}
-            <Field>
+            <FormInput
+              label="Company"
+              id="companyID"
+              name="company_id"
+              placeholder="Select a company"
+              inputs={companies}
+              defaultValue={incident.company_id}
+              state={state}
+            />
+            {/* <Field>
               <Label>Company</Label>
               <Select id="companyId" name="company_id">
                 <option value="" disabled>
@@ -77,9 +88,9 @@ export default function EditForm({
                   </option>
                 ))}
               </Select>
-              {/* {state.errors.has('full_name') && <ErrorMessage>{errors.get('full_name')}</ErrorMessage>
-              )} */}
-            </Field>
+              {state.errors.has('full_name') && <ErrorMessage>{errors.get('full_name')}</ErrorMessage>
+              )}
+            </Field> */}
 
             {/* Assigned To*/}
             <Field>
