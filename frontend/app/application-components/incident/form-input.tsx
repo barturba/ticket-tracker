@@ -34,9 +34,7 @@ export default function FormInput({
           </option>
         ))}
       </Select>
-      {!!invalid && (
-        <ErrorMessage key={ErrorMessage}>{ErrorMessage}</ErrorMessage>
-      )}
+      {!!invalid && <ErrorMessage>{errorMessage}</ErrorMessage>}
     </Field>
   );
 }

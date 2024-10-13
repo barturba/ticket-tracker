@@ -1,29 +1,18 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { updateIncident } from "@/app/lib/actions/incidents";
 import { IncidentForm } from "@/app/lib/definitions/incidents";
-import { CI, CIField } from "@/app/lib/definitions/cis";
-import { User, UserField } from "@/app/lib/definitions/users";
-import { Company, CompanyField } from "@/app/lib/definitions/companies";
+import { CIField } from "@/app/lib/definitions/cis";
+import { UserField } from "@/app/lib/definitions/users";
+import { CompanyField } from "@/app/lib/definitions/companies";
 import { Subheading } from "@/app/components/heading";
 import { Divider } from "@/app/components/divider";
-import { Input } from "@/app/components/input";
-import { Textarea } from "@/app/components/textarea";
-import {
-  Description,
-  ErrorMessage,
-  Field,
-  FieldGroup,
-  Fieldset,
-  Label,
-  Legend,
-} from "@/app/components/fieldset";
-import { Select } from "@/app/components/select";
-import { Listbox, ListboxLabel, ListboxOption } from "@/app/components/listbox";
-import { useFormStatus } from "react-dom";
-import CompanyInput from "@/app/application-components/incident/form-input";
+import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormInput from "@/app/application-components/incident/form-input";
+import StateListbox from "@/app/application-components/incident/state-listbox";
+import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
+import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 
 type State = {
   message: string;
@@ -63,8 +52,6 @@ export default function EditForm({
       <Divider className="mt-4" />
 
       <form action={formAction}>
-        {/* Incident Details*/}
-
         <Fieldset aria-label="Incident details">
           <FieldGroup>
             {/* Company */}
@@ -76,116 +63,70 @@ export default function EditForm({
               inputs={companies}
               defaultValue={incident.company_id}
               invalid={
-                state.errors?.companyId && state.errors.companyId.length > 0
+                !!state.errors?.companyId && state.errors.companyId.length > 0
               }
-              errorMessage={state.errors?.shortDescription?.join(", ")}
+              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
             />
-            {/* <Field>
-              <Label>Company</Label>
-              <Select id="companyId" name="company_id">
-                <option value="" disabled>
-                  Select a company
-                </option>
-                {companies.map((company) => (
-                  <option key={company.id} value={company.id}>
-                    {company.name}
-                  </option>
-                ))}
-              </Select>
-              {state.errors.has('full_name') && <ErrorMessage>{errors.get('full_name')}</ErrorMessage>
-              )}
-            </Field> */}
 
             {/* Assigned To*/}
-            <Field>
-              <Label>Assigned To</Label>
-              <Select
-                id="assignedToId"
-                name="assigned_to_id"
-                aria-describedby="assigned-to-error"
-              >
-                <option value="" disabled>
-                  Select a user
-                </option>
-                {initialUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {`${user.first_name} ${user.last_name}`}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <FormInput
+              label="Assigned To"
+              id="assignedToId"
+              name="assigned_to_id"
+              placeholder="Select a user"
+              inputs={initialUsers.map((user) => ({
+                id: user.id,
+                name: `${user.first_name} ${user.last_name}`,
+              }))}
+              defaultValue={incident.assigned_to_id}
+              invalid={
+                !!state.errors?.assignedToId &&
+                state.errors.assignedToId.length > 0
+              }
+              errorMessage={state.errors?.assignedToId?.join(", ")}
+            />
 
             {/* CI */}
-            <Field>
-              <Label>CI</Label>
-              <Select
-                id="configurationItemId"
-                name="configuration_item_id"
-                aria-describedby="configuration-item-error"
-              >
-                <option value="" disabled>
-                  Select a CI
-                </option>
-                {cis.map((ci) => (
-                  <option key={ci.id} value={ci.id}>
-                    {ci.name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <FormInput
+              label="CI"
+              id="configurationItemId"
+              name="configuration_item_id"
+              placeholder="Select a CI"
+              inputs={cis}
+              defaultValue={incident.configuration_item_id}
+              invalid={
+                !!state.errors?.configurationItemId &&
+                state.errors.configurationItemId.length > 0
+              }
+              errorMessage={state.errors?.configurationItemId?.join(", ")}
+            />
 
             {/* Short Description */}
-            <Field>
-              <Label>Short description</Label>
-              <Input
-                name="short_description"
-                defaultValue={incident.short_description}
-                invalid={
-                  state.errors?.shortDescription &&
-                  state.errors.shortDescription.length > 0
-                }
-              />
-
-              {state.errors?.shortDescription &&
-                state.errors?.shortDescription.map((error: string) => (
-                  <ErrorMessage key={error}>{error}</ErrorMessage>
-                ))}
-            </Field>
+            <ShortDescriptionInput
+              defaultValue={incident.short_description}
+              invalid={
+                !!state.errors?.shortDescription &&
+                state.errors.shortDescription.length > 0
+              }
+              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
+            />
 
             {/* Description */}
-            <Field>
-              <Label>Description</Label>
-              <Textarea
-                name="description"
-                defaultValue={incident.description.String}
-              />
-              <Description>
-                Provide a detailed description of the incident
-              </Description>
-            </Field>
+            <DescriptionTextarea
+              defaultValue={incident.description.String}
+              invalid={
+                !!state.errors?.shortDescription &&
+                state.errors.shortDescription.length > 0
+              }
+              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
+            />
 
             {/* Incident State */}
-
-            <Field>
-              <Label>State</Label>
-              <Listbox name="state" defaultValue="New">
-                <ListboxOption value="New">
-                  <ListboxLabel>New</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="In Progress">
-                  <ListboxLabel>In Progress</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="Assigned">
-                  <ListboxLabel>Assigned</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="On Hold">
-                  <ListboxLabel>On Hold</ListboxLabel>
-                </ListboxOption>
-                <ListboxOption value="Resolved">
-                  <ListboxLabel>Resolved</ListboxLabel>
-                </ListboxOption>
-              </Listbox>
-            </Field>
+            <StateListbox
+              defaultValue={incident.state}
+              invalid={!!state.errors?.state && state.errors.state.length > 0}
+              errorMessage={state.errors?.state?.join(", ") || ""}
+            />
           </FieldGroup>
         </Fieldset>
 
