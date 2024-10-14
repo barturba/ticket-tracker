@@ -6,7 +6,6 @@ import { IncidentForm } from "@/app/lib/definitions/incidents";
 import { CIField } from "@/app/lib/definitions/cis";
 import { UserField } from "@/app/lib/definitions/users";
 import { CompanyField } from "@/app/lib/definitions/companies";
-import { Subheading } from "@/app/components/heading";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormInput from "@/app/application-components/incident/form-input";
@@ -16,6 +15,8 @@ import ShortDescriptionInput from "@/app/application-components/incident/short-d
 import { IncidentState } from "@/app/lib/actions/incidents";
 import FormWrapper from "@/app/application-components/form-wrapper";
 import MessageArea from "@/app/application-components/incident/message-area";
+import { useFormStatus } from "react-dom";
+import SubmitButton from "@/app/application-components/button-submit";
 
 export default function EditIncidentForm({
   incident,
@@ -125,7 +126,7 @@ export default function EditIncidentForm({
           <Button type="reset" plain>
             Reset
           </Button>
-          <Button type="submit">Save</Button>
+          <SubmitButton />
         </div>
       </form>
     </FormWrapper>

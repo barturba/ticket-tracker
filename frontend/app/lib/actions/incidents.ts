@@ -59,8 +59,6 @@ export async function getIncidents(
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const IncidentsData: IncidentsData = await data.json();
       if (IncidentsData) {
@@ -104,8 +102,6 @@ export async function getIncidentsAll(
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const IncidentsData: IncidentsData = await data.json();
       if (IncidentsData) {
@@ -144,8 +140,6 @@ export async function fetchLatestIncidents() {
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const incidents = await data.json();
       if (incidents) {
@@ -341,9 +335,15 @@ export async function updateIncident(
       message: "Database Error: Failed to Update Incident.",
     };
   }
+  // Simulate slow load
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   // Revalidate the cache for the incidents page and redirect the user.
-  revalidatePath("/dashboard/incidents");
-  redirect("/dashboard/incidents");
+  revalidatePath(`/dashboard/incidents/${id}/edit`);
+  return {
+    message: "Update Successful",
+  };
+
+  // redirect(`/dashboard/incidents/${id}/edit`);
 }
 
 // DELETE

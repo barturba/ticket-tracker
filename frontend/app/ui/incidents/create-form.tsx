@@ -1,7 +1,5 @@
 "use client";
-import Link from "next/link";
 import { Button } from "@/app/components/button";
-import { useFormState } from "react-dom";
 import { createIncident, IncidentState } from "@/app/lib/actions/incidents";
 import { UserField } from "@/app/lib/definitions/users";
 import { CIField } from "@/app/lib/definitions/cis";
@@ -15,6 +13,7 @@ import StateListbox from "@/app/application-components/incident/state-listbox";
 import { Divider } from "@/app/components/divider";
 import { useActionState } from "react";
 import MessageArea from "@/app/application-components/incident/message-area";
+import SubmitButton from "@/app/application-components/button-submit";
 
 export default function CreateIncidentForm({
   companies,
@@ -112,7 +111,7 @@ export default function CreateIncidentForm({
           <Button type="reset" plain>
             Reset
           </Button>
-          <Button type="submit">Save</Button>
+          <SubmitButton />
         </div>
       </form>
     </FormWrapper>
