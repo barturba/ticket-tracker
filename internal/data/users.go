@@ -15,7 +15,6 @@ type User struct {
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email,omitempty"`
-	Password  string    `json:"-"`
 }
 
 func ValidateUser(v *validator.Validator, user *User) {
@@ -28,5 +27,4 @@ func ValidateUser(v *validator.Validator, user *User) {
 	v.Check(user.Email != "", "email", "must be provided")
 	v.Check(len(user.Email) <= 320, "email", "must not be more than 320 bytes long")
 
-	// v.Check(len(user.Password) <= 255, "password", "must not be more than 255 bytes long")
 }

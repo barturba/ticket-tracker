@@ -101,7 +101,7 @@ func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, 
 }
 
 const getIncidentById = `-- name: GetIncidentById :one
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE incidents.id = $1
@@ -123,7 +123,6 @@ type GetIncidentByIdRow struct {
 	FirstName           sql.NullString
 	LastName            sql.NullString
 	Email               sql.NullString
-	Password            sql.NullString
 }
 
 func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetIncidentByIdRow, error) {
@@ -145,13 +144,12 @@ func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetInciden
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
-		&i.Password,
 	)
 	return i, err
 }
 
 const getIncidents = `-- name: GetIncidents :many
-SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, password FROM incidents
+SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (incidents.short_description ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -201,7 +199,6 @@ type GetIncidentsRow struct {
 	FirstName           sql.NullString
 	LastName            sql.NullString
 	Email               sql.NullString
-	Password            sql.NullString
 }
 
 func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]GetIncidentsRow, error) {
@@ -236,7 +233,6 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 			&i.FirstName,
 			&i.LastName,
 			&i.Email,
-			&i.Password,
 		); err != nil {
 			return nil, err
 		}
@@ -268,7 +264,7 @@ func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (
 }
 
 const getIncidentsLatest = `-- name: GetIncidentsLatest :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, password FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC
@@ -296,7 +292,6 @@ type GetIncidentsLatestRow struct {
 	FirstName           sql.NullString
 	LastName            sql.NullString
 	Email               sql.NullString
-	Password            sql.NullString
 }
 
 func (q *Queries) GetIncidentsLatest(ctx context.Context, arg GetIncidentsLatestParams) ([]GetIncidentsLatestRow, error) {
@@ -324,7 +319,6 @@ func (q *Queries) GetIncidentsLatest(ctx context.Context, arg GetIncidentsLatest
 			&i.FirstName,
 			&i.LastName,
 			&i.Email,
-			&i.Password,
 		); err != nil {
 			return nil, err
 		}

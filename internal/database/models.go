@@ -91,5 +91,4 @@ type User struct {
 	FirstName sql.NullString
 	LastName  sql.NullString
 	Email     string
-	Password  sql.NullString
 }

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/barturba/ticket-tracker/internal/auth"
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/google/uuid"
@@ -65,12 +64,6 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Us
 
 func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
 
-	password := auth.Password{}
-	err := auth.Set(&password, user.Password)
-	if err != nil {
-		return data.User{}, errors.New("couldn't set password")
-	}
-
 	i, err := db.CreateUser(r.Context(), database.CreateUserParams{
 		ID:        user.ID,
 		CreatedAt: time.Now(),
@@ -78,7 +71,6 @@ func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User,
 		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
 		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
 		Email:     user.Email,
-		// Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	response := convert(i)
 	if err != nil {
@@ -91,19 +83,12 @@ func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User,
 
 func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
 
-	password := auth.Password{}
-	err := auth.Set(&password, user.Password)
-	if err != nil {
-		return data.User{}, errors.New("couldn't set password")
-	}
-
 	i, err := db.UpdateUser(r.Context(), database.UpdateUserParams{
 		ID:        user.ID,
 		UpdatedAt: time.Now(),
 		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
 		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
 		Email:     user.Email,
-		// Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	if err != nil {
 		log.Printf("put err %v\n", err)
