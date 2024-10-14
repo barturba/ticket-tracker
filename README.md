@@ -56,14 +56,14 @@ The frontend uses the following npm packages:
 
 - Create a .env file in the root directory of your project with the following format:
 
-```bash .env
-ENV="development"
-HOST="localhost"
-PORT="8080"
-DATABASE_URL="postgres://YOURNAME:@localhost:5432/tickettracker?sslmode=disable"
-JWT_SECRET="GENERATEME"
-ADMIN_PASSWORD="pass123"
-```
+  ```bash .env
+  ENV="development"
+  HOST="localhost"
+  PORT="8080"
+  DATABASE_URL="postgres://YOURNAME:@localhost:5432/tickettracker?sslmode=disable"
+  JWT_SECRET="GENERATEME"
+  ADMIN_PASSWORD="pass123"
+  ```
 
 - **ENV:** Set the environment. For development, use "development".
 - **HOST:** Specify the host for the server.
@@ -71,9 +71,9 @@ ADMIN_PASSWORD="pass123"
 - **DATABASE_URL:** Provide your PostgreSQL connection string, replacing YOURNAME with your database username.
 - **JWT_SECRET:** Generate a secret for JSON Web Token encryption. Use the following command to generate a secure key:
 
-```bash
-openssl rand -base64 60
-```
+  ```bash
+  openssl rand -base64 60
+  ```
 
 - **ADMIN_PASSWORD:** Set the password for the admin user.
 
