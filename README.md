@@ -6,15 +6,15 @@
 
 Most incident management tools I tried were:
 
-- _molasses slow_
-- clunky
-- impossible navigate.
+- _molasses_ slow
+- **clunky**
+- **impossible** to navigate
 
 I needed something:
 
-- quicker (loads everything in less than 250 ms)
-- smoother
-- way more intuitive
+- **quicker** (loads everything in less than 250 ms)
+- **smoother**
+- way more **intuitive**
 
 That's why I built **TicketTracker**.
 
