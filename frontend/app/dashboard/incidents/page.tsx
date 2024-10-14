@@ -19,6 +19,7 @@ import {
 import { getIncidents } from "@/app/lib/actions/incidents";
 import { IncidentData } from "@/app/lib/definitions/incidents";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
+import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default async function Incidents(props: {
   const currentPage = Number(searchParams?.page) || 1;
 
   const incidentData: IncidentData = await getIncidents(query, currentPage);
+  console.log(`total records: ${incidentData.metadata.last_page}`);
 
   return (
     <>
@@ -77,21 +79,7 @@ export default async function Incidents(props: {
         </TableBody>
       </Table>
 
-      <Pagination>
-        <PaginationPrevious href="?page=2" />
-        <PaginationList>
-          <PaginationPage href="?page=1">1</PaginationPage>
-          <PaginationPage href="?page=2">2</PaginationPage>
-          <PaginationPage href="?page=3" current>
-            3
-          </PaginationPage>
-          <PaginationPage href="?page=4">4</PaginationPage>
-          <PaginationGap />
-          <PaginationPage href="?page=65">65</PaginationPage>
-          <PaginationPage href="?page=66">66</PaginationPage>
-        </PaginationList>
-        <PaginationNext href="?page=4" />
-      </Pagination>
+      <PaginationApp totalPages={incidentData.metadata.last_page} />
     </>
   );
 }

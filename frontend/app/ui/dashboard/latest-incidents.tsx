@@ -1,8 +1,6 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 // import Image from "next/image";
-import { lusitana } from "@/app/ui/fonts";
-import { Incident } from "@/app/lib/definitions";
 import Link from "next/link";
 
 import { formatDateToLocal, truncate } from "@/app/lib/utils";

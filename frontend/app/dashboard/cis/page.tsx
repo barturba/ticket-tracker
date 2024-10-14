@@ -1,15 +1,4 @@
 import AppHeading from "@/app/application-components/heading";
-import { Badge } from "@/app/components/badge";
-import { Button } from "@/app/components/button";
-import { Heading } from "@/app/components/heading";
-import {
-  Pagination,
-  PaginationGap,
-  PaginationList,
-  PaginationNext,
-  PaginationPage,
-  PaginationPrevious,
-} from "@/app/components/pagination";
 import {
   Table,
   TableBody,
@@ -20,7 +9,8 @@ import {
 } from "@/app/components/table";
 import { getCIs } from "@/app/lib/actions/cis";
 import { CIsData } from "@/app/lib/definitions/cis";
-import { formatDateToLocal, truncate } from "@/app/lib/utils";
+import { formatDateToLocal } from "@/app/lib/utils";
+import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -71,21 +61,7 @@ export default async function CIs(props: {
         </TableBody>
       </Table>
 
-      <Pagination>
-        <PaginationPrevious href="?page=2" />
-        <PaginationList>
-          <PaginationPage href="?page=1">1</PaginationPage>
-          <PaginationPage href="?page=2">2</PaginationPage>
-          <PaginationPage href="?page=3" current>
-            3
-          </PaginationPage>
-          <PaginationPage href="?page=4">4</PaginationPage>
-          <PaginationGap />
-          <PaginationPage href="?page=65">65</PaginationPage>
-          <PaginationPage href="?page=66">66</PaginationPage>
-        </PaginationList>
-        <PaginationNext href="?page=4" />
-      </Pagination>
+      <PaginationApp totalPages={cisData.metadata.last_page} />
     </>
   );
 }

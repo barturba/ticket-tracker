@@ -1,13 +1,5 @@
 import AppHeading from "@/app/application-components/heading";
 import {
-  Pagination,
-  PaginationGap,
-  PaginationList,
-  PaginationNext,
-  PaginationPage,
-  PaginationPrevious,
-} from "@/app/components/pagination";
-import {
   Table,
   TableBody,
   TableCell,
@@ -18,6 +10,7 @@ import {
 import { getCompanies } from "@/app/lib/actions/companies";
 import { CompaniesData } from "@/app/lib/definitions/companies";
 import { formatDateToLocal } from "@/app/lib/utils";
+import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -34,7 +27,7 @@ export default async function Companies(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const companyData: CompaniesData = await getCompanies(query, currentPage);
+  const companiesData: CompaniesData = await getCompanies(query, currentPage);
 
   return (
     <>
@@ -52,7 +45,7 @@ export default async function Companies(props: {
           </TableRow>
         </TableHead>
         <TableBody>
-          {companyData.companies.map((company) => (
+          {companiesData.companies.map((company) => (
             <TableRow
               key={company.id}
               href={`/dashboard/companies/${company.id}/edit`}
@@ -68,21 +61,7 @@ export default async function Companies(props: {
         </TableBody>
       </Table>
 
-      <Pagination>
-        <PaginationPrevious href="?page=2" />
-        <PaginationList>
-          <PaginationPage href="?page=1">1</PaginationPage>
-          <PaginationPage href="?page=2">2</PaginationPage>
-          <PaginationPage href="?page=3" current>
-            3
-          </PaginationPage>
-          <PaginationPage href="?page=4">4</PaginationPage>
-          <PaginationGap />
-          <PaginationPage href="?page=65">65</PaginationPage>
-          <PaginationPage href="?page=66">66</PaginationPage>
-        </PaginationList>
-        <PaginationNext href="?page=4" />
-      </Pagination>
+      <PaginationApp totalPages={companiesData.metadata.last_page} />
     </>
   );
 }
