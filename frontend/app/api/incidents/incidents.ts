@@ -55,7 +55,7 @@ export async function getIncidents(
     // Don't do this in production :)
 
     // console.log('Fetching revenue data...');
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // await new Promise((resolve) => setTimeout(resolve, 3000));
     const url = new URL(`http://localhost:8080/v1/incidents`);
 
     const searchParams = url.searchParams;
