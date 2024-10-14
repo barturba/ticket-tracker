@@ -67,8 +67,6 @@ export async function getIncidents(
           metadata: IncidentsData.metadata,
         };
       } else {
-        // console.log(`getIncidents url: ${url.toString()}`);
-        // console.log(`getIncidents error: !IncidentsData`);
         throw new Error("Failed to fetch incidents data: !IncidentsData");
       }
     } else {
@@ -110,8 +108,6 @@ export async function getIncidentsAll(
           metadata: IncidentsData.metadata,
         };
       } else {
-        // console.log(`getIncidents url: ${url.toString()}`);
-        // console.log(`getIncidents error: !IncidentsData`);
         throw new Error("Failed to fetch incidents data: !IncidentsData");
       }
     } else {
@@ -131,7 +127,6 @@ export async function getIncidentsAll(
 
 export async function fetchLatestIncidents() {
   try {
-    console.log(`calling fetchLatestIncidents()`);
     const url = new URL(`http://localhost:8080/v1/incidents_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
@@ -335,8 +330,6 @@ export async function updateIncident(
       message: "Database Error: Failed to Update Incident.",
     };
   }
-  // Simulate slow load
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
   // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath(`/dashboard/incidents/${id}/edit`);
   return {

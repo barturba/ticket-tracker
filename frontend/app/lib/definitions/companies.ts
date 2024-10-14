@@ -12,8 +12,13 @@ export type CompanyField = {
   name: string;
 };
 
-export type CompanyData = {
+export type CompaniesData = {
   companies: Company[];
+  metadata: Metadata;
+};
+
+export type CompanyData = {
+  company: Company;
   metadata: Metadata;
 };
 

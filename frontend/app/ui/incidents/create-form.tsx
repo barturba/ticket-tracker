@@ -6,13 +6,13 @@ import { CIField } from "@/app/lib/definitions/cis";
 import { CompanyField } from "@/app/lib/definitions/companies";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
-import FormInput from "@/app/application-components/incident/form-input";
+import FormInput from "@/app/application-components/resources/form-input";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import StateListbox from "@/app/application-components/incident/state-listbox";
 import { Divider } from "@/app/components/divider";
 import { useActionState } from "react";
-import MessageArea from "@/app/application-components/incident/message-area";
+import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 
 export default function CreateIncidentForm({
@@ -78,6 +78,8 @@ export default function CreateIncidentForm({
 
             {/* Short Description */}
             <ShortDescriptionInput
+              label="Short Description"
+              name="short_description"
               invalid={
                 !!state.errors?.shortDescription &&
                 state.errors.shortDescription.length > 0
@@ -87,11 +89,15 @@ export default function CreateIncidentForm({
 
             {/* Description */}
             <DescriptionTextarea
+              label="Description"
+              name="description"
+              description="Provide a detailed description of the incident"
               invalid={
-                !!state.errors?.shortDescription &&
-                state.errors.shortDescription.length > 0
+                !!state.errors?.description &&
+                state.errors.description.length > 0
               }
-              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
+              errorMessage={state.errors?.description?.join(", ") || ""}
+              defaultValue={""}
             />
 
             {/* Incident State */}

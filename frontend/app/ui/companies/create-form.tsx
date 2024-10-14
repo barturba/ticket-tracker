@@ -1,50 +1,58 @@
 "use client";
-import { State } from "@/app/lib/actions";
-import { BuildingOfficeIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
-import { useFormState } from "react-dom";
-import { Button } from "../button";
-import { createCompany } from "@/app/lib/actions/companies";
+import { Button } from "@/app/components/button";
+import { CompanyState, createCompany } from "@/app/lib/actions/companies";
+import { UserField } from "@/app/lib/definitions/users";
+import { CIField } from "@/app/lib/definitions/cis";
+import { CompanyField } from "@/app/lib/definitions/companies";
+import FormWrapper from "@/app/application-components/resources/form-wrapper";
+import { FieldGroup, Fieldset } from "@/app/components/fieldset";
+import { Divider } from "@/app/components/divider";
+import { useActionState } from "react";
+import MessageArea from "@/app/application-components/resources/message-area";
+import SubmitButton from "@/app/application-components/resources/button-submit";
 
-export default function Form() {
-  const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useFormState(createCompany, initialState);
+export default function CreateCompanyForm({
+  companies,
+  users,
+  cis,
+}: {
+  companies: CompanyField[];
+  users: UserField[];
+  cis: CIField[];
+}) {
+  const initialState: CompanyState = { message: "", errors: {} };
+  const [state, formAction] = useActionState(createCompany, initialState);
 
   return (
-    <form action={formAction}>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Company Name */}
-        <div className="mb-4">
-          <label
-            htmlFor="company-name"
-            className="mb-2 block text-sm font-medium"
-          >
-            Enter a company name
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="company-name"
-                name="name"
-                type="text"
-                placeholder="Enter a company name"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                aria-describedby="name-error"
-              />
-            </div>
-            <BuildingOfficeIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-          </div>
+    <FormWrapper subheading="Summary">
+      <form action={formAction}>
+        <Fieldset aria-label="Company details">
+          <FieldGroup>
+            {/* Name */}
+            <ShortDescriptionInput
+              label="Name"
+              name="name"
+              invalid={
+                !!state.errors?.shortDescription &&
+                state.errors.shortDescription.length > 0
+              }
+              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
+            />
+          </FieldGroup>
+
+          {/* Message Area */}
+          <MessageArea state={state} />
+        </Fieldset>
+
+        <Divider className="my-10" soft />
+
+        <div className="flex justify-end gap-4">
+          <Button type="reset" plain>
+            Reset
+          </Button>
+          <SubmitButton />
         </div>
-      </div>
-      <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/dashboard/companies"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Cancel
-        </Link>
-        <Button type="submit">Create Company</Button>
-      </div>
-    </form>
+      </form>
+    </FormWrapper>
   );
 }

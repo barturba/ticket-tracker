@@ -8,14 +8,13 @@ import { UserField } from "@/app/lib/definitions/users";
 import { CompanyField } from "@/app/lib/definitions/companies";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
-import FormInput from "@/app/application-components/incident/form-input";
+import FormInput from "@/app/application-components/resources/form-input";
 import StateListbox from "@/app/application-components/incident/state-listbox";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import { IncidentState } from "@/app/lib/actions/incidents";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
-import MessageArea from "@/app/application-components/incident/message-area";
-import { useFormStatus } from "react-dom";
+import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 
 export default function EditIncidentForm({
@@ -35,8 +34,6 @@ export default function EditIncidentForm({
     updateIncidentWithId,
     initialState
   );
-  console.log(`state: ${JSON.stringify(state)}`);
-  console.log(`formAction: ${JSON.stringify(formAction)}`);
 
   return (
     <FormWrapper subheading="Summary">
@@ -92,6 +89,8 @@ export default function EditIncidentForm({
 
             {/* Short Description */}
             <ShortDescriptionInput
+              label="Short Description"
+              name="short_description"
               defaultValue={incident.short_description}
               invalid={
                 !!state.errors?.shortDescription &&
@@ -102,6 +101,9 @@ export default function EditIncidentForm({
 
             {/* Description */}
             <DescriptionTextarea
+              label="Description"
+              name="description"
+              description="Provide a detailed description of the incident"
               defaultValue={incident.description.String}
               invalid={
                 !!state.errors?.shortDescription &&

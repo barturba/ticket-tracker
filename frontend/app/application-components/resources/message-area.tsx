@@ -1,6 +1,11 @@
+import { CompanyState } from "@/app/lib/actions/companies";
 import { IncidentState } from "@/app/lib/actions/incidents";
 
-export default function MessageArea({ state }: { state: IncidentState }) {
+export default function MessageArea({
+  state,
+}: {
+  state: IncidentState | CompanyState;
+}) {
   return (
     <div aria-live="polite" aria-atomic="true">
       {state.errors && state.message ? (

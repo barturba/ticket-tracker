@@ -134,13 +134,13 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		count, err := db.GetCompanyByID(r.Context(), id)
+		i, err := GetByIDFromDB(r, db, id)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/company/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
+		logger.Info("msg", "handle", "GET /v1/companies/{id}")
+		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 

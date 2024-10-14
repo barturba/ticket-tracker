@@ -1,7 +1,4 @@
 import AppHeading from "@/app/application-components/heading";
-import { Badge } from "@/app/components/badge";
-import { Button } from "@/app/components/button";
-import { Heading } from "@/app/components/heading";
 import {
   Pagination,
   PaginationGap,
@@ -19,8 +16,8 @@ import {
   TableRow,
 } from "@/app/components/table";
 import { getCompanies } from "@/app/lib/actions/companies";
-import { CompanyData } from "@/app/lib/definitions/companies";
-import { formatDateToLocal, truncate } from "@/app/lib/utils";
+import { CompaniesData } from "@/app/lib/definitions/companies";
+import { formatDateToLocal } from "@/app/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -37,7 +34,7 @@ export default async function Companies(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const companyData: CompanyData = await getCompanies(query, currentPage);
+  const companyData: CompaniesData = await getCompanies(query, currentPage);
 
   return (
     <>
@@ -51,13 +48,11 @@ export default async function Companies(props: {
           <TableRow>
             <TableHeader>ID </TableHeader>
             <TableHeader>Updated date</TableHeader>
-            <TableHeader>Assigned to</TableHeader>
-            <TableHeader>Short description</TableHeader>
-            <TableHeader>State</TableHeader>
+            <TableHeader>Name</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* {companyData.companies.map((company) => (
+          {companyData.companies.map((company) => (
             <TableRow
               key={company.id}
               href={`/dashboard/companies/${company.id}/edit`}
@@ -67,15 +62,9 @@ export default async function Companies(props: {
               <TableCell className="text-zinc-500">
                 {formatDateToLocal(company.updated_at)}
               </TableCell>
-              <TableCell>{company.assigned_to_name}</TableCell>
-              <TableCell>{truncate(company.short_description)}</TableCell>
-              <TableCell>
-                <Badge className="max-sm:hidden" state={company.state}>
-                  {company.state}
-                </Badge>
-              </TableCell>
+              <TableCell>{company.name}</TableCell>
             </TableRow>
-          ))} */}
+          ))}
         </TableBody>
       </Table>
 

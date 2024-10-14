@@ -7,19 +7,25 @@ import {
 import { Textarea } from "@/app/components/textarea";
 
 export default function DescriptionTextarea({
+  label,
+  name,
+  description,
   defaultValue,
   invalid,
   errorMessage,
 }: {
-  defaultValue?: string;
+  label: string;
+  name: string;
+  description: string;
+  defaultValue: string;
   invalid: boolean;
   errorMessage: string;
 }) {
   return (
     <Field>
-      <Label>Description</Label>
-      <Textarea name="description" defaultValue={defaultValue} />
-      <Description>Provide a detailed description of the incident</Description>
+      <Label>{label}</Label>
+      <Textarea name={name} defaultValue={defaultValue} />
+      <Description>{description}</Description>
       {!!invalid && <ErrorMessage>{errorMessage}</ErrorMessage>}
     </Field>
   );
