@@ -1,9 +1,10 @@
 "use client";
 
 import clsx from "clsx";
+import Link from "next/link";
 import type React from "react";
 import { createContext, useContext, useState } from "react";
-import { Link } from "@/app/components/link";
+// import { Link } from "@/app/components/link";
 
 const TableContext = createContext<{
   bleed: boolean;

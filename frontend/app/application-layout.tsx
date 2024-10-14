@@ -20,6 +20,7 @@ import {
   DocumentDuplicateIcon,
   BriefcaseIcon,
   BuildingOffice2Icon,
+  CogIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -161,6 +162,13 @@ export function ApplicationLayout({
                 <HomeIcon />
                 <SidebarLabel>Dashboard</SidebarLabel>
               </SidebarItem>
+              <SidebarItem
+                href="/loading"
+                current={pathname.startsWith("/loading")}
+              >
+                <CogIcon />
+                <SidebarLabel>Loading Test</SidebarLabel>
+              </SidebarItem>
 
               <SidebarItem
                 href="/dashboard/incidents"
@@ -212,9 +220,9 @@ export function ApplicationLayout({
               ))}
             </SidebarSection> */}
 
-            <SidebarSpacer />
+            {/* <SidebarSpacer /> */}
 
-            <SidebarSection>
+            {/* <SidebarSection>
               <SidebarItem href="#">
                 <QuestionMarkCircleIcon />
                 <SidebarLabel>Support</SidebarLabel>
@@ -223,7 +231,7 @@ export function ApplicationLayout({
                 <SparklesIcon />
                 <SidebarLabel>Changelog</SidebarLabel>
               </SidebarItem>
-            </SidebarSection>
+            </SidebarSection> */}
           </SidebarBody>
 
           {/* <SidebarFooter className="max-lg:hidden">
