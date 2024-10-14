@@ -2,6 +2,10 @@
 
 ![Alt text](/ticket-tracker-screenshot.png?raw=true "Screenshot of TicketTracker")
 
+## Why?
+
+Most incident management tools I tried were molasses slow, clunky, and to impossible navigate. I needed something quicker, smoother, and more intuitive —- so I built **TicketTracker**. Now, tracking and resolving incidents is as lightning fast as it should be.
+
 **TicketTracker** is a IT ticketing system designed to simplify the management of incidents. It provides basic user support and essential features for IT service management.
 
 ## Features
