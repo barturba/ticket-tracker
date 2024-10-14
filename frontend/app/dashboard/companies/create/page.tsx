@@ -1,28 +1,23 @@
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
-import { CompanyData } from "@/app/lib/definitions/companies";
-import { getCompanies } from "@/app/lib/actions/companies";
+import { getCIs, getCIsAll } from "@/app/lib/actions/cis";
+import { getCompanies, getCompaniesAll } from "@/app/lib/actions/companies";
+import { getUsers, getUsersAll } from "@/app/lib/actions/users";
+import CreateCompanyForm from "@/app/ui/companies/create-form";
+import HeadingEdit from "@/app/application-components/heading-edit";
+import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 
 export const metadata: Metadata = {
   title: "Create Company",
 };
 
-export default async function Page() {
-  const companydata: CompanyData = await getCompanies("", 1);
+export default async function CreateCompany() {
   return (
-    <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: "Companies", href: "/dashboard/companies" },
-          {
-            label: "Create Company",
-            href: "/dashboard/companies/create",
-            active: true,
-          },
-        ]}
-      />
-      <Form />
-    </main>
+    <>
+      <HeadingEdit name="Companies" backLink="/dashboard/companies" />
+      <HeadingSubEdit name={`Create Company`} />
+      <CreateCompanyForm />
+    </>
   );
 }

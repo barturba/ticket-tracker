@@ -18,13 +18,15 @@ export default function HeadingSubEdit({
     | "On Hold"
     | "Resolved"
     | undefined;
-  badgeText: string;
+  badgeText: string | undefined;
 }) {
   return (
     <div className="mt-4 lg:mt-8">
       <div className="flex items-center gap-4">
         <Heading>{name}</Heading>
-        <Badge state={badgeState}>{badgeText}</Badge>
+        {badgeState && badgeText && (
+          <Badge state={badgeState}>{badgeText}</Badge>
+        )}
       </div>
       {/* <div className="isolate mt-2.5 flex flex-wrap justify-between gap-x-6 gap-y-4">
         <div className="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
