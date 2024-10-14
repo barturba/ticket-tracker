@@ -1,14 +1,6 @@
 import AppHeading from "@/app/application-components/heading";
 import { Badge } from "@/app/components/badge";
 import {
-  Pagination,
-  PaginationGap,
-  PaginationList,
-  PaginationNext,
-  PaginationPage,
-  PaginationPrevious,
-} from "@/app/components/pagination";
-import {
   Table,
   TableBody,
   TableCell,
@@ -17,7 +9,7 @@ import {
   TableRow,
 } from "@/app/components/table";
 import { getIncidents } from "@/app/lib/actions/incidents";
-import { IncidentData } from "@/app/lib/definitions/incidents";
+import { IncidentsData } from "@/app/lib/definitions/incidents";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
@@ -36,8 +28,8 @@ export default async function Incidents(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const incidentData: IncidentData = await getIncidents(query, currentPage);
-  console.log(`total records: ${incidentData.metadata.last_page}`);
+  const incidentsData: IncidentsData = await getIncidents(query, currentPage);
+  console.log(`total records: ${incidentsData.metadata.last_page}`);
 
   return (
     <>
@@ -57,7 +49,7 @@ export default async function Incidents(props: {
           </TableRow>
         </TableHead>
         <TableBody>
-          {incidentData.incidents.map((incident) => (
+          {incidentsData.incidents.map((incident) => (
             <TableRow
               key={incident.id}
               href={`/dashboard/incidents/${incident.id}/edit`}
@@ -79,7 +71,7 @@ export default async function Incidents(props: {
         </TableBody>
       </Table>
 
-      <PaginationApp totalPages={incidentData.metadata.last_page} />
+      <PaginationApp totalPages={incidentsData.metadata.last_page} />
     </>
   );
 }
