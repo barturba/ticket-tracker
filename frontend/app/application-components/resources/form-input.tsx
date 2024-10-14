@@ -1,6 +1,5 @@
 import { ErrorMessage, Field, Label } from "@/app/components/fieldset";
 import { Select } from "@/app/components/select";
-import { State } from "@/app/lib/actions";
 
 export default function FormInput({
   label,

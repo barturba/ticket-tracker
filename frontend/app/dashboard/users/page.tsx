@@ -8,10 +8,10 @@ import {
   TableRow,
 } from "@/app/components/table";
 import { getUsers } from "@/app/api/users/users";
-import { UsersData } from "@/app/lib/definitions/users";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
+import { UsersData } from "@/app/api/users/users.d";
 
 export const metadata: Metadata = {
   title: "Users",

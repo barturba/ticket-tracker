@@ -8,10 +8,10 @@ import {
   TableRow,
 } from "@/app/components/table";
 import { getCIs } from "@/app/api/cis/cis";
-import { CIsData } from "@/app/lib/definitions/cis";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
+import { CIsData } from "@/app/api/cis/cis.d";
 
 export const metadata: Metadata = {
   title: "CIs",

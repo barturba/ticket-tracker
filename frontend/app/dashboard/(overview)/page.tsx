@@ -3,7 +3,7 @@ import { getIncidents } from "@/app/api/incidents/incidents";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
 import { IncidentsData } from "@/app/api/incidents/incidents.d";
-import IncidentsTable from "../incidents/table";
+import IncidentsTable from "../../ui/sections/incidents/table";
 
 export const metadata: Metadata = {
   title: "Dashboard",

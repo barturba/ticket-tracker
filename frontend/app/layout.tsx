@@ -30,9 +30,7 @@ export default async function RootLayout({
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body>
-        <ApplicationLayout events={undefined} children={undefined}>
-          {children}
-        </ApplicationLayout>
+        <ApplicationLayout>{children}</ApplicationLayout>
       </body>
     </html>
   );

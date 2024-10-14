@@ -8,10 +8,10 @@ import {
   TableRow,
 } from "@/app/components/table";
 import { getCompanies } from "@/app/api/companies/companies";
-import { CompaniesData } from "@/app/lib/definitions/companies";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
+import { CompaniesData } from "@/app/api/companies/companies.d";
 
 export const metadata: Metadata = {
   title: "Companies",

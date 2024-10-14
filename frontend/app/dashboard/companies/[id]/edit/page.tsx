@@ -1,10 +1,7 @@
 import EditCompanyForm from "@/app/ui/sections/companies/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCIsAll } from "@/app/api/cis/cis";
-import { getCompaniesAll } from "@/app/api/companies/companies";
 import { getCompany } from "@/app/api/companies/companies";
-import { getUsersAll } from "@/app/api/users/users";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 

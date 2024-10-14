@@ -1,5 +1,5 @@
-import { Badge } from "../components/badge";
-import { Heading } from "../components/heading";
+import { Badge } from "@/app/components/badge";
+import { Heading } from "@/app/components/heading";
 
 export default function HeadingSubEdit({
   name,

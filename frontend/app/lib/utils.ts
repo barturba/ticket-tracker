@@ -65,6 +65,6 @@ export function truncate(str: string, useWordBoundary: boolean) {
   );
 }
 
-export function classNames(...classes) {
+export function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }

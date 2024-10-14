@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
-import { UserData, UsersData } from "@/app/lib/definitions/users";
+import { UsersData } from "@/app/api/users/users.d";
 
 export type UserState = {
   message?: string;

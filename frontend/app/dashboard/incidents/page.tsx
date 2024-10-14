@@ -2,7 +2,7 @@ import AppHeading from "@/app/application-components/heading";
 import { getIncidents } from "@/app/api/incidents/incidents";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
-import IncidentsTable from "./table";
+import IncidentsTable from "../../ui/sections/incidents/table";
 import { IncidentsData } from "@/app/api/incidents/incidents.d";
 
 export const metadata: Metadata = {

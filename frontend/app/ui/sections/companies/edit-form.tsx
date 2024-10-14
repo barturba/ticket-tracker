@@ -2,13 +2,13 @@
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
 import { CompanyState, updateCompany } from "@/app/api/companies/companies";
-import { CompanyForm } from "@/app/lib/definitions/companies";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import MessageArea from "@/app/application-components/resources/message-area";
+import { CompanyForm } from "@/app/api/companies/companies.d";
 
 export default function EditCompanyForm({ company }: { company: CompanyForm }) {
   const initialState: CompanyState = { message: "", errors: {} };

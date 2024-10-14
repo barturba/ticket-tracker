@@ -2,7 +2,6 @@
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
 import { updateCI } from "@/app/api/cis/cis";
-import { CIForm } from "@/app/lib/definitions/cis";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { CIState } from "@/app/api/cis/cis";
@@ -10,6 +9,7 @@ import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
+import { CIForm } from "@/app/api/cis/cis.d";
 
 export default function EditCIForm({ ci }: { ci: CIForm }) {
   const initialState: CIState = { message: "", errors: {} };

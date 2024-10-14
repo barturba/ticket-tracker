@@ -1,4 +1,5 @@
 "use client";
+import { IncidentsData } from "@/app/api/incidents/incidents.d";
 import { Badge } from "@/app/components/badge";
 import {
   Table,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { IncidentsData } from "@/app/lib/definitions/incidents";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 import { Suspense } from "react";
 
@@ -42,7 +42,9 @@ export default function IncidentsTable({
                   {formatDateToLocal(incident.updated_at)}
                 </TableCell>
                 <TableCell>{incident.assigned_to_name}</TableCell>
-                <TableCell>{truncate(incident.short_description)}</TableCell>
+                <TableCell>
+                  {truncate(incident.short_description, true)}
+                </TableCell>
                 <TableCell>
                   <Badge className="max-sm:hidden" state={incident.state}>
                     {incident.state}

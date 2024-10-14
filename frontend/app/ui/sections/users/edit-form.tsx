@@ -2,8 +2,8 @@
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
 import { updateUser } from "@/app/api/users/users";
-import { UserForm } from "@/app/lib/definitions/users";
 import { Divider } from "@/app/components/divider";
+import { UserForm } from "@/app/api/users/users.d";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";

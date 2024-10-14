@@ -11,7 +11,8 @@ export type User = {
 
 export type UserField = {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
 };
 
 export type UsersData = {

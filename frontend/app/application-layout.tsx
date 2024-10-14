@@ -1,26 +1,15 @@
 "use client";
 import logo from "@/public/static/images/logo.png";
 import {
-  ChevronDownIcon,
-  Cog8ToothIcon,
-  PlusIcon,
   HomeIcon,
   Square2StackIcon,
-  TicketIcon,
-  Cog6ToothIcon,
-  QuestionMarkCircleIcon,
-  SparklesIcon,
-  ChevronUpIcon,
   ArrowRightStartOnRectangleIcon,
   LightBulbIcon,
   ShieldCheckIcon,
   UserCircleIcon,
   CpuChipIcon,
   UserGroupIcon,
-  DocumentDuplicateIcon,
-  BriefcaseIcon,
   BuildingOffice2Icon,
-  CogIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -35,11 +24,9 @@ import {
   Sidebar,
   SidebarBody,
   SidebarHeader,
-  SidebarHeading,
   SidebarItem,
   SidebarLabel,
   SidebarSection,
-  SidebarSpacer,
 } from "@/app/components/sidebar";
 import { Avatar } from "@/app/components/avatar";
 import {
@@ -78,13 +65,7 @@ function AccountDropdownMenu({
     </DropdownMenu>
   );
 }
-export function ApplicationLayout({
-  events,
-  children,
-}: {
-  events: Awaited<ReturnType<typeof getEvents>>;
-  children: React.ReactNode;
-}) {
+export function ApplicationLayout({ children }: { children: React.ReactNode }) {
   let pathname = usePathname();
 
   return (

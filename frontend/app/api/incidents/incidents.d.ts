@@ -8,7 +8,7 @@ export type Incident = {
   configuration_item_id: string;
   configuration_item_id_name: string;
   company_id: string;
-  state: string;
+  state: "New" | "Assigned" | "In Progress" | "On Hold" | "Resolved";
   assigned_to: string;
   assigned_to_name: string;
 };
