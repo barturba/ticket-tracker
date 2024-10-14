@@ -20,6 +20,7 @@ type Incident struct {
 	ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
 	CompanyID           uuid.UUID          `json:"company_id"`
 	AssignedToID        uuid.NullUUID      `json:"assigned_to_id"`
+	AssignedToName      string             `json:"assigned_to_name"`
 	State               database.StateEnum `json:"state"`
 }
 

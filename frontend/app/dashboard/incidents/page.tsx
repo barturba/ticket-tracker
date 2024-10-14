@@ -67,7 +67,7 @@ export default async function Incidents(props: {
               <TableCell className="text-zinc-500">
                 {formatDateToLocal(incident.updated_at)}
               </TableCell>
-              <TableCell>{incident.assigned_to}</TableCell>
+              <TableCell>{incident.assigned_to_name}</TableCell>
               <TableCell>{truncate(incident.short_description)}</TableCell>
               <TableCell>
                 <Badge className="max-sm:hidden" state={incident.state}>

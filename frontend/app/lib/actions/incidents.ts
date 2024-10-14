@@ -336,7 +336,7 @@ export async function updateIncident(
     };
   }
   // Simulate slow load
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
   // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath(`/dashboard/incidents/${id}/edit`);
   return {

@@ -1,6 +1,8 @@
 package incidents
 
 import (
+	"fmt"
+
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 )
@@ -92,6 +94,7 @@ func convertRowAndCount(row database.GetIncidentsRow, count *int64) data.Inciden
 		ConfigurationItemID: row.ConfigurationItemID,
 		CompanyID:           row.CompanyID,
 		AssignedToID:        row.AssignedTo,
+		AssignedToName:      fmt.Sprintf("%s %s", row.FirstName.String, row.LastName.String),
 		State:               row.State,
 	}
 	*count = row.Count

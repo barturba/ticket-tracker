@@ -1,7 +1,6 @@
 import { IncidentState } from "@/app/lib/actions/incidents";
 
 export default function MessageArea({ state }: { state: IncidentState }) {
-  console.log(`MessageArea state: ${JSON.stringify(state, null, 2)}`);
   return (
     <div aria-live="polite" aria-atomic="true">
       {state.errors && state.message ? (
