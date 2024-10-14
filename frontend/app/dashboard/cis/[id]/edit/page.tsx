@@ -1,9 +1,9 @@
 import EditCIForm from "@/app/ui/sections/cis/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCIsAll } from "@/app/lib/actions/cis";
+import { getCIsAll } from "@/app/api/cis/cis";
 import { getCompaniesAll } from "@/app/lib/actions/companies";
-import { getCI } from "@/app/lib/actions/cis";
+import { getCI } from "@/app/api/cis/cis";
 import { getUsersAll } from "@/app/lib/actions/users";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";

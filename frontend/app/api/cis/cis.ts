@@ -6,7 +6,8 @@ import {
   ALL_ITEMS_LIMIT,
   ITEMS_PER_PAGE,
 } from "@/app/lib/definitions/constants";
-import { CIData, CIsData } from "@/app/lib/definitions/cis";
+
+import type { CIsData } from "@/app/api/cis/cis.d";
 
 export type CIState = {
   message?: string;

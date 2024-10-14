@@ -1,7 +1,7 @@
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/sections/companies/create-form";
 import { Metadata } from "next";
-import { getCIs, getCIsAll } from "@/app/lib/actions/cis";
+import { getCIs, getCIsAll } from "@/app/api/cis/cis";
 import { getCompanies, getCompaniesAll } from "@/app/lib/actions/companies";
 import { getUsers, getUsersAll } from "@/app/lib/actions/users";
 import CreateCompanyForm from "@/app/ui/sections/companies/create-form";

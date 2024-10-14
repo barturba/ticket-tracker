@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { createCI, CIState } from "@/app/lib/actions/cis";
+import { createCI, CIState } from "@/app/api/cis/cis";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { Divider } from "@/app/components/divider";

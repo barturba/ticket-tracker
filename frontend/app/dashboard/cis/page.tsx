@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { getCIs } from "@/app/lib/actions/cis";
+import { getCIs } from "@/app/api/cis/cis";
 import { CIsData } from "@/app/lib/definitions/cis";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";

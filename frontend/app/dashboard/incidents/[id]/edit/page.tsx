@@ -1,7 +1,7 @@
 import EditIncidentForm from "@/app/ui/sections/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCIsAll } from "@/app/lib/actions/cis";
+import { getCIsAll } from "@/app/api/cis/cis";
 import { getCompaniesAll } from "@/app/lib/actions/companies";
 import { getIncident } from "@/app/api/incidents/incidents";
 import HeadingEdit from "@/app/application-components/heading-edit";

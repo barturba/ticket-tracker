@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getCIsAll } from "@/app/lib/actions/cis";
+import { getCIsAll } from "@/app/api/cis/cis";
 import { getCompaniesAll } from "@/app/lib/actions/companies";
 import { getUsersAll } from "@/app/lib/actions/users";
 import CreateCIForm from "@/app/ui/sections/cis/create-form";
