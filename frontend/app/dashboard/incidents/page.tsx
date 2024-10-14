@@ -34,7 +34,7 @@ export default async function Incidents(props: {
   return (
     <>
       <AppHeading
-        name="Incident"
+        name="Incidents"
         createLabel="Create Incident"
         createLink="/dashboard/incidents/create"
       />

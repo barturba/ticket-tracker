@@ -32,7 +32,7 @@ export default async function Users(props: {
   return (
     <>
       <AppHeading
-        name="User"
+        name="Users"
         createLabel="Create User"
         createLink="/dashboard/users/create"
       />

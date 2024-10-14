@@ -32,7 +32,7 @@ export default async function CIs(props: {
   return (
     <>
       <AppHeading
-        name="CI"
+        name="CIs"
         createLabel="Create CI"
         createLink="/dashboard/cis/create"
       />
