@@ -13,18 +13,20 @@ import Link from "next/link";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   let incident = await getIncident(params.id);
 
   return {
     title: incident && `Incident #${incident.id}`,
   };
 }
-export default async function Incident({ params }: { params: { id: string } }) {
+export default async function Incident(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const id = params.id;
   const [incident, usersData, companiesData, cisData] = await Promise.all([
     getIncident(id),
