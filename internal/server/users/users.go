@@ -1,6 +1,7 @@
 package users
 
 import (
+	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -140,13 +141,13 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		count, err := db.GetUserByID(r.Context(), id)
+		i, err := GetByIDFromDB(r, db, id)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/user/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
+		logger.Info("msg", "handle", "GET /v1/users/{id}", "id", id)
+		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
@@ -207,13 +208,8 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			CreatedAt time.Time
-			UpdatedAt time.Time
-			FirstName string
-			LastName  string
-			APIKey    string
-			Email     string
-			Password  string
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
 		}
 
 		err = helpers.ReadJSON(w, r, &input)
@@ -224,18 +220,15 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		user := &data.User{
 			ID:        id,
-			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			FirstName: input.FirstName,
 			LastName:  input.LastName,
-			APIkey:    input.APIKey,
-			Email:     input.Email,
-			Password:  input.Password,
 		}
 
 		v := validator.New()
 
 		if data.ValidateUser(v, user); !v.Valid() {
+			log.Printf("Put %v\n", v.Errors)
 			errutil.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}

@@ -193,9 +193,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			CreatedAt time.Time
-			UpdatedAt time.Time
-			Name      string
+			Name string `json:"name"`
 		}
 
 		err = helpers.ReadJSON(w, r, &input)
@@ -206,7 +204,6 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		company := &data.Company{
 			ID:        id,
-			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Name:      input.Name,
 		}

@@ -134,13 +134,13 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		count, err := db.GetCIsByID(r.Context(), id)
+		i, err := GetByIDFromDB(r, db, id)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/cis/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, count)
+		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
@@ -191,8 +191,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			UpdatedAt time.Time
-			Name      string
+			Name string `json:"name"`
 		}
 
 		err = helpers.ReadJSON(w, r, &input)

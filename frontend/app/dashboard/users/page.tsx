@@ -36,8 +36,6 @@ export default async function Users(props: {
 
   const usersData: UsersData = await getUsers(query, currentPage);
 
-  console.log(`usersData: ${JSON.stringify(usersData, null, 2)}`);
-
   return (
     <>
       <AppHeading

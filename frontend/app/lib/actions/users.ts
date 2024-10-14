@@ -11,38 +11,23 @@ import { UserData, UsersData } from "@/app/lib/definitions/users";
 export type UserState = {
   message?: string;
   errors?: {
-    shortDescription?: string[];
-    description?: string[];
-    userId?: string[];
-    companyId?: string[];
-    assignedToId?: string[];
-    configurationItemId?: string[];
-    state?: string[];
+    first_name?: string[];
+    last_name?: string[];
   };
 };
 
 const FormSchemaUser = z.object({
   id: z.string(),
-  shortDescription: z
+  first_name: z
     .string({
-      required_error: "Please enter a short description.",
+      required_error: "Please enter the first name.",
     })
-    .min(1, { message: "Short description must be at least 1 character." }),
-  description: z.string({
-    required_error: "Please enter a description.",
-  }),
-  assignedToId: z.string({
-    invalid_type_error: "Please select a user to assign to.",
-  }),
-  companyId: z.string({
-    invalid_type_error: "Please select a company.",
-  }),
-  configurationItemId: z.string({
-    invalid_type_error: "Please select a configuration item to assign to.",
-  }),
-  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
-    invalid_type_error: "Please select an user state.",
-  }),
+    .min(1, { message: "First name must be at least 1 character." }),
+  last_name: z
+    .string({
+      required_error: "Please enter the last name.",
+    })
+    .min(1, { message: "last name must be at least 1 character." }),
 });
 
 // GET
@@ -188,12 +173,8 @@ export async function createUser(
   formData: FormData
 ): Promise<UserState> {
   const validatedFields = UpdateUser.safeParse({
-    shortDescription: formData.get("short_description"),
-    description: formData.get("description"),
-    assignedToId: formData.get("assigned_to_id"),
-    companyId: formData.get("company_id"),
-    configurationItemId: formData.get("configuration_item_id"),
-    state: formData.get("state"),
+    first_name: formData.get("first_name"),
+    last_name: formData.get("last_name"),
   });
 
   if (!validatedFields.success) {
@@ -204,26 +185,15 @@ export async function createUser(
   }
 
   // Validate form fields using Zod
-  const {
-    shortDescription,
-    description,
-    companyId,
-    assignedToId,
-    configurationItemId,
-    state,
-  } = validatedFields.data;
+  const { first_name, last_name } = validatedFields.data;
 
   try {
     const url = new URL(`http://localhost:8080/v1/users`);
     const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
-        short_description: shortDescription,
-        description: description,
-        company_id: companyId,
-        assigned_to_id: assignedToId,
-        configuration_item_id: configurationItemId,
-        state: state,
+        first_name: first_name,
+        last_name: last_name,
       }),
     });
     if (data.ok) {
@@ -267,12 +237,8 @@ export async function updateUser(
 ): Promise<UserState> {
   // Parse the form data using Zod
   const validatedFields = UpdateUser.safeParse({
-    shortDescription: formData.get("short_description"),
-    description: formData.get("description"),
-    assignedToId: formData.get("assigned_to_id"),
-    companyId: formData.get("company_id"),
-    configurationItemId: formData.get("configuration_item_id"),
-    state: formData.get("state"),
+    first_name: formData.get("first_name"),
+    last_name: formData.get("last_name"),
   });
 
   if (!validatedFields.success) {
@@ -281,16 +247,10 @@ export async function updateUser(
       message: "Missing Fields. Failed to Update User.",
     };
   }
-
+  console.log(`updateUser PUT`);
+  console.log(`id: ${id} ${JSON.stringify(validatedFields)}`);
   // Validate form fields using Zod
-  const {
-    shortDescription,
-    description,
-    assignedToId,
-    companyId,
-    configurationItemId,
-    state,
-  } = validatedFields.data;
+  const { first_name, last_name } = validatedFields.data;
 
   // Prepare data for sending to the API.
   try {
@@ -299,12 +259,8 @@ export async function updateUser(
     const data = await fetch(url.toString(), {
       method: "PUT",
       body: JSON.stringify({
-        short_description: shortDescription,
-        description: description,
-        company_id: companyId,
-        assigned_to_id: assignedToId,
-        configuration_item_id: configurationItemId,
-        state: state,
+        first_name: first_name,
+        last_name: last_name,
       }),
     });
     if (data.ok) {

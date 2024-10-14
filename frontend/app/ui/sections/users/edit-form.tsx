@@ -1,137 +1,61 @@
 "use client";
-import { State } from "@/app/lib/actions";
-import Link from "next/link";
-import { Button } from "../button";
-import { useFormStatus } from "react-dom";
-import { useActionState, useState } from "react";
-import { updateIncident } from "@/app/lib/actions/incidents";
-import { Company } from "@/app/lib/definitions/companies";
-import { IncidentForm } from "@/app/lib/definitions/incidents";
-import { User } from "@/app/lib/definitions/users";
-import { CI } from "@/app/lib/definitions/cis";
+import { Button } from "@/app/components/button";
+import { useActionState } from "react";
+import { updateUser } from "@/app/lib/actions/users";
+import { UserForm } from "@/app/lib/definitions/users";
+import { Divider } from "@/app/components/divider";
+import { FieldGroup, Fieldset } from "@/app/components/fieldset";
+import { UserState } from "@/app/lib/actions/users";
+import FormWrapper from "@/app/application-components/resources/form-wrapper";
+import MessageArea from "@/app/application-components/resources/message-area";
+import SubmitButton from "@/app/application-components/resources/button-submit";
+import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" aria-disabled={pending}>
-      Update incident
-    </Button>
-  );
-}
-
-export default function EditForm({
-  incident,
-  initialUsers,
-  companies,
-  cis,
-}: {
-  incident: IncidentForm;
-  initialUsers: User[];
-  companies: Company[];
-  cis: CI[];
-}) {
-  const initialState: State = { message: null, errors: {} };
-  const updateIncidentWithId = updateIncident.bind(null, incident.id);
-  const [state, formAction] = useActionState(
-    updateIncidentWithId,
-    initialState
-  );
-  const [users] = useState(initialUsers);
-  const [setSelectedCompany] = useState(incident.company_id);
-
-  // const handleChange = (event) => {
-  //   setSelectedCompany(event.target.value);
-  // };
-
-  // useEffect(() => {
-  //   console.log(`selectedCompany: ${selectedCompany}`);
-  //   const fetchData = async () => {
-  //     const data = await getUsersByCompany(selectedCompany);
-  //     // console.log(`data.length: ${data.length}`);
-  //     setUsers(data);
-  //   };
-  //   fetchData()
-  //     // make sure to catch any error
-  //     .catch(console.error);
-  // }, [selectedCompany]);
-
-  // TODO [ ]: Get users and configuration items for selected company
-
-  // const handleChange = async (e): Promise<void> => {
-  //   const { name, value } = e.target;
-  //   const newUsers = await getUsersByCompany(value);
-  //   setUsers(newUsers);
-  //   console.log(`name: ${name} value: ${value}`);
-  //   console.log(`newUsers: ${newUsers}`);
-  // };
-  // const [users, setUsers] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const newUsers = await getUsersByCompany(value);
-  //     setUsers(newUsers);
-  //   };
-  //   fetchData();
-  // }, []);
-  // console.log(`got incident: ${JSON.stringify(incident)}`);
+export default function EditUserForm({ user }: { user: UserForm }) {
+  const initialState: UserState = { message: "", errors: {} };
+  const updateUserWithId = updateUser.bind(null, user.id);
+  const [state, formAction] = useActionState(updateUserWithId, initialState);
 
   return (
-    <form action={formAction}>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Company Name */}
-        {/* <div className="mb-4">
-          <label htmlFor="company" className="mb-2 block text-sm font-medium">
-            Choose company
-          </label>
-          <div className="relative">
-            <select
-              id="companyId"
-              name="company_id"
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              // defaultValue={incident.company_id}
-              // defaultValue={selectedCompany}
-              aria-describedby="company-error"
-            >
-              <option value="" disabled>
-                Select a company
-              </option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-            <BuildingOffice2Icon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-          </div>
+    <FormWrapper subheading="Summary">
+      <form action={formAction}>
+        <Fieldset aria-label="User details">
+          <FieldGroup>
+            {/* First Name*/}
+            <ShortDescriptionInput
+              label="First Name"
+              name="first_name"
+              defaultValue={user.first_name}
+              invalid={
+                !!state.errors?.first_name && state.errors.first_name.length > 0
+              }
+              errorMessage={state.errors?.first_name?.join(", ") || ""}
+            />
+            {/* Last Name*/}
+            <ShortDescriptionInput
+              label="Last Name"
+              name="last_name"
+              defaultValue={user.last_name}
+              invalid={
+                !!state.errors?.last_name && state.errors.last_name.length > 0
+              }
+              errorMessage={state.errors?.last_name?.join(", ") || ""}
+            />
+          </FieldGroup>
 
-          <div id="company-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.companyId &&
-              state.errors.companyId.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500" key={error}>
-                  {error}
-                </p>
-              ))}
-          </div>
-        </div> */}
+          {/* Message Area */}
+          <MessageArea state={state} />
+        </Fieldset>
 
-        <div aria-live="polite" aria-atomic="true">
-          <div>
-            {state.message ? (
-              <p className="mt-2 text-sm text-red-500">{state.message}</p>
-            ) : null}
-          </div>
+        <Divider className="my-10" soft />
+
+        <div className="flex justify-end gap-4">
+          <Button type="reset" plain>
+            Reset
+          </Button>
+          <SubmitButton />
         </div>
-      </div>
-      <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/dashboard/incidents"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Cancel
-        </Link>
-        <SubmitButton />
-      </div>
-    </form>
+      </form>
+    </FormWrapper>
   );
 }
