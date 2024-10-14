@@ -11,6 +11,8 @@
 
 ## Dependencies
 
+This program uses the following packages among many others. Please refer to the `go.mod` and `package.json` files for a complete list of dependencies.
+
 ### Go Modules
 
 - The following Go modules are required for this project:
