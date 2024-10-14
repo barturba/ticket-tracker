@@ -1,4 +1,4 @@
-# TicketTracker Readme
+# TicketTracker
 
 ![Alt text](/ticket-tracker-screenshot.png?raw=true "Screenshot of TicketTracker")
 
