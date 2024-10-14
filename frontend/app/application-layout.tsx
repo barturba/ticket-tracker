@@ -162,13 +162,6 @@ export function ApplicationLayout({
                 <HomeIcon />
                 <SidebarLabel>Dashboard</SidebarLabel>
               </SidebarItem>
-              <SidebarItem
-                href="/loading"
-                current={pathname.startsWith("/loading")}
-              >
-                <CogIcon />
-                <SidebarLabel>Loading Test</SidebarLabel>
-              </SidebarItem>
 
               <SidebarItem
                 href="/dashboard/incidents"
