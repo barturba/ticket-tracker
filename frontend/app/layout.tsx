@@ -1,4 +1,3 @@
-// import { getEvents } from '@/data'
 import "@/styles/tailwind.css";
 import type { Metadata } from "next";
 import type React from "react";
@@ -18,8 +17,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // let events = await getEvents();
-
   return (
     <html
       lang="en"
