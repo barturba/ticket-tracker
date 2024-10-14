@@ -179,7 +179,7 @@ export function ApplicationLayout({
               </SidebarItem>
 
               <SidebarItem
-                href="/dashboardusers"
+                href="/dashboard/users"
                 current={pathname.startsWith("/dashboard/users")}
               >
                 <UserGroupIcon />

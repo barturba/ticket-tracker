@@ -1,17 +1,55 @@
 "use server";
-// Users
-
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
-import { UserData } from "@/app/lib/definitions/users";
-import { IncidentState } from "@/app/lib/actions/incidents";
+import {
+  ALL_ITEMS_LIMIT,
+  ITEMS_PER_PAGE,
+} from "@/app/lib/definitions/constants";
+import { UserData, UsersData } from "@/app/lib/definitions/users";
 
+export type UserState = {
+  message?: string;
+  errors?: {
+    shortDescription?: string[];
+    description?: string[];
+    userId?: string[];
+    companyId?: string[];
+    assignedToId?: string[];
+    configurationItemId?: string[];
+    state?: string[];
+  };
+};
+
+const FormSchemaUser = z.object({
+  id: z.string(),
+  shortDescription: z
+    .string({
+      required_error: "Please enter a short description.",
+    })
+    .min(1, { message: "Short description must be at least 1 character." }),
+  description: z.string({
+    required_error: "Please enter a description.",
+  }),
+  assignedToId: z.string({
+    invalid_type_error: "Please select a user to assign to.",
+  }),
+  companyId: z.string({
+    invalid_type_error: "Please select a company.",
+  }),
+  configurationItemId: z.string({
+    invalid_type_error: "Please select a configuration item to assign to.",
+  }),
+  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
+    invalid_type_error: "Please select an user state.",
+  }),
+});
+
+// GET
 export async function getUsers(
   query: string,
   currentPage: number
-): Promise<UserData> {
+): Promise<UsersData> {
   try {
     const url = new URL(`http://localhost:8080/v1/users`);
 
@@ -24,19 +62,15 @@ export async function getUsers(
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const userData: UserData = await data.json();
-      if (userData) {
+      const UsersData: UsersData = await data.json();
+      if (UsersData) {
         return {
-          users: userData.users,
-          metadata: userData.metadata,
+          users: UsersData.users,
+          metadata: UsersData.metadata,
         };
       } else {
-        // console.log(`getUsers url: ${url.toString()}`);
-        // console.log(`getUsers error: !userData`);
-        throw new Error("Failed to fetch users data: !userData");
+        throw new Error("Failed to fetch users data: !UsersData");
       }
     } else {
       console.log(`getUsers url: ${url.toString()}`);
@@ -52,35 +86,32 @@ export async function getUsers(
     throw new Error(`Failed to fetch users data: ${error}`);
   }
 }
+
 export async function getUsersAll(
   query: string,
   currentPage: number
-): Promise<UserData> {
+): Promise<UsersData> {
   try {
     const url = new URL(`http://localhost:8080/v1/users_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
-    searchParams.set("sort", "last_name");
+    searchParams.set("sort", "-updated_at");
     searchParams.set("page", currentPage.toString());
     searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
 
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const userData: UserData = await data.json();
-      if (userData) {
+      const UsersData: UsersData = await data.json();
+      if (UsersData) {
         return {
-          users: userData.users,
-          metadata: userData.metadata,
+          users: UsersData.users,
+          metadata: UsersData.metadata,
         };
       } else {
-        // console.log(`getUsers url: ${url.toString()}`);
-        // console.log(`getUsers error: !userData`);
-        throw new Error("Failed to fetch users data: !userData");
+        throw new Error("Failed to fetch users data: !UsersData");
       }
     } else {
       console.log(`getUsers url: ${url.toString()}`);
@@ -96,6 +127,221 @@ export async function getUsersAll(
     throw new Error(`Failed to fetch users data: ${error}`);
   }
 }
+
+export async function fetchLatestUsers() {
+  try {
+    const url = new URL(`http://localhost:8080/v1/users_latest`);
+    const searchParams = url.searchParams;
+    searchParams.set("page_size", ITEMS_PER_PAGE.toString());
+    searchParams.set("page", "1");
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    if (data.ok) {
+      const users = await data.json();
+      if (users) {
+        return users;
+      } else {
+        return "";
+      }
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.log(`fetchFilteredUsers error: ${error}`);
+    throw new Error("Failed to fetch users.");
+  }
+}
+
+export async function getUser(id: string) {
+  const url = new URL(`http://localhost:8080/v1/users/${id}`);
+
+  const searchParams = url.searchParams;
+  searchParams.set("id", id);
+  try {
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    if (data.ok) {
+      const user = await data.json();
+      if (user) {
+        return user;
+      } else {
+        return "";
+      }
+    } else {
+      return "";
+    }
+  } catch (error) {
+    console.log(`getUser error: ${error}`);
+    throw new Error("Failed to fetch user data.");
+  }
+}
+
+// POST
+
+const CreateUser = FormSchemaUser.omit({ id: true });
+export async function createUser(
+  prevState: UserState,
+  formData: FormData
+): Promise<UserState> {
+  const validatedFields = UpdateUser.safeParse({
+    shortDescription: formData.get("short_description"),
+    description: formData.get("description"),
+    assignedToId: formData.get("assigned_to_id"),
+    companyId: formData.get("company_id"),
+    configurationItemId: formData.get("configuration_item_id"),
+    state: formData.get("state"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Create User.",
+    };
+  }
+
+  // Validate form fields using Zod
+  const {
+    shortDescription,
+    description,
+    companyId,
+    assignedToId,
+    configurationItemId,
+    state,
+  } = validatedFields.data;
+
+  try {
+    const url = new URL(`http://localhost:8080/v1/users`);
+    const data = await fetch(url.toString(), {
+      method: "POST",
+      body: JSON.stringify({
+        short_description: shortDescription,
+        description: description,
+        company_id: companyId,
+        assigned_to_id: assignedToId,
+        configuration_item_id: configurationItemId,
+        state: state,
+      }),
+    });
+    if (data.ok) {
+      const user = await data.json();
+      if (user) {
+        console.log(`createUser success`);
+      } else {
+        console.log(`createUser error: !user`);
+        return {
+          message: "Database Error: Failed to Create User.",
+        };
+      }
+    } else {
+      console.log(
+        `createUser error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Create User.",
+      };
+    }
+  } catch (error) {
+    console.log(`createUser error: ${error}`);
+    return {
+      message: "Database Error: Failed to Create User.",
+    };
+  }
+  // Revalidate the cache for the users page and redirect the user.
+  revalidatePath("/dashboard/users");
+  redirect("/dashboard/users");
+}
+
+// PUT
+
+const UpdateUser = FormSchemaUser.omit({ id: true });
+export async function updateUser(
+  id: string,
+  prevState: UserState,
+  formData: FormData
+): Promise<UserState> {
+  // Parse the form data using Zod
+  const validatedFields = UpdateUser.safeParse({
+    shortDescription: formData.get("short_description"),
+    description: formData.get("description"),
+    assignedToId: formData.get("assigned_to_id"),
+    companyId: formData.get("company_id"),
+    configurationItemId: formData.get("configuration_item_id"),
+    state: formData.get("state"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing Fields. Failed to Update User.",
+    };
+  }
+
+  // Validate form fields using Zod
+  const {
+    shortDescription,
+    description,
+    assignedToId,
+    companyId,
+    configurationItemId,
+    state,
+  } = validatedFields.data;
+
+  // Prepare data for sending to the API.
+  try {
+    const url = new URL(`http://localhost:8080/v1/users/${id}`);
+    console.log(`updateUser PUT`);
+    const data = await fetch(url.toString(), {
+      method: "PUT",
+      body: JSON.stringify({
+        short_description: shortDescription,
+        description: description,
+        company_id: companyId,
+        assigned_to_id: assignedToId,
+        configuration_item_id: configurationItemId,
+        state: state,
+      }),
+    });
+    if (data.ok) {
+      const user = await data.json();
+      if (user) {
+        console.log(`update success`);
+      } else {
+        console.log(`update error: !user`);
+        return {
+          message: "Database Error: Failed to Update User.",
+        };
+      }
+    } else {
+      console.log(
+        `update error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Update User.",
+      };
+    }
+  } catch (error) {
+    console.log(`createUser error: ${error}`);
+    return {
+      message: "Database Error: Failed to Update User.",
+    };
+  }
+  // Revalidate the cache for the users page and redirect the user.
+  revalidatePath(`/dashboard/users/${id}/edit`);
+  return {
+    message: "Update Successful",
+  };
+}
+
+// DELETE
+
 export async function deleteUser(id: string) {
   // Prepare data for sending to the API.
   try {
@@ -110,131 +356,7 @@ export async function deleteUser(id: string) {
     console.log(`deleteUser error: ${error}`);
     // If a database error occurs, return a more specific error.
     return {
-      message: "Database Error: Failed to Delete User.",
+      message: "Database Error: Failed to Update User.",
     };
-  }
-}
-
-const FormSchemaUser = z.object({
-  id: z.string(),
-  name: z.string({
-    required_error: "Please enter a short description.",
-  }),
-});
-
-const CreateUser = FormSchemaUser.omit({ id: true });
-export async function createUser(prevState: IncidentState, formData: FormData) {
-  // Validate form fields using Zod
-  const validatedFields = CreateUser.safeParse({
-    name: formData.get("name"),
-  });
-
-  // If form validation fails, return errors early. Otherwise, continue.
-  if (!validatedFields.success) {
-    console.log(
-      `createUser error: ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: "Missing Fields. Failed to Create User.",
-    };
-  }
-
-  // Prepare data for sending to the API.
-  const { name } = validatedFields.data;
-  try {
-    const url = new URL(`http://localhost:8080/v1/users`);
-    await fetch(url.toString(), {
-      method: "POST",
-      body: JSON.stringify({
-        name: name,
-      }),
-    });
-  } catch (error) {
-    // If a database error occurs, return a more specific error.
-    console.log(`createUser error: ${error}`);
-    return {
-      message: "Database Error: Failed to Create User.",
-    };
-  }
-  // Revalidate the cache for the users page and redirect the user.
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
-}
-const UpdateUser = FormSchemaUser.omit({ id: true });
-export async function updateUser(
-  id: string,
-  prevState: IncidentState,
-  formData: FormData
-) {
-  const validatedFields = UpdateUser.safeParse({
-    name: formData.get("name"),
-  });
-
-  if (!validatedFields.success) {
-    console.log(
-      "actions.ts updateUser !validatedFields.success: ",
-      validatedFields.error.flatten().fieldErrors
-    );
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: "Missing Fields. Failed to Update Incident.",
-    };
-  }
-
-  // Validate form fields using Zod
-  const { name } = validatedFields.data;
-
-  // Prepare data for sending to the API.
-  try {
-    const url = new URL(`http://localhost:8080/v1/users/${id}`);
-    await fetch(url.toString(), {
-      method: "PUT",
-      body: JSON.stringify({
-        id: id,
-        name: name,
-      }),
-    });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
-  } catch (error) {
-    return {
-      message: "Database Error: Failed to Update Incident.",
-    };
-  }
-  // Revalidate the cache for the users page and redirect the user.
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
-}
-
-export async function getUser(id: string) {
-  const url = new URL(`http://localhost:8080/v1/user_by_id`);
-
-  const searchParams = url.searchParams;
-  searchParams.set("id", id);
-  try {
-    const data = await fetch(url.toString(), {
-      method: "GET",
-    });
-
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (data.ok) {
-      const user = await data.json();
-      if (user) {
-        return user;
-      } else {
-        return "";
-      }
-    } else {
-      return "";
-    }
-  } catch (error) {
-    console.log(`getUser error: ${error}`);
-    throw new Error("Failed to fetch user data.");
   }
 }

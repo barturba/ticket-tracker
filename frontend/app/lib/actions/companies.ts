@@ -2,7 +2,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
+import {
+  ALL_ITEMS_LIMIT,
+  ITEMS_PER_PAGE,
+} from "@/app/lib/definitions/constants";
 import { CompaniesData } from "@/app/lib/definitions/companies";
 
 export type CompanyState = {

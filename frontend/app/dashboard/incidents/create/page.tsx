@@ -1,10 +1,10 @@
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
-import Form from "@/app/ui/incidents/create-form";
+import Form from "@/app/ui/sections/incidents/create-form";
 import { Metadata } from "next";
 import { getCIs, getCIsAll } from "@/app/lib/actions/cis";
 import { getCompanies, getCompaniesAll } from "@/app/lib/actions/companies";
 import { getUsers, getUsersAll } from "@/app/lib/actions/users";
-import CreateIncidentForm from "@/app/ui/incidents/create-form";
+import CreateIncidentForm from "@/app/ui/sections/incidents/create-form";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 

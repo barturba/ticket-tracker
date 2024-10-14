@@ -1,4 +1,4 @@
-import EditCompanyForm from "@/app/ui/companies/edit-form";
+import EditCompanyForm from "@/app/ui/sections/companies/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCIsAll } from "@/app/lib/actions/cis";

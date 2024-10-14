@@ -3,7 +3,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { IncidentState } from "@/app/lib/actions/incidents";
-import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
+import {
+  ALL_ITEMS_LIMIT,
+  ITEMS_PER_PAGE,
+} from "@/app/lib/definitions/constants";
 import { CIData } from "@/app/lib/definitions/cis";
 
 // CIs

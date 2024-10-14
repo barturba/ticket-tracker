@@ -1,4 +1,4 @@
-import EditIncidentForm from "@/app/ui/incidents/edit-form";
+import EditIncidentForm from "@/app/ui/sections/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCIsAll } from "@/app/lib/actions/cis";
