@@ -1,3 +1,20 @@
+// main.go is the entry point for the ticket-tracker application. It initializes
+// the application context, loads environment variables, sets up the database
+// connection, and starts the HTTP server.
+//
+// The main function calls the run function, which performs the following tasks:
+//  1. Creates a logger for logging messages.
+//  2. Loads environment variables from a .env file.
+//  3. Retrieves necessary configuration values (host, port, environment, and database URL)
+//     from the environment variables.
+//  4. Opens a connection to the PostgreSQL database using the provided database URL.
+//  5. Creates a new server instance with the logger, configuration, and database queries.
+//  6. Starts the HTTP server in a separate goroutine and listens for incoming requests.
+//  7. Waits for an interrupt signal (e.g., Ctrl+C) to gracefully shut down the server.
+//
+// The NewServer function sets up the HTTP server by creating a new ServeMux and adding
+// routes for incidents, companies, users, and configuration items. It returns an HTTP
+// handler that can be used by the HTTP server.
 package main
 
 import (
@@ -33,41 +50,46 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	// Create a logger
+	// Create a structured logger for logging messages.
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// Load ENV variables
+	// Load ENV variables from .env file.
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Couldn't load .env file")
 	}
 
-	// Create a config
+	// Create a config structure to hold the configuration values.
 	var config data.Config
 
-	// Get the host name
+	// Get the host name.
 	host := os.Getenv("HOST")
 	if host == "" {
 		log.Fatal("HOST environment variable is not set")
 	}
 
-	// Get the port number
+	// Get the port number.
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("PORT environment variable is not set")
 	}
 
-	// Get the environment type
+	// Get the environment type.
 	env := os.Getenv("ENV")
 	if env == "" {
 		log.Fatal("ENV environment variable is not set")
 	}
 
-	// Get the db url
+	// Get the database url.
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL environment variable is not set")
 	}
+
+	// Set the configuration values.
+	config.Env = env
+	config.Host = host
+	config.Port = port
 
 	// Open a database connection
 	db, err := sql.Open("postgres", dbURL)
@@ -76,22 +98,21 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	}
 	dbQueries := database.New(db)
 
-	config.Env = env
-	config.Host = host
-	config.Port = port
-
+	// Create a new server instance.
 	srv := NewServer(logger, config, dbQueries)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, config.Port),
 		Handler: srv,
 	}
+	// Start the HTTP server in a new goroutine.
 	go func() {
-		// Start the HTTP server.
 		logger.Info("starting server", "addr", httpServer.Addr, "env", config.Env)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("error listening and serving", "error", err)
 		}
 	}()
+
+	// Wait for an interrupt signal to gracefully shut down the server.
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
@@ -108,13 +129,20 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	return nil
 }
 
+// NewServer sets up the HTTP server by creating a new ServeMux and adding
+// routes for incidents, companies, users, and configuration items.
+//
+// Returns an HTTP handler that can be used by the HTTP server.
 func NewServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
+
 	mux := http.NewServeMux()
+
 	addRoutesIncidents(mux, logger, config, db)
 	addRoutesCompanies(mux, logger, config, db)
 	addRoutesUsers(mux, logger, config, db)
 	addRoutesConfigurationItems(mux, logger, config, db)
+
 	var handler http.Handler = mux
-	// handler = someMiddleware(handler)
+
 	return handler
 }
