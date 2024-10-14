@@ -1,5 +1,7 @@
 # TicketTracker Readme
 
+![Alt text](/ticket-tracker-screenshot.jpg?raw=true "Screenshot of TicketTracker")
+
 **TicketTracker** is a IT ticketing system designed to simplify the management of incidents. It provides basic user support and essential features for IT service management.
 
 ## Features
