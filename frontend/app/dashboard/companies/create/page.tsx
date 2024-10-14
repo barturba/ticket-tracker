@@ -16,7 +16,11 @@ export default async function CreateCompany() {
   return (
     <>
       <HeadingEdit name="Companies" backLink="/dashboard/companies" />
-      <HeadingSubEdit name={`Create Company`} />
+      <HeadingSubEdit
+        name={`Create Company`}
+        badgeState={undefined}
+        badgeText={undefined}
+      />
       <CreateCompanyForm />
     </>
   );
