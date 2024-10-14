@@ -4,10 +4,10 @@ import clsx from "clsx";
 import Link from "next/link";
 
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
-import { fetchLatestIncidents } from "@/app/api/incidents/incidents";
+import { getIncidentsLatest } from "@/app/api/incidents/incidents";
 
 export default async function LatestIncidents() {
-  const latestIncidents: Incident[] = await fetchLatestIncidents();
+  const latestIncidents: Incident[] = await getIncidentsLatest();
   console.log(
     `LatestIncidents: latestIncidents: ${JSON.stringify(
       latestIncidents?.length,

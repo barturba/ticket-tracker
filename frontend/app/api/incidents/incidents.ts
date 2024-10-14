@@ -134,7 +134,7 @@ export async function getIncidentsAll(
   }
 }
 
-export async function fetchLatestIncidents() {
+export async function getIncidentsLatest() {
   try {
     const url = new URL(`http://localhost:8080/v1/incidents_latest`);
     const searchParams = url.searchParams;
