@@ -4,7 +4,19 @@
 
 ## Why?
 
-Most incident management tools I tried were _molasses slow_, clunky, and to impossible navigate. I needed something quicker, smoother, and way more intuitive —- so I built **TicketTracker**.
+Most incident management tools I tried were:
+
+- _molasses slow_
+- clunky
+- impossible navigate.
+
+I needed something:
+
+- quicker (loads everything in less than 250 ms)
+- smoother
+- way more intuitive
+
+That's why I built **TicketTracker**.
 
 Now, tracking and resolving incidents is as lightning fast as it should be.
 
