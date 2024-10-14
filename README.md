@@ -1,6 +1,6 @@
 # TicketTracker
 
-![Alt text](/ticket-tracker-screenshot.png?raw=true "Screenshot of TicketTracker")
+![Alt text](/ticket-tracker-in-action.gif "GIF video of TicketTracker")
 
 ## Why?
 
