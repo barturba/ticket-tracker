@@ -342,8 +342,6 @@ export async function updateIncident(
   return {
     message: "Update Successful",
   };
-
-  // redirect(`/dashboard/incidents/${id}/edit`);
 }
 
 // DELETE

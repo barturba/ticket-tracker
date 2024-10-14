@@ -35,6 +35,8 @@ export default function EditIncidentForm({
     updateIncidentWithId,
     initialState
   );
+  console.log(`state: ${JSON.stringify(state)}`);
+  console.log(`formAction: ${JSON.stringify(formAction)}`);
 
   return (
     <FormWrapper subheading="Summary">
