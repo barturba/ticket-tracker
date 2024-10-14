@@ -1,19 +1,33 @@
-import { CreateCompany } from "@/app/ui/companies/buttons";
-import Table from "@/app/ui/companies/table";
-import { lusitana } from "@/app/ui/fonts";
-import Pagination from "@/app/ui/utils/pagination";
-import Search from "@/app/ui/search";
-import { Metadata } from "next";
-import { Suspense } from "react";
+import AppHeading from "@/app/application-components/heading";
+import { Badge } from "@/app/components/badge";
+import { Button } from "@/app/components/button";
+import { Heading } from "@/app/components/heading";
+import {
+  Pagination,
+  PaginationGap,
+  PaginationList,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+} from "@/app/components/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/table";
 import { getCompanies } from "@/app/lib/actions/companies";
 import { CompanyData } from "@/app/lib/definitions/companies";
-import { CompaniesTableSkeleton } from "@/app/ui/skeletons/companies";
+import { formatDateToLocal, truncate } from "@/app/lib/utils";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Companies",
 };
 
-export default async function Page(props: {
+export default async function Companies(props: {
   searchParams?: Promise<{
     query?: string;
     page?: string;
@@ -23,27 +37,63 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const companydata: CompanyData = await getCompanies(query, currentPage);
-
-  const totalPages = companydata.metadata.last_page;
-  const companies = companydata.companies;
+  const companyData: CompanyData = await getCompanies(query, currentPage);
 
   return (
-    <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Companies</h1>
-      </div>
+    <>
+      <AppHeading
+        name="Company"
+        createLabel="Create Company"
+        createLink="/dashboard/companies/create"
+      />
+      <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
+        <TableHead>
+          <TableRow>
+            <TableHeader>ID </TableHeader>
+            <TableHeader>Updated date</TableHeader>
+            <TableHeader>Assigned to</TableHeader>
+            <TableHeader>Short description</TableHeader>
+            <TableHeader>State</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {/* {companyData.companies.map((company) => (
+            <TableRow
+              key={company.id}
+              href={`/dashboard/companies/${company.id}/edit`}
+              title={`Company #${company.id}`}
+            >
+              <TableCell>{company.id}</TableCell>
+              <TableCell className="text-zinc-500">
+                {formatDateToLocal(company.updated_at)}
+              </TableCell>
+              <TableCell>{company.assigned_to_name}</TableCell>
+              <TableCell>{truncate(company.short_description)}</TableCell>
+              <TableCell>
+                <Badge className="max-sm:hidden" state={company.state}>
+                  {company.state}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))} */}
+        </TableBody>
+      </Table>
 
-      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="Search companies ..." />
-        <CreateCompany />
-      </div>
-      <Suspense key={query + currentPage} fallback={<CompaniesTableSkeleton />}>
-        <Table companies={companies} />
-      </Suspense>
-      <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div>
-    </div>
+      <Pagination>
+        <PaginationPrevious href="?page=2" />
+        <PaginationList>
+          <PaginationPage href="?page=1">1</PaginationPage>
+          <PaginationPage href="?page=2">2</PaginationPage>
+          <PaginationPage href="?page=3" current>
+            3
+          </PaginationPage>
+          <PaginationPage href="?page=4">4</PaginationPage>
+          <PaginationGap />
+          <PaginationPage href="?page=65">65</PaginationPage>
+          <PaginationPage href="?page=66">66</PaginationPage>
+        </PaginationList>
+        <PaginationNext href="?page=4" />
+      </Pagination>
+    </>
   );
 }

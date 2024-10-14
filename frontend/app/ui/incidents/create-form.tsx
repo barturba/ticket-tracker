@@ -4,7 +4,7 @@ import { createIncident, IncidentState } from "@/app/lib/actions/incidents";
 import { UserField } from "@/app/lib/definitions/users";
 import { CIField } from "@/app/lib/definitions/cis";
 import { CompanyField } from "@/app/lib/definitions/companies";
-import FormWrapper from "@/app/application-components/form-wrapper";
+import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormInput from "@/app/application-components/incident/form-input";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
@@ -13,7 +13,7 @@ import StateListbox from "@/app/application-components/incident/state-listbox";
 import { Divider } from "@/app/components/divider";
 import { useActionState } from "react";
 import MessageArea from "@/app/application-components/incident/message-area";
-import SubmitButton from "@/app/application-components/button-submit";
+import SubmitButton from "@/app/application-components/resources/button-submit";
 
 export default function CreateIncidentForm({
   companies,

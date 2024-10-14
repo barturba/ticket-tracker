@@ -13,10 +13,10 @@ import StateListbox from "@/app/application-components/incident/state-listbox";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import { IncidentState } from "@/app/lib/actions/incidents";
-import FormWrapper from "@/app/application-components/form-wrapper";
+import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import MessageArea from "@/app/application-components/incident/message-area";
 import { useFormStatus } from "react-dom";
-import SubmitButton from "@/app/application-components/button-submit";
+import SubmitButton from "@/app/application-components/resources/button-submit";
 
 export default function EditIncidentForm({
   incident,
