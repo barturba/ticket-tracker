@@ -34,7 +34,7 @@ export default function EditForm({
   );
 
   return (
-    <>
+    <div className="mt-12">
       <Subheading>Summary</Subheading>
       <Divider className="mt-4" />
 
@@ -126,6 +126,6 @@ export default function EditForm({
           <button type="submit">Send</button>
         </div>
       </form>
-    </>
+    </div>
   );
 }

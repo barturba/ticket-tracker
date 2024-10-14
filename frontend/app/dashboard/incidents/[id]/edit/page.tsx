@@ -24,9 +24,7 @@ export async function generateMetadata({
     title: incident && `Incident #${incident.id}`,
   };
 }
-
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export default async function Incident({ params }: { params: { id: string } }) {
   const id = params.id;
   const [incident, usersData, companiesData, cisData] = await Promise.all([
     getIncident(id),
@@ -34,6 +32,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     getCompaniesAll("", 1),
     getCIsAll("", 1),
   ]);
+
   if (!incident) {
     notFound();
   }
@@ -46,14 +45,12 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         badgeState={incident.state}
         badgeText={incident.state}
       />
-      <div className="mt-12">
-        <EditForm
-          incident={incident}
-          companies={companiesData.companies}
-          initialUsers={usersData.users}
-          cis={cisData.cis}
-        />
-      </div>
+      <EditForm
+        incident={incident}
+        companies={companiesData.companies}
+        initialUsers={usersData.users}
+        cis={cisData.cis}
+      />
     </>
   );
 }
