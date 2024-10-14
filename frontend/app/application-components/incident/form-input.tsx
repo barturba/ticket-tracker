@@ -24,9 +24,14 @@ export default function FormInput({
   return (
     <Field>
       <Label>{label}</Label>
-      <Select id={id} name={name} invalid={!!invalid}>
+      <Select
+        id={id}
+        name={name}
+        defaultValue={defaultValue}
+        invalid={!!invalid}
+      >
         <option value="" disabled>
-          {placeholder}
+          {placeholder}&hellip;
         </option>
         {inputs.map((input) => (
           <option key={input.id} value={input.id}>

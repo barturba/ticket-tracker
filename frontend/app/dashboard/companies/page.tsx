@@ -5,7 +5,7 @@ import Pagination from "@/app/ui/utils/pagination";
 import Search from "@/app/ui/search";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { fetchCompanies } from "@/app/lib/actions/companies";
+import { getCompanies } from "@/app/lib/actions/companies";
 import { CompanyData } from "@/app/lib/definitions/companies";
 import { CompaniesTableSkeleton } from "@/app/ui/skeletons/companies";
 
@@ -23,7 +23,7 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const companydata: CompanyData = await fetchCompanies(query, currentPage);
+  const companydata: CompanyData = await getCompanies(query, currentPage);
 
   const totalPages = companydata.metadata.last_page;
   const companies = companydata.companies;

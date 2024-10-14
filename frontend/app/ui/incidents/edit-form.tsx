@@ -13,19 +13,7 @@ import FormInput from "@/app/application-components/incident/form-input";
 import StateListbox from "@/app/application-components/incident/state-listbox";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
-
-type State = {
-  message: string;
-  errors: {
-    shortDescription?: string[];
-    description?: string[];
-    incidentId?: string[];
-    companyID?: string[];
-    assignedToId?: string[];
-    configurationItemId?: string[];
-    state?: string[];
-  };
-};
+import { IncidentState } from "@/app/lib/actions/incidents";
 
 export default function EditForm({
   incident,
@@ -38,13 +26,12 @@ export default function EditForm({
   companies: CompanyField[];
   cis: CIField[];
 }) {
-  const initialState: State = { message: "", errors: {} };
+  const initialState: IncidentState = { message: "", errors: {} };
   const updateIncidentWithId = updateIncident.bind(null, incident.id);
   const [state, formAction] = useActionState(
     updateIncidentWithId,
     initialState
   );
-  console.log(`EditForm incident: ${JSON.stringify(incident, null, 2)}`);
 
   return (
     <>
@@ -63,9 +50,9 @@ export default function EditForm({
               inputs={companies}
               defaultValue={incident.company_id}
               invalid={
-                !!state.errors?.companyId && state.errors.companyId.length > 0
+                state.errors?.companyId && state.errors.companyId.length > 0
               }
-              errorMessage={state.errors?.shortDescription?.join(", ") || ""}
+              errorMessage={state.errors?.companyId?.join(", ")}
             />
 
             {/* Assigned To*/}

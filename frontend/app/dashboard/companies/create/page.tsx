@@ -2,14 +2,14 @@ import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
 import Form from "@/app/ui/companies/create-form";
 import { Metadata } from "next";
 import { CompanyData } from "@/app/lib/definitions/companies";
-import { fetchCompanies } from "@/app/lib/actions/companies";
+import { getCompanies } from "@/app/lib/actions/companies";
 
 export const metadata: Metadata = {
   title: "Create Company",
 };
 
 export default async function Page() {
-  const companydata: CompanyData = await fetchCompanies("", 1);
+  const companydata: CompanyData = await getCompanies("", 1);
   return (
     <main>
       <Breadcrumbs

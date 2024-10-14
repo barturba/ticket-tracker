@@ -1,14 +1,15 @@
+"use server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { State } from "@/app/lib/actions";
-import { ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { IncidentState } from "@/app/lib/actions/incidents";
+import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
 import { CIData } from "@/app/lib/definitions/cis";
 
 // CIs
 
 // GET
-export async function fetchCIs(
+export async function getCIs(
   query: string,
   currentPage: number
 ): Promise<CIData> {
@@ -34,21 +35,66 @@ export async function fetchCIs(
           metadata: ciData.metadata,
         };
       } else {
-        // console.log(`fetchCIs url: ${url.toString()}`);
-        // console.log(`fetchCIs error: !ciData`);
+        // console.log(`getCIs url: ${url.toString()}`);
+        // console.log(`getCIs error: !ciData`);
         throw new Error("Failed to fetch cis data: !ciData");
       }
     } else {
-      console.log(`fetchCIs url: ${url.toString()}`);
+      console.log(`getCIs url: ${url.toString()}`);
       console.log(
-        `fetchCIs error: !data.ok ${data.status} ${JSON.stringify(
+        `getCIs error: !data.ok ${data.status} ${JSON.stringify(
           data.statusText
         )}`
       );
       throw new Error("Failed to fetch cis data: !data.ok");
     }
   } catch (error) {
-    console.log(`fetchCIs error: ${error}`);
+    console.log(`getCIs error: ${error}`);
+    throw new Error(`Failed to fetch cis data: ${error}`);
+  }
+}
+
+export async function getCIsAll(
+  query: string,
+  currentPage: number
+): Promise<CIData> {
+  try {
+    const url = new URL(`http://localhost:8080/v1/cis_all`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    searchParams.set("sort", "name");
+    searchParams.set("page", currentPage.toString());
+    searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const ciData: CIData = await data.json();
+      if (ciData) {
+        return {
+          cis: ciData.cis,
+          metadata: ciData.metadata,
+        };
+      } else {
+        // console.log(`getCIs url: ${url.toString()}`);
+        // console.log(`getCIs error: !ciData`);
+        throw new Error("Failed to fetch cis data: !ciData");
+      }
+    } else {
+      console.log(`getCIs url: ${url.toString()}`);
+      console.log(
+        `getCIs error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      throw new Error("Failed to fetch cis data: !data.ok");
+    }
+  } catch (error) {
+    console.log(`getCIs error: ${error}`);
     throw new Error(`Failed to fetch cis data: ${error}`);
   }
 }
@@ -82,7 +128,7 @@ export async function fetchLatestCIs() {
   }
 }
 
-export async function fetchCIById(id: string) {
+export async function getCI(id: string) {
   const url = new URL(`http://localhost:8080/v1/cis/${id}`);
 
   const searchParams = url.searchParams;
@@ -103,7 +149,7 @@ export async function fetchCIById(id: string) {
       return "";
     }
   } catch (error) {
-    console.log(`fetchCIById error: ${error}`);
+    console.log(`getCI error: ${error}`);
     throw new Error("Failed to fetch ci data.");
   }
 }
@@ -133,7 +179,7 @@ const FormSchemaCI = z.object({
 // POST
 
 const CreateCI = FormSchemaCI.omit({ id: true });
-export async function createCI(prevState: State, formData: FormData) {
+export async function createCI(prevState: IncidentState, formData: FormData) {
   // Validate form fields using Zod
   const validatedFields = CreateCI.safeParse({
     shortDescription: formData.get("short_description"),
@@ -207,7 +253,7 @@ export async function createCI(prevState: State, formData: FormData) {
 const UpdateCI = FormSchemaCI.omit({ id: true });
 export async function updateCI(
   id: string,
-  prevState: State,
+  prevState: IncidentState,
   formData: FormData
 ) {
   const validatedFields = UpdateCI.safeParse({

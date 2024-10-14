@@ -5,7 +5,7 @@ import Table from "@/app/ui/users/table";
 import Search from "@/app/ui/search";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { fetchUsers } from "@/app/lib/actions/users";
+import { getUsers } from "@/app/lib/actions/users";
 import { UserData } from "@/app/lib/definitions/users";
 import { UsersTableSkeleton } from "@/app/ui/skeletons/users";
 
@@ -23,7 +23,7 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const userData: UserData = await fetchUsers(query, currentPage);
+  const userData: UserData = await getUsers(query, currentPage);
 
   const totalPages = userData.metadata.last_page;
   const users = userData.users;

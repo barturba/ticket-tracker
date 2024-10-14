@@ -3,7 +3,7 @@ import Pagination from "@/app/ui/utils/pagination";
 import Search from "@/app/ui/search";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { fetchCIs } from "@/app/lib/actions/cis";
+import { getCIs } from "@/app/lib/actions/cis";
 import { CIsTableSkeleton } from "@/app/ui/skeletons/cis";
 import Table from "@/app/ui/cis/table";
 import { CreateCI } from "@/app/ui/cis/buttons";
@@ -22,7 +22,7 @@ export default async function Page(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const ciData: CIData = await fetchCIs(query, currentPage);
+  const ciData: CIData = await getCIs(query, currentPage);
 
   const totalPages = ciData.metadata.last_page;
   const cis = ciData.cis;

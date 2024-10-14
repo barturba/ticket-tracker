@@ -11,7 +11,13 @@ export default function HeadingSubEdit({
   badgeText,
 }: {
   name: string;
-  badgeState: string;
+  badgeState:
+    | "New"
+    | "Assigned"
+    | "In Progress"
+    | "On Hold"
+    | "Resolved"
+    | undefined;
   badgeText: string;
 }) {
   return (

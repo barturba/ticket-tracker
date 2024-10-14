@@ -29,12 +29,19 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return incidents, metadata, nil
 }
 
-func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetIncidentsCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
-	if err != nil {
-		return 0, errors.New("couldn't find incidents")
+func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) ([]data.Incident, data.Metadata, error) {
+	p := database.GetIncidentsParams{
+		Limit:    1_000_000,
+		Offset:   int32(filters.Offset()),
+		OrderBy:  filters.SortColumn(),
+		OrderDir: filters.SortDirection(),
 	}
-	return count, nil
+	rows, err := db.GetIncidents(r.Context(), p)
+	if err != nil {
+		return nil, data.Metadata{}, errors.New("couldn't find incidents")
+	}
+	incidents, metadata := convertRowsAndMetadata(rows, filters)
+	return incidents, metadata, nil
 }
 
 func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {

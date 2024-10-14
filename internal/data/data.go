@@ -78,6 +78,19 @@ func ValidateFilters(v *validator.Validator, f Filters) {
 	v.Check(validator.PermittedValue(f.Sort, f.SortSafelist...), "sort", "invalid sort value")
 }
 
+func ValidateFiltersGetAll(v *validator.Validator, f Filters) {
+
+	// Check that the page and page_size parameters contain sensible values, but large enough
+	// to cover getting most values in one shot
+	v.Check(f.Page > 0, "page", "must be greater than zero")
+	v.Check(f.Page <= 10_000_000, "page", "must be no more than ten million")
+	v.Check(f.PageSize > 0, "page_size", "must be greater than zero")
+	v.Check(f.PageSize <= 10_000_000, "page_size", "must be no more than ten million")
+
+	// Check that the sort parameter matches a value in the safelist.
+	v.Check(validator.PermittedValue(f.Sort, f.SortSafelist...), "sort", "invalid sort value")
+}
+
 // Define an Envelope type
 
 type Envelope map[string]any

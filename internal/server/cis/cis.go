@@ -54,6 +54,45 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Query  string
+			Limit  int
+			Offset int
+			data.Filters
+		}
+
+		v := validator.New()
+
+		var qs = r.URL.Query()
+
+		input.Query = data.ReadString(qs, "query", "")
+
+		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10_000_000, v)
+
+		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.SortSafelist = []string{"id", "-id",
+			"created_at", "-created_at",
+			"updated_at", "-updated_at",
+			"name", "-name"}
+
+		if data.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
+			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			return
+		}
+
+		cis, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		if err != nil {
+			errutil.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		logger.Info("msg", "handle", "GET /v1/cis")
+		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"cis": cis, "metadata": metadata})
+	})
+}
+
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {

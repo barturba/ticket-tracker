@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { fetchIncidents } from "@/app/lib/actions/incidents";
+import { getIncidents } from "@/app/lib/actions/incidents";
 import { IncidentData } from "@/app/lib/definitions/incidents";
 import { formatDateToLocal, truncate } from "@/app/lib/utils";
 import type { Metadata } from "next";
@@ -37,7 +37,7 @@ export default async function Incidents(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const incidentData: IncidentData = await fetchIncidents(query, currentPage);
+  const incidentData: IncidentData = await getIncidents(query, currentPage);
 
   return (
     <>

@@ -1,13 +1,14 @@
+"use server";
 // Companies
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { State } from "@/app/lib/actions";
-import { ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
 import { CompanyData } from "@/app/lib/definitions/companies";
+import { IncidentState } from "@/app/lib/actions/incidents";
 
-export async function fetchCompanies(
+export async function getCompanies(
   query: string,
   currentPage: number
 ): Promise<CompanyData> {
@@ -33,21 +34,66 @@ export async function fetchCompanies(
           metadata: companyData.metadata,
         };
       } else {
-        // console.log(`fetchCompanies url: ${url.toString()}`);
-        // console.log(`fetchCompanies error: !companyData`);
+        // console.log(`getCompanies url: ${url.toString()}`);
+        // console.log(`getCompanies error: !companyData`);
         throw new Error("Failed to fetch companies data: !companyData");
       }
     } else {
-      //   console.log(`fetchCompanies url: ${url.toString()}`);
+      //   console.log(`getCompanies url: ${url.toString()}`);
       //   console.log(
-      //     `fetchCompanies error: !data.ok ${data.status} ${JSON.stringify(
+      //     `getCompanies error: !data.ok ${data.status} ${JSON.stringify(
       //       data.statusText
       //     )}`
       //   );
       throw new Error("Failed to fetch companies data: !data.ok");
     }
   } catch (error) {
-    console.log(`fetchCompanies error: ${error}`);
+    console.log(`getCompanies error: ${error}`);
+    throw new Error(`Failed to fetch companies data: ${error}`);
+  }
+}
+
+export async function getCompaniesAll(
+  query: string,
+  currentPage: number
+): Promise<CompanyData> {
+  try {
+    const url = new URL(`http://localhost:8080/v1/companies_all`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    searchParams.set("sort", "name");
+    searchParams.set("page", currentPage.toString());
+    searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const companyData: CompanyData = await data.json();
+      if (companyData) {
+        return {
+          companies: companyData.companies,
+          metadata: companyData.metadata,
+        };
+      } else {
+        // console.log(`getCompanies url: ${url.toString()}`);
+        // console.log(`getCompanies error: !companyData`);
+        throw new Error("Failed to fetch companies data: !companyData");
+      }
+    } else {
+      //   console.log(`getCompanies url: ${url.toString()}`);
+      //   console.log(
+      //     `getCompanies error: !data.ok ${data.status} ${JSON.stringify(
+      //       data.statusText
+      //     )}`
+      //   );
+      throw new Error("Failed to fetch companies data: !data.ok");
+    }
+  } catch (error) {
+    console.log(`getCompanies error: ${error}`);
     throw new Error(`Failed to fetch companies data: ${error}`);
   }
 }
@@ -78,7 +124,10 @@ const FormSchemaCompany = z.object({
 });
 
 const CreateCompany = FormSchemaCompany.omit({ id: true });
-export async function createCompany(prevState: State, formData: FormData) {
+export async function createCompany(
+  prevState: IncidentState,
+  formData: FormData
+) {
   // Validate form fields using Zod
   const validatedFields = CreateCompany.safeParse({
     name: formData.get("name"),
@@ -123,7 +172,7 @@ export async function createCompany(prevState: State, formData: FormData) {
 const UpdateCompany = FormSchemaCompany.omit({ id: true });
 export async function updateCompany(
   id: string,
-  prevState: State,
+  prevState: IncidentState,
   formData: FormData
 ) {
   const validatedFields = UpdateCompany.safeParse({
@@ -166,7 +215,7 @@ export async function updateCompany(
   redirect("/dashboard/companies");
 }
 
-export async function fetchCompanyById(id: string) {
+export async function getCompany(id: string) {
   const url = new URL(`http://localhost:8080/v1/company_by_id`);
 
   const searchParams = url.searchParams;
@@ -189,7 +238,7 @@ export async function fetchCompanyById(id: string) {
       return "";
     }
   } catch (error) {
-    console.log(`fetchCompanyById error: ${error}`);
+    console.log(`getCompany error: ${error}`);
     throw new Error("Failed to fetch company data.");
   }
 }

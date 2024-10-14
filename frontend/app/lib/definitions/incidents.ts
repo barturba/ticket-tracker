@@ -19,8 +19,13 @@ export type IncidentField = {
   name: string;
 };
 
-export type IncidentData = {
+export type IncidentsData = {
   incidents: Incident[];
+  metadata: Metadata;
+};
+
+export type IncidentData = {
+  incident: Incident;
   metadata: Metadata;
 };
 

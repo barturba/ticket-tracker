@@ -53,7 +53,7 @@ export default function EditForm({
   // useEffect(() => {
   //   console.log(`selectedCompany: ${selectedCompany}`);
   //   const fetchData = async () => {
-  //     const data = await fetchUsersByCompany(selectedCompany);
+  //     const data = await getUsersByCompany(selectedCompany);
   //     // console.log(`data.length: ${data.length}`);
   //     setUsers(data);
   //   };
@@ -66,7 +66,7 @@ export default function EditForm({
 
   // const handleChange = async (e): Promise<void> => {
   //   const { name, value } = e.target;
-  //   const newUsers = await fetchUsersByCompany(value);
+  //   const newUsers = await getUsersByCompany(value);
   //   setUsers(newUsers);
   //   console.log(`name: ${name} value: ${value}`);
   //   console.log(`newUsers: ${newUsers}`);
@@ -75,7 +75,7 @@ export default function EditForm({
 
   // useEffect(() => {
   //   const fetchData = async () => {
-  //     const newUsers = await fetchUsersByCompany(value);
+  //     const newUsers = await getUsersByCompany(value);
   //     setUsers(newUsers);
   //   };
   //   fetchData();

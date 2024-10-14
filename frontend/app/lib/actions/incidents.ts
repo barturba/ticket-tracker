@@ -1,17 +1,29 @@
+"use server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { State } from "@/app/lib/actions";
-import { ITEMS_PER_PAGE } from "@/app/lib/constants";
-import { IncidentData } from "@/app/lib/definitions/incidents";
+import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { IncidentData, IncidentsData } from "@/app/lib/definitions/incidents";
 
+export type IncidentState = {
+  message: string;
+  errors?: {
+    shortDescription?: string[];
+    description?: string[];
+    incidentId?: string[];
+    companyId?: string[];
+    assignedToId?: string[];
+    configurationItemId?: string[];
+    state?: string[];
+  };
+};
 // Incidents
 
 // GET
-export async function fetchIncidents(
+export async function getIncidents(
   query: string,
   currentPage: number
-): Promise<IncidentData> {
+): Promise<IncidentsData> {
   try {
     const url = new URL(`http://localhost:8080/v1/incidents`);
 
@@ -27,28 +39,73 @@ export async function fetchIncidents(
     // Simulate slow load
     // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const incidentData: IncidentData = await data.json();
-      if (incidentData) {
+      const IncidentsData: IncidentsData = await data.json();
+      if (IncidentsData) {
         return {
-          incidents: incidentData.incidents,
-          metadata: incidentData.metadata,
+          incidents: IncidentsData.incidents,
+          metadata: IncidentsData.metadata,
         };
       } else {
-        // console.log(`fetchIncidents url: ${url.toString()}`);
-        // console.log(`fetchIncidents error: !incidentData`);
-        throw new Error("Failed to fetch incidents data: !incidentData");
+        // console.log(`getIncidents url: ${url.toString()}`);
+        // console.log(`getIncidents error: !IncidentsData`);
+        throw new Error("Failed to fetch incidents data: !IncidentsData");
       }
     } else {
-      console.log(`fetchIncidents url: ${url.toString()}`);
+      console.log(`getIncidents url: ${url.toString()}`);
       console.log(
-        `fetchIncidents error: !data.ok ${data.status} ${JSON.stringify(
+        `getIncidents error: !data.ok ${data.status} ${JSON.stringify(
           data.statusText
         )}`
       );
       throw new Error("Failed to fetch incidents data: !data.ok");
     }
   } catch (error) {
-    console.log(`fetchIncidents error: ${error}`);
+    console.log(`getIncidents error: ${error}`);
+    throw new Error(`Failed to fetch incidents data: ${error}`);
+  }
+}
+
+export async function getIncidentsAll(
+  query: string,
+  currentPage: number
+): Promise<IncidentsData> {
+  try {
+    const url = new URL(`http://localhost:8080/v1/incidents_all`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    searchParams.set("sort", "-updated_at");
+    searchParams.set("page", currentPage.toString());
+    searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const IncidentsData: IncidentsData = await data.json();
+      if (IncidentsData) {
+        return {
+          incidents: IncidentsData.incidents,
+          metadata: IncidentsData.metadata,
+        };
+      } else {
+        // console.log(`getIncidents url: ${url.toString()}`);
+        // console.log(`getIncidents error: !IncidentsData`);
+        throw new Error("Failed to fetch incidents data: !IncidentsData");
+      }
+    } else {
+      console.log(`getIncidents url: ${url.toString()}`);
+      console.log(
+        `getIncidents error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      throw new Error("Failed to fetch incidents data: !data.ok");
+    }
+  } catch (error) {
+    console.log(`getIncidents error: ${error}`);
     throw new Error(`Failed to fetch incidents data: ${error}`);
   }
 }
@@ -82,7 +139,7 @@ export async function fetchLatestIncidents() {
   }
 }
 
-export async function fetchIncidentById(id: string) {
+export async function getIncident(id: string) {
   const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
 
   const searchParams = url.searchParams;
@@ -103,7 +160,7 @@ export async function fetchIncidentById(id: string) {
       return "";
     }
   } catch (error) {
-    console.log(`fetchIncidentById error: ${error}`);
+    console.log(`getIncident error: ${error}`);
     throw new Error("Failed to fetch incident data.");
   }
 }
@@ -135,7 +192,10 @@ const FormSchemaIncident = z.object({
 // POST
 
 const CreateIncident = FormSchemaIncident.omit({ id: true });
-export async function createIncident(prevState: State, formData: FormData) {
+export async function createIncident(
+  prevState: IncidentState,
+  formData: FormData
+) {
   // Validate form fields using Zod
   const validatedFields = CreateIncident.safeParse({
     shortDescription: formData.get("short_description"),
@@ -209,30 +269,20 @@ export async function createIncident(prevState: State, formData: FormData) {
 const UpdateIncident = FormSchemaIncident.omit({ id: true });
 export async function updateIncident(
   id: string,
-  prevState: State,
+  prevState: IncidentState,
   formData: FormData
-) {
-  console.log(
-    `updateIncident(${id}, ${JSON.stringify(prevState)}, ${formData})`
-  );
-  console.log(`calling updateIncident id: ${id}`);
+): Promise<IncidentState> {
+  // Parse the form data using Zod
   const validatedFields = UpdateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
     assignedToId: formData.get("assigned_to_id"),
-    companyID: formData.get("company_id"),
+    companyId: formData.get("company_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
   });
 
   if (!validatedFields.success) {
-    console.log(
-      `updateIncident() !validatedFields.success : ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Missing Fields. Failed to Update Incident.",
@@ -262,10 +312,7 @@ export async function updateIncident(
         state: state,
       }),
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
   } catch (error) {
-    // If a database error occurs, return a more specific error.
     console.log(`updateIncident error: ${error}`);
     return {
       message: "Database Error: Failed to Update Incident.",

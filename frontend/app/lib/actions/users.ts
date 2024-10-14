@@ -1,13 +1,14 @@
+"use server";
 // Users
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { State } from "@/app/lib/actions";
-import { ITEMS_PER_PAGE } from "@/app/lib/constants";
+import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
 import { UserData } from "@/app/lib/definitions/users";
+import { IncidentState } from "@/app/lib/actions/incidents";
 
-export async function fetchUsers(
+export async function getUsers(
   query: string,
   currentPage: number
 ): Promise<UserData> {
@@ -33,21 +34,65 @@ export async function fetchUsers(
           metadata: userData.metadata,
         };
       } else {
-        // console.log(`fetchUsers url: ${url.toString()}`);
-        // console.log(`fetchUsers error: !userData`);
+        // console.log(`getUsers url: ${url.toString()}`);
+        // console.log(`getUsers error: !userData`);
         throw new Error("Failed to fetch users data: !userData");
       }
     } else {
-      console.log(`fetchUsers url: ${url.toString()}`);
+      console.log(`getUsers url: ${url.toString()}`);
       console.log(
-        `fetchUsers error: !data.ok ${data.status} ${JSON.stringify(
+        `getUsers error: !data.ok ${data.status} ${JSON.stringify(
           data.statusText
         )}`
       );
       throw new Error("Failed to fetch users data: !data.ok");
     }
   } catch (error) {
-    console.log(`fetchUsers error: ${error}`);
+    console.log(`getUsers error: ${error}`);
+    throw new Error(`Failed to fetch users data: ${error}`);
+  }
+}
+export async function getUsersAll(
+  query: string,
+  currentPage: number
+): Promise<UserData> {
+  try {
+    const url = new URL(`http://localhost:8080/v1/users_all`);
+
+    const searchParams = url.searchParams;
+    searchParams.set("query", query);
+    searchParams.set("sort", "last_name");
+    searchParams.set("page", currentPage.toString());
+    searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
+
+    const data = await fetch(url.toString(), {
+      method: "GET",
+    });
+    // Simulate slow load
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (data.ok) {
+      const userData: UserData = await data.json();
+      if (userData) {
+        return {
+          users: userData.users,
+          metadata: userData.metadata,
+        };
+      } else {
+        // console.log(`getUsers url: ${url.toString()}`);
+        // console.log(`getUsers error: !userData`);
+        throw new Error("Failed to fetch users data: !userData");
+      }
+    } else {
+      console.log(`getUsers url: ${url.toString()}`);
+      console.log(
+        `getUsers error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      throw new Error("Failed to fetch users data: !data.ok");
+    }
+  } catch (error) {
+    console.log(`getUsers error: ${error}`);
     throw new Error(`Failed to fetch users data: ${error}`);
   }
 }
@@ -78,7 +123,7 @@ const FormSchemaUser = z.object({
 });
 
 const CreateUser = FormSchemaUser.omit({ id: true });
-export async function createUser(prevState: State, formData: FormData) {
+export async function createUser(prevState: IncidentState, formData: FormData) {
   // Validate form fields using Zod
   const validatedFields = CreateUser.safeParse({
     name: formData.get("name"),
@@ -123,7 +168,7 @@ export async function createUser(prevState: State, formData: FormData) {
 const UpdateUser = FormSchemaUser.omit({ id: true });
 export async function updateUser(
   id: string,
-  prevState: State,
+  prevState: IncidentState,
   formData: FormData
 ) {
   const validatedFields = UpdateUser.safeParse({
@@ -166,7 +211,7 @@ export async function updateUser(
   redirect("/dashboard/users");
 }
 
-export async function fetchUserById(id: string) {
+export async function getUser(id: string) {
   const url = new URL(`http://localhost:8080/v1/user_by_id`);
 
   const searchParams = url.searchParams;
@@ -189,7 +234,7 @@ export async function fetchUserById(id: string) {
       return "";
     }
   } catch (error) {
-    console.log(`fetchUserById error: ${error}`);
+    console.log(`getUser error: ${error}`);
     throw new Error("Failed to fetch user data.");
   }
 }
