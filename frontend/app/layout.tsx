@@ -2,6 +2,7 @@ import "@/styles/tailwind.css";
 import type { Metadata } from "next";
 import type React from "react";
 import { ApplicationLayout } from "@/app/application-layout";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: {
@@ -27,6 +28,7 @@ export default async function RootLayout({
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body>
+        <NextTopLoader />
         <ApplicationLayout>{children}</ApplicationLayout>
       </body>
     </html>
