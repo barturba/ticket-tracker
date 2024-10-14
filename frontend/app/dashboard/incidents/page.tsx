@@ -41,7 +41,11 @@ export default async function Incidents(props: {
 
   return (
     <>
-      <AppHeading name="Incidents" createLink="/dashboard/incidents/create" />
+      <AppHeading
+        name="Incident"
+        createLabel="Create Incident"
+        createLink="/dashboard/incidents/create"
+      />
       <Table className="mt-8 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
         <TableHead>
           <TableRow>

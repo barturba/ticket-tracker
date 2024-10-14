@@ -6,7 +6,7 @@ import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/lib/constants";
 import { IncidentData, IncidentsData } from "@/app/lib/definitions/incidents";
 
 export type IncidentState = {
-  message: string;
+  message?: string;
   errors?: {
     shortDescription?: string[];
     description?: string[];
@@ -17,7 +17,30 @@ export type IncidentState = {
     state?: string[];
   };
 };
-// Incidents
+
+const FormSchemaIncident = z.object({
+  id: z.string(),
+  shortDescription: z
+    .string({
+      required_error: "Please enter a short description.",
+    })
+    .min(1, { message: "Short description must be at least 1 character." }),
+  description: z.string({
+    required_error: "Please enter a description.",
+  }),
+  assignedToId: z.string({
+    invalid_type_error: "Please select a user to assign to.",
+  }),
+  companyId: z.string({
+    invalid_type_error: "Please select a company.",
+  }),
+  configurationItemId: z.string({
+    invalid_type_error: "Please select a configuration item to assign to.",
+  }),
+  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
+    invalid_type_error: "Please select an incident state.",
+  }),
+});
 
 // GET
 export async function getIncidents(
@@ -165,95 +188,73 @@ export async function getIncident(id: string) {
   }
 }
 
-const FormSchemaIncident = z.object({
-  id: z.string(),
-  shortDescription: z
-    .string({
-      required_error: "Please enter a short description.",
-    })
-    .min(1, { message: "Short description must be at least 1 character." }),
-  description: z.string({
-    required_error: "Please enter a description.",
-  }),
-  assignedToId: z.string({
-    invalid_type_error: "Please select a user to assign to.",
-  }),
-  companyId: z.string({
-    invalid_type_error: "Please select a company.",
-  }),
-  configurationItemId: z.string({
-    invalid_type_error: "Please select a configuration item to assign to.",
-  }),
-  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
-    invalid_type_error: "Please select an incident state.",
-  }),
-});
-
 // POST
 
 const CreateIncident = FormSchemaIncident.omit({ id: true });
 export async function createIncident(
   prevState: IncidentState,
   formData: FormData
-) {
-  // Validate form fields using Zod
-  const validatedFields = CreateIncident.safeParse({
+): Promise<IncidentState> {
+  const validatedFields = UpdateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
-    incidentId: formData.get("incident_id"),
     assignedToId: formData.get("assigned_to_id"),
+    companyId: formData.get("company_id"),
     configurationItemId: formData.get("configuration_item_id"),
     state: formData.get("state"),
   });
 
-  // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
-    console.log(
-      `createIncident error: ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Missing Fields. Failed to Create Incident.",
     };
   }
 
-  // Prepare data for sending to the API.
+  // Validate form fields using Zod
   const {
     shortDescription,
     description,
-    incidentId,
+    companyId,
     assignedToId,
     configurationItemId,
     state,
   } = validatedFields.data;
+
   try {
     const url = new URL(`http://localhost:8080/v1/incidents`);
-    await fetch(url.toString(), {
+    const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
         short_description: shortDescription,
         description: description,
-        incident_id: incidentId,
+        company_id: companyId,
         assigned_to_id: assignedToId,
         configuration_item_id: configurationItemId,
         state: state,
       }),
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    // if (data.ok) {
-    //   console.log("got ok message");
-    //   const incident = await data.json();
-    //   if (incident) {
-    //     return incident;
-    //   }
-    // }
+    if (data.ok) {
+      const incident = await data.json();
+      if (incident) {
+        console.log(`createIncident success`);
+      } else {
+        console.log(`createIncident error: !incident`);
+        return {
+          message: "Database Error: Failed to Create Incident.",
+        };
+      }
+    } else {
+      console.log(
+        `createIncident error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Create Incident.",
+      };
+    }
   } catch (error) {
-    // If a database error occurs, return a more specific error.
     console.log(`createIncident error: ${error}`);
     return {
       message: "Database Error: Failed to Create Incident.",
@@ -294,6 +295,7 @@ export async function updateIncident(
     shortDescription,
     description,
     assignedToId,
+    companyId,
     configurationItemId,
     state,
   } = validatedFields.data;
@@ -301,19 +303,40 @@ export async function updateIncident(
   // Prepare data for sending to the API.
   try {
     const url = new URL(`http://localhost:8080/v1/incidents/${id}`);
-    await fetch(url.toString(), {
+    console.log(`updateIncident PUT`);
+    const data = await fetch(url.toString(), {
       method: "PUT",
       body: JSON.stringify({
-        id: id,
         short_description: shortDescription,
         description: description,
+        company_id: companyId,
         assigned_to_id: assignedToId,
         configuration_item_id: configurationItemId,
         state: state,
       }),
     });
+    if (data.ok) {
+      const incident = await data.json();
+      if (incident) {
+        console.log(`update success`);
+      } else {
+        console.log(`update error: !incident`);
+        return {
+          message: "Database Error: Failed to Update Incident.",
+        };
+      }
+    } else {
+      console.log(
+        `update error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Update Incident.",
+      };
+    }
   } catch (error) {
-    console.log(`updateIncident error: ${error}`);
+    console.log(`createIncident error: ${error}`);
     return {
       message: "Database Error: Failed to Update Incident.",
     };

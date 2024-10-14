@@ -7,9 +7,11 @@ import { html } from "framer-motion/client";
 
 export default function AppHeading({
   name,
+  createLabel,
   createLink,
 }: {
   name: string;
+  createLabel: string;
   createLink: string;
 }) {
   return (
@@ -32,7 +34,7 @@ export default function AppHeading({
           </div>
         </div> */}
       </div>
-      <Button href={createLink}>Create {name}</Button>
+      <Button href={createLink}>{createLabel}</Button>
     </div>
   );
 }

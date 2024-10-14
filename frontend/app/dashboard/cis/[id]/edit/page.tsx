@@ -1,5 +1,5 @@
 import Breadcrumbs from "@/app/ui/utils/breadcrumbs";
-import EditForm from "@/app/ui/incidents/edit-form";
+import EditIncidentForm from "@/app/ui/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCompanies } from "@/app/lib/actions/companies";
@@ -35,9 +35,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           },
         ]}
       />
-      <EditForm
+      <EditIncidentForm
         incident={incident}
-        initialUsers={usersData.users}
+        users={usersData.users}
         companies={companiesData.companies}
         cis={cisData.cis}
       />

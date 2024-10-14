@@ -6,14 +6,14 @@ export default function StateListbox({
   invalid,
   errorMessage,
 }: {
-  defaultValue: string;
+  defaultValue?: string;
   invalid: boolean;
   errorMessage: string;
 }) {
   return (
     <Field>
       <Label>State</Label>
-      <Listbox name="state" defaultValue={defaultValue}>
+      <Listbox name="state" defaultValue={defaultValue ? defaultValue : "New"}>
         <ListboxOption value="New">
           <ListboxLabel>New</ListboxLabel>
         </ListboxOption>

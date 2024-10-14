@@ -1,4 +1,4 @@
-import EditForm from "@/app/ui/incidents/edit-form";
+import EditIncidentForm from "@/app/ui/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCIsAll } from "@/app/lib/actions/cis";
@@ -42,10 +42,10 @@ export default async function Incident(props: {
         badgeState={incident.state}
         badgeText={incident.state}
       />
-      <EditForm
+      <EditIncidentForm
         incident={incident}
         companies={companiesData.companies}
-        initialUsers={usersData.users}
+        users={usersData.users}
         cis={cisData.cis}
       />
     </>

@@ -11,7 +11,7 @@ export default function DescriptionTextarea({
   invalid,
   errorMessage,
 }: {
-  defaultValue: string;
+  defaultValue?: string;
   invalid: boolean;
   errorMessage: string;
 }) {

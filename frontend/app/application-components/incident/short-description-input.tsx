@@ -6,7 +6,7 @@ export default function ShortDescriptionInput({
   invalid,
   errorMessage,
 }: {
-  defaultValue: string;
+  defaultValue?: string;
   invalid: boolean;
   errorMessage: string;
 }) {

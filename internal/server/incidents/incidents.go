@@ -162,12 +162,12 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			ShortDescription    string
-			Description         string
-			ConfigurationItemID uuid.UUID
-			CompanyID           uuid.UUID
-			AssignedToID        uuid.UUID
-			State               database.StateEnum
+			ShortDescription    string             `json:"short_description"`
+			Description         string             `json:"description"`
+			ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+			CompanyID           uuid.UUID          `json:"company_id"`
+			AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+			State               database.StateEnum `json:"state"`
 		}
 
 		err := helpers.ReadJSON(w, r, &input)
@@ -216,14 +216,12 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			CreatedAt           time.Time
-			UpdatedAt           time.Time
-			ShortDescription    string
-			Description         string
-			ConfigurationItemID uuid.UUID
-			CompanyID           uuid.UUID
-			AssignedToID        uuid.UUID
-			State               database.StateEnum
+			ShortDescription    string             `json:"short_description"`
+			Description         string             `json:"description"`
+			ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+			CompanyID           uuid.UUID          `json:"company_id"`
+			AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+			State               database.StateEnum `json:"state"`
 		}
 
 		err = helpers.ReadJSON(w, r, &input)
@@ -234,7 +232,6 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		incident := &data.Incident{
 			ID:                  id,
-			CreatedAt:           time.Now(),
 			UpdatedAt:           time.Now(),
 			ShortDescription:    input.ShortDescription,
 			Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},

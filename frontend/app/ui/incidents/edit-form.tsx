@@ -14,15 +14,17 @@ import StateListbox from "@/app/application-components/incident/state-listbox";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import { IncidentState } from "@/app/lib/actions/incidents";
+import FormWrapper from "@/app/application-components/form-wrapper";
+import MessageArea from "@/app/application-components/incident/message-area";
 
-export default function EditForm({
+export default function EditIncidentForm({
   incident,
-  initialUsers,
+  users: users,
   companies,
   cis,
 }: {
   incident: IncidentForm;
-  initialUsers: UserField[];
+  users: UserField[];
   companies: CompanyField[];
   cis: CIField[];
 }) {
@@ -34,10 +36,7 @@ export default function EditForm({
   );
 
   return (
-    <div className="mt-12">
-      <Subheading>Summary</Subheading>
-      <Divider className="mt-4" />
-
+    <FormWrapper subheading="Summary">
       <form action={formAction}>
         <Fieldset aria-label="Incident details">
           <FieldGroup>
@@ -61,7 +60,7 @@ export default function EditForm({
               id="assignedToId"
               name="assigned_to_id"
               placeholder="Select a user"
-              inputs={initialUsers.map((user) => ({
+              inputs={users.map((user) => ({
                 id: user.id,
                 name: `${user.first_name} ${user.last_name}`,
               }))}
@@ -115,6 +114,9 @@ export default function EditForm({
               errorMessage={state.errors?.state?.join(", ") || ""}
             />
           </FieldGroup>
+
+          {/* Message Area */}
+          <MessageArea state={state} />
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -123,9 +125,9 @@ export default function EditForm({
           <Button type="reset" plain>
             Reset
           </Button>
-          <button type="submit">Send</button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
-    </div>
+    </FormWrapper>
   );
 }
