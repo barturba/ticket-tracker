@@ -1,3 +1,5 @@
+// Package cis provides functions to interact with the database for Configuration Items (CIs).
+// It includes functions to retrieve, create, update, and delete CIs from the database.
 package cis
 
 import (
@@ -11,8 +13,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// GetFromDB retrieves a list of CIs from the database based on the provided query and filters.
+// It returns the list of CIs, metadata, and an error if any.
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.CI, data.Metadata, error) {
 	p := database.GetCIsParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
@@ -29,6 +31,8 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return cis, metadata, nil
 }
 
+// GetLatestFromDB retrieves the latest CIs from the database based on the provided limit and offset.
+// It returns the list of CIs and an error if any.
 func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.CI, error) {
 	p := database.GetCIsLatestParams{
 		Limit:  int32(limit),
@@ -42,6 +46,8 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	return cis, nil
 }
 
+// GetByIDFromDB retrieves a CI from the database based on the provided ID.
+// It returns the CI and an error if any.
 func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.CI, error) {
 	record, err := db.GetCIsByID(r.Context(), id)
 	if err != nil {
@@ -51,8 +57,8 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.CI
 	return ci, nil
 }
 
-// POST
-
+// PostToDB creates a new CI in the database based on the provided CI data.
+// It returns the created CI and an error if any.
 func PostToDB(r *http.Request, db *database.Queries, ci data.CI) (data.CI, error) {
 	i, err := db.CreateCIs(r.Context(), database.CreateCIsParams{
 		ID:        ci.ID,
@@ -67,8 +73,8 @@ func PostToDB(r *http.Request, db *database.Queries, ci data.CI) (data.CI, error
 	return response, nil
 }
 
-// PUT
-
+// PutToDB updates an existing CI in the database based on the provided CI data.
+// It returns the updated CI and an error if any.
 func PutToDB(r *http.Request, db *database.Queries, ci data.CI) (data.CI, error) {
 	i, err := db.UpdateCIs(r.Context(), database.UpdateCIsParams{
 		ID:        ci.ID,
@@ -84,8 +90,8 @@ func PutToDB(r *http.Request, db *database.Queries, ci data.CI) (data.CI, error)
 	return response, nil
 }
 
-// DELETE
-
+// DeleteFromDB deletes a CI from the database based on the provided ID.
+// It returns the deleted CI and an error if any.
 func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.CI, error) {
 	i, err := db.DeleteCIs(r.Context(), id)
 	if err != nil {
