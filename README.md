@@ -24,16 +24,16 @@
 
 The frontend uses the following npm packages:
 
-- @headlessui/react - Version ^2.1.9
-- @heroicons/react - Version ^2.1.5
-- @tailwindcss/forms - Version ^0.5.9
-- @types/node - Version ^20
-- @types/react - Version ^18
-- @types/react-dom - Version ^18
-- clsx - Version ^2.1.1
-- eslint - Version ^8
-- eslint-config-next - Version 14.2.14 (MIT License)
-- framer-motion - Version ^11.11.8
+- @headlessui/react - Version 2.1.9
+- @heroicons/react - Version 2.1.5
+- @tailwindcss/forms - Version 0.5.9
+- @types/node - Version 20
+- @types/react - Version 18
+- @types/react-dom - Version 18
+- clsx - Version 2.1.1
+- eslint - Version 8
+- eslint-config-next - Version 14.2.14
+- framer-motion - Version 11.11.8
 
 ## Getting Started
 
