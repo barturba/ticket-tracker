@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/server/cis"
 	"github.com/barturba/ticket-tracker/internal/server/companies"
@@ -12,11 +11,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/server/users"
 )
 
-func addRoutesIncidents(
-	mux *http.ServeMux,
-	logger *slog.Logger,
-	config data.Config,
-	db *database.Queries) {
+func addRoutesIncidents(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
 	mux.Handle("GET /v1/incidents", incidents.Get(logger, db))
 	mux.Handle("GET /v1/incidents_all", incidents.GetAll(logger, db))
 	mux.Handle("POST /v1/incidents", incidents.Post(logger, db))
@@ -26,11 +21,7 @@ func addRoutesIncidents(
 	mux.Handle("DELETE /v1/incidents/{id}", incidents.Delete(logger, db))
 }
 
-func addRoutesCompanies(
-	mux *http.ServeMux,
-	logger *slog.Logger,
-	config data.Config,
-	db *database.Queries) {
+func addRoutesCompanies(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
 	mux.Handle("GET /v1/companies", companies.Get(logger, db))
 	mux.Handle("GET /v1/companies_all", companies.GetAll(logger, db))
 	mux.Handle("POST /v1/companies", companies.Post(logger, db))
@@ -40,11 +31,7 @@ func addRoutesCompanies(
 	mux.Handle("DELETE /v1/companies/{id}", companies.Delete(logger, db))
 }
 
-func addRoutesUsers(
-	mux *http.ServeMux,
-	logger *slog.Logger,
-	config data.Config,
-	db *database.Queries) {
+func addRoutesUsers(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
 	mux.Handle("GET /v1/users", users.Get(logger, db))
 	mux.Handle("GET /v1/users_all", users.GetAll(logger, db))
 	mux.Handle("POST /v1/users", users.Post(logger, db))
@@ -54,11 +41,7 @@ func addRoutesUsers(
 	mux.Handle("DELETE /v1/users/{id}", users.Delete(logger, db))
 }
 
-func addRoutesConfigurationItems(
-	mux *http.ServeMux,
-	logger *slog.Logger,
-	config data.Config,
-	db *database.Queries) {
+func addRoutesConfigurationItems(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
 	mux.Handle("GET /v1/cis", cis.Get(logger, db))
 	mux.Handle("GET /v1/cis_all", cis.GetAll(logger, db))
 	mux.Handle("POST /v1/cis", cis.Post(logger, db))

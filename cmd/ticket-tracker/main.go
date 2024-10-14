@@ -1,20 +1,4 @@
-// main.go is the entry point for the ticket-tracker application. It initializes
-// the application context, loads environment variables, sets up the database
-// connection, and starts the HTTP server.
-//
-// The main function calls the run function, which performs the following tasks:
-//  1. Creates a logger for logging messages.
-//  2. Loads environment variables from a .env file.
-//  3. Retrieves necessary configuration values (host, port, environment, and database URL)
-//     from the environment variables.
-//  4. Opens a connection to the PostgreSQL database using the provided database URL.
-//  5. Creates a new server instance with the logger, configuration, and database queries.
-//  6. Starts the HTTP server in a separate goroutine and listens for incoming requests.
-//  7. Waits for an interrupt signal (e.g., Ctrl+C) to gracefully shut down the server.
-//
-// The NewServer function sets up the HTTP server by creating a new ServeMux and adding
-// routes for incidents, companies, users, and configuration items. It returns an HTTP
-// handler that can be used by the HTTP server.
+// main.go is the entry point for ticket-tracker.
 package main
 
 import (
@@ -99,7 +83,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	dbQueries := database.New(db)
 
 	// Create a new server instance.
-	srv := NewServer(logger, config, dbQueries)
+	srv := newServer(logger, config, dbQueries)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, config.Port),
 		Handler: srv,
@@ -133,14 +117,14 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 // routes for incidents, companies, users, and configuration items.
 //
 // Returns an HTTP handler that can be used by the HTTP server.
-func NewServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
+func newServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
 
 	mux := http.NewServeMux()
 
-	addRoutesIncidents(mux, logger, config, db)
-	addRoutesCompanies(mux, logger, config, db)
-	addRoutesUsers(mux, logger, config, db)
-	addRoutesConfigurationItems(mux, logger, config, db)
+	addRoutesIncidents(mux, logger, db)
+	addRoutesCompanies(mux, logger, db)
+	addRoutesUsers(mux, logger, db)
+	addRoutesConfigurationItems(mux, logger, db)
 
 	var handler http.Handler = mux
 
