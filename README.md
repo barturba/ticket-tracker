@@ -34,7 +34,7 @@ This program uses the following packages among many others. Please refer to the 
 
 ### Go Modules
 
-- The following Go modules are required for this project:
+The following Go modules are required for this project:
 
 - [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Version 5.2.1
 - [github.com/google/uuid](https://github.com/google/uuid) - Version 1.6.0
