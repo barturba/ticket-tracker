@@ -20,12 +20,13 @@ That's why I built **TicketTracker**.
 
 Now, tracking and resolving incidents is as lightning fast as it should be.
 
-**TicketTracker** is a IT ticketing system designed to simplify the management of incidents. It provides basic user support and essential features for IT service management.
+**TicketTracker** is a IT ticketing system designed to simplify the management of incidents.
 
 ## Features
 
 - **Incident Management:** Log, track, and resolve incidents with ease.
-- **Configuration Item Management:** Maintain an inventory of configuration items (CIs).
+- **Fast:** Blazing quick Go backend
+- **Intuitive:** Smooth, modern React frontend.
 
 ## Dependencies
 
