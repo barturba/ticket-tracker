@@ -107,10 +107,6 @@ The frontend uses the following npm packages, among others:
 
 6. **Access the application:** Open a web browser and go to `http://localhost:3000`.
 
-## Disclaimer
-
-This is a basic implementation of a ticket tracker. It is not intended for production use. Please use at your own risk.
-
 ## Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/barturba/ticket-tracker/issues).
