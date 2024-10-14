@@ -1,10 +1,7 @@
 import AppHeading from "@/app/application-components/heading";
-import { getIncidents } from "@/app/lib/actions/incidents";
-import { IncidentsData } from "@/app/lib/definitions/incidents";
-import { IncidentsTableSkeleton } from "@/app/ui/skeletons/incidents";
+import { getIncidents } from "@/app/api/incidents/incidents";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import IncidentsTable from "./table";
 
 export const metadata: Metadata = {
@@ -30,9 +27,7 @@ export default async function Incidents(props: {
         createLabel="Create Incident"
         createLink="/dashboard/incidents/create"
       />
-      <Suspense fallback={<p>Loading INcidents Table...</p>}>
-        <IncidentsTable incidentsData={incidentsData} />
-      </Suspense>
+      <IncidentsTable incidentsData={incidentsData} />
       <PaginationApp totalPages={incidentsData.metadata.last_page} />
     </>
   );

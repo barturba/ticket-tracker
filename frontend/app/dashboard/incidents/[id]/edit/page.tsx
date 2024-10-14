@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCIsAll } from "@/app/lib/actions/cis";
 import { getCompaniesAll } from "@/app/lib/actions/companies";
-import { getIncident } from "@/app/lib/actions/incidents";
+import { getIncident } from "@/app/api/incidents/incidents";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 import { getUsersAll } from "@/app/lib/actions/users";

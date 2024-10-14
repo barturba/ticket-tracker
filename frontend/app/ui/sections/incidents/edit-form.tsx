@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
-import { updateIncident } from "@/app/lib/actions/incidents";
+import { updateIncident } from "@/app/api/incidents/incidents";
 import { IncidentForm } from "@/app/lib/definitions/incidents";
 import { CIField } from "@/app/lib/definitions/cis";
 import { UserField } from "@/app/lib/definitions/users";
@@ -12,7 +12,7 @@ import FormInput from "@/app/application-components/resources/form-input";
 import StateListbox from "@/app/application-components/incident/state-listbox";
 import DescriptionTextarea from "@/app/application-components/incident/description-textarea";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
-import { IncidentState } from "@/app/lib/actions/incidents";
+import { IncidentState } from "@/app/api/incidents/incidents";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";

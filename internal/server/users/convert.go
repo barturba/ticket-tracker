@@ -42,7 +42,6 @@ func convertRowAndCount(row database.GetUsersRow, count *int64) data.User {
 		UpdatedAt: row.UpdatedAt,
 		FirstName: row.FirstName.String,
 		LastName:  row.LastName.String,
-		APIkey:    row.Apikey,
 	}
 	*count = row.Count
 

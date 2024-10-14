@@ -6,7 +6,7 @@ import {
   ALL_ITEMS_LIMIT,
   ITEMS_PER_PAGE,
 } from "@/app/lib/definitions/constants";
-import { IncidentData, IncidentsData } from "@/app/lib/definitions/incidents";
+import { IncidentsData } from "@/app/api/incidents/incidents.d";
 
 export type IncidentState = {
   message?: string;

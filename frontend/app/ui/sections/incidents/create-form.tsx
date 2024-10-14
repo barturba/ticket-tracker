@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { createIncident, IncidentState } from "@/app/lib/actions/incidents";
+import { createIncident, IncidentState } from "@/app/api/incidents/incidents";
 import { UserField } from "@/app/lib/definitions/users";
 import { CIField } from "@/app/lib/definitions/cis";
 import { CompanyField } from "@/app/lib/definitions/companies";

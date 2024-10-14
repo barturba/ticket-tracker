@@ -16,7 +16,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO USERS (id, created_at, updated_at, first_name, last_name, email)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
+RETURNING id, created_at, updated_at, first_name, last_name, email, password
 `
 
 type CreateUserParams struct {
@@ -44,7 +44,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
-		&i.Apikey,
 		&i.Email,
 		&i.Password,
 	)
@@ -54,7 +53,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 const deleteUserByID = `-- name: DeleteUserByID :one
 DELETE FROM users 
 WHERE id = $1
-RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
+RETURNING id, created_at, updated_at, first_name, last_name, email, password
 `
 
 func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -66,27 +65,6 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error
 		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
-		&i.Apikey,
-		&i.Email,
-		&i.Password,
-	)
-	return i, err
-}
-
-const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE APIKEY = $1
-`
-
-func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByAPIKey, apikey)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.FirstName,
-		&i.LastName,
-		&i.Apikey,
 		&i.Email,
 		&i.Password,
 	)
@@ -94,7 +72,7 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apikey string) (User, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE email = $1
+SELECT id, created_at, updated_at, first_name, last_name, email, password FROM USERS WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -106,7 +84,6 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
-		&i.Apikey,
 		&i.Email,
 		&i.Password,
 	)
@@ -114,7 +91,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM USERS WHERE id = $1
+SELECT id, created_at, updated_at, first_name, last_name, email, password FROM USERS WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -126,7 +103,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
-		&i.Apikey,
 		&i.Email,
 		&i.Password,
 	)
@@ -134,7 +110,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
+SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, email, password FROM users 
 WHERE (email ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (last_name ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -168,7 +144,6 @@ type GetUsersRow struct {
 	UpdatedAt time.Time
 	FirstName sql.NullString
 	LastName  sql.NullString
-	Apikey    string
 	Email     string
 	Password  sql.NullString
 }
@@ -195,7 +170,6 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersR
 			&i.UpdatedAt,
 			&i.FirstName,
 			&i.LastName,
-			&i.Apikey,
 			&i.Email,
 			&i.Password,
 		); err != nil {
@@ -213,7 +187,7 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersR
 }
 
 const getUsersByCompany = `-- name: GetUsersByCompany :many
-SELECT users.id, users.created_at, users.updated_at, first_name, last_name, apikey, email, password, companies.id, companies.created_at, companies.updated_at, name FROM users 
+SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, password, companies.id, companies.created_at, companies.updated_at, name FROM users 
 LEFT JOIN companies 
 ON users.assigned_to = users.id
 ORDER BY users.name ASC
@@ -225,7 +199,6 @@ type GetUsersByCompanyRow struct {
 	UpdatedAt   time.Time
 	FirstName   sql.NullString
 	LastName    sql.NullString
-	Apikey      string
 	Email       string
 	Password    sql.NullString
 	ID_2        uuid.NullUUID
@@ -249,7 +222,6 @@ func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow
 			&i.UpdatedAt,
 			&i.FirstName,
 			&i.LastName,
-			&i.Apikey,
 			&i.Email,
 			&i.Password,
 			&i.ID_2,
@@ -284,7 +256,7 @@ func (q *Queries) GetUsersCount(ctx context.Context, query sql.NullString) (int6
 }
 
 const getUsersLatest = `-- name: GetUsersLatest :many
-SELECT id, created_at, updated_at, first_name, last_name, apikey, email, password FROM users 
+SELECT id, created_at, updated_at, first_name, last_name, email, password FROM users 
 ORDER BY users.updated_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -309,7 +281,6 @@ func (q *Queries) GetUsersLatest(ctx context.Context, arg GetUsersLatestParams) 
 			&i.UpdatedAt,
 			&i.FirstName,
 			&i.LastName,
-			&i.Apikey,
 			&i.Email,
 			&i.Password,
 		); err != nil {
@@ -331,11 +302,10 @@ UPDATE users
 SET updated_at = $2, 
 first_name = $3,
 last_name = $4,
-apikey = $5, 
-email = $6, 
-password = $7
+email = $5, 
+password = $6
 WHERE ID = $1
-RETURNING id, created_at, updated_at, first_name, last_name, apikey, email, password
+RETURNING id, created_at, updated_at, first_name, last_name, email, password
 `
 
 type UpdateUserParams struct {
@@ -343,7 +313,6 @@ type UpdateUserParams struct {
 	UpdatedAt time.Time
 	FirstName sql.NullString
 	LastName  sql.NullString
-	Apikey    string
 	Email     string
 	Password  sql.NullString
 }
@@ -354,7 +323,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.UpdatedAt,
 		arg.FirstName,
 		arg.LastName,
-		arg.Apikey,
 		arg.Email,
 		arg.Password,
 	)
@@ -365,7 +333,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
-		&i.Apikey,
 		&i.Email,
 		&i.Password,
 	)

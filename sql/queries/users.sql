@@ -38,8 +38,6 @@ LEFT JOIN companies
 ON users.assigned_to = users.id
 ORDER BY users.name ASC;
 
--- name: GetUserByAPIKey :one
-SELECT * FROM USERS WHERE APIKEY = $1;
 
 -- name: GetUserByEmail :one
 SELECT * FROM USERS WHERE email = $1;
@@ -52,9 +50,8 @@ UPDATE users
 SET updated_at = $2, 
 first_name = $3,
 last_name = $4,
-apikey = $5, 
-email = $6, 
-password = $7
+email = $5, 
+password = $6
 WHERE ID = $1
 RETURNING *;
 

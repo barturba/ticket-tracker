@@ -90,7 +90,6 @@ type User struct {
 	UpdatedAt time.Time
 	FirstName sql.NullString
 	LastName  sql.NullString
-	Apikey    string
 	Email     string
 	Password  sql.NullString
 }
