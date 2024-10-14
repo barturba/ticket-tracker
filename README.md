@@ -20,23 +20,31 @@
 2. **Install dependencies:**
 
    ```bash
-   cd tickettracker
+   cd ticket-tracker
    go mod tidy
    ```
 
 3. **Configure the application:**
 
-- Update .env with your database connection details.
-- Set up user authentication (if required).
+- Create a .env file with your database connection details in the root of the project.
 
-4. **Build and run the application:**
+4. **Build and run the backend application:**
 
    ```bash
-   go build .
-   ./ticket-tracker
+   make
    ```
 
-5. **Access the application:** Open a web browser and go to `http://localhost:8080`.
+5. **Build and run the frontend:**
+
+- Open a new teriminal in the roow of the project and run the following commands:
+
+  ```bash
+  cd frontend
+  pnpm install
+  pnpm dev
+  ```
+
+6. **Access the application:** Open a web browser and go to `http://localhost:3000`.
 
 ## Disclaimer
 
