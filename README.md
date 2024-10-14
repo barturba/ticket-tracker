@@ -1,13 +1,11 @@
 # TicketTracker Readme
 
-**TicketTracker** is a IT ticketing system designed to simplify the management of incidents, change requests, and configuration items. It provides basic user support and essential features for IT service management.
+**TicketTracker** is a IT ticketing system designed to simplify the management of incidents. It provides basic user support and essential features for IT service management.
 
 ## Features
 
-- **Incident Management:** Log, track, and resolve incidents with ease. Assign priorities, set due dates, and collaborate with team members to ensure timely resolution.
-- **Change Request Management:** Initiate, review, approve, and implement change requests following established processes. Minimize risks and maintain system stability.
-- **Configuration Item Management:** Maintain an inventory of configuration items (CIs). Track relationships between CIs, monitor changes, and support IT asset management.
-- **Basic User Support:** Provide users with a self-service portal to submit tickets, track progress, and view knowledge base articles for common issues.
+- **Incident Management:** Log, track, and resolve incidents with ease.
+- **Configuration Item Management:** Maintain an inventory of configuration items (CIs).
 
 ## Dependencies
 
