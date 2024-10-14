@@ -25,8 +25,8 @@ Now, tracking and resolving incidents is as lightning fast as it should be.
 ## Features
 
 - **Incident Management:** Log, track, and resolve incidents with ease.
-- **Fast:** Blazing quick Go backend
-- **Intuitive:** Smooth, modern React frontend.
+- **Fast:** Blazing quick **[Go](https://golang.org/)** backend
+- **Intuitive:** Smooth, modern **[React](https://reactjs.org/)** frontend.
 
 ## Dependencies
 
@@ -36,18 +36,18 @@ This program uses the following packages among many others. Please refer to the 
 
 - The following Go modules are required for this project:
 
-- github.com/golang-jwt/jwt/v5 - Version 5.2.1
-- github.com/google/uuid - Version 1.6.0
-- github.com/joho/godotenv - Version 1.5.1
-- golang.org/x/crypto - Version 0.27.0
+- [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Version 5.2.1
+- [github.com/google/uuid](https://github.com/google/uuid) - Version 1.6.0
+- [github.com/joho/godotenv](github.com/joho/godotenv) - Version 1.5.1
+- [golang.org/x/crypto](https://pkg.go.dev/golang.org/x/crypto) - Version 0.27.0
 
 ### NPM Packages
 
 The frontend uses the following npm packages, among others:
 
-- @headlessui/react - Version 2.1.9
-- @heroicons/react - Version 2.1.5
-- @tailwindcss/forms - Version 0.5.9
+- [@headlessui/react](https://github.com/tailwindlabs/headlessui) - Version 2.1.9
+- [@heroicons/react](https://github.com/tailwindlabs/heroicons) - Version 2.1.5
+- [@tailwindcss/forms](https://github.com/tailwindlabs/tailwindcss-forms) - Version 0.5.9
 
 ## Getting Started
 
@@ -113,4 +113,4 @@ This is a basic implementation of a ticket tracker. It is not intended for produ
 
 ## Support
 
-For support, please open an issue on the GitHub repository.
+For support, please open an issue on the [GitHub repository](https://github.com/barturba/ticket-tracker/issues).
