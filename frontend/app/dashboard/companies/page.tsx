@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { getCompanies } from "@/app/lib/actions/companies";
+import { getCompanies } from "@/app/api/companies/companies";
 import { CompaniesData } from "@/app/lib/definitions/companies";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";

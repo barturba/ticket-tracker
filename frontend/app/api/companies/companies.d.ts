@@ -1,4 +1,4 @@
-import { Metadata } from "@/app/lib/definitions";
+import type { Metadata } from "../metadata/metadata";
 
 export type Company = {
   id: string;

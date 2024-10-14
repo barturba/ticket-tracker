@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
-import { CompanyState, updateCompany } from "@/app/lib/actions/companies";
+import { CompanyState, updateCompany } from "@/app/api/companies/companies";
 import { CompanyForm } from "@/app/lib/definitions/companies";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";

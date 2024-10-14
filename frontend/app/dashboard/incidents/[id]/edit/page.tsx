@@ -2,11 +2,11 @@ import EditIncidentForm from "@/app/ui/sections/incidents/edit-form";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCIsAll } from "@/app/api/cis/cis";
-import { getCompaniesAll } from "@/app/lib/actions/companies";
+import { getCompaniesAll } from "@/app/api/companies/companies";
 import { getIncident } from "@/app/api/incidents/incidents";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
-import { getUsersAll } from "@/app/lib/actions/users";
+import { getUsersAll } from "@/app/api/users/users";
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;

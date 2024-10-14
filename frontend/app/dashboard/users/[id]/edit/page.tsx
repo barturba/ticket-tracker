@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getUser } from "@/app/lib/actions/users";
+import { getUser } from "@/app/api/users/users";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 import EditUserForm from "@/app/ui/sections/users/edit-form";

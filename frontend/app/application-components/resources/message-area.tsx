@@ -1,4 +1,4 @@
-import { CompanyState } from "@/app/lib/actions/companies";
+import { CompanyState } from "@/app/api/companies/companies";
 import { IncidentState } from "@/app/api/incidents/incidents";
 
 export default function MessageArea({

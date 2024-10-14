@@ -2,11 +2,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import {
-  ALL_ITEMS_LIMIT,
-  ITEMS_PER_PAGE,
-} from "@/app/lib/definitions/constants";
-import { CompaniesData } from "@/app/lib/definitions/companies";
+import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
+import type { CompaniesData } from "@/app/api/companies/companies.d";
 
 export type CompanyState = {
   message?: string;

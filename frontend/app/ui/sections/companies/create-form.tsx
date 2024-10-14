@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { CompanyState, createCompany } from "@/app/lib/actions/companies";
+import { CompanyState, createCompany } from "@/app/api/companies/companies";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { Divider } from "@/app/components/divider";

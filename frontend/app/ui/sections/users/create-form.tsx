@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { createUser, UserState } from "@/app/lib/actions/users";
+import { createUser, UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormInput from "@/app/application-components/resources/form-input";

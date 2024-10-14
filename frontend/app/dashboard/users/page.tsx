@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { getUsers } from "@/app/lib/actions/users";
+import { getUsers } from "@/app/api/users/users";
 import { UsersData } from "@/app/lib/definitions/users";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";

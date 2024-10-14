@@ -1,11 +1,11 @@
 "use client";
 import { Button } from "@/app/components/button";
 import { useActionState } from "react";
-import { updateUser } from "@/app/lib/actions/users";
+import { updateUser } from "@/app/api/users/users";
 import { UserForm } from "@/app/lib/definitions/users";
 import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
-import { UserState } from "@/app/lib/actions/users";
+import { UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
