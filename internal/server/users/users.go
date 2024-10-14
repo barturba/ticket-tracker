@@ -156,12 +156,9 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			FirstName           string
-			LastName            string
-			ConfigurationItemID uuid.UUID
-			ApiKey              string
-			Email               string
-			Password            string
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+			Email     string `json:"email"`
 		}
 
 		err := helpers.ReadJSON(w, r, &input)
@@ -172,12 +169,10 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		user := &data.User{
 			ID:        uuid.New(),
-			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			FirstName: input.FirstName,
 			LastName:  input.LastName,
-			APIkey:    input.ApiKey,
-			Password:  input.Password,
+			Email:     input.Email,
 		}
 
 		v := validator.New()
@@ -210,6 +205,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		var input struct {
 			FirstName string `json:"first_name"`
 			LastName  string `json:"last_name"`
+			Email     string `json:"email"`
 		}
 
 		err = helpers.ReadJSON(w, r, &input)
@@ -223,6 +219,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			UpdatedAt: time.Now(),
 			FirstName: input.FirstName,
 			LastName:  input.LastName,
+			Email:     input.Email,
 		}
 
 		v := validator.New()
@@ -238,7 +235,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/user", "id", id)
+		logger.Info("msg", "handle", "PUT /v1/user/{id}", "id", id)
 		helpers.RespondWithJSON(w, http.StatusOK, i)
 	})
 }

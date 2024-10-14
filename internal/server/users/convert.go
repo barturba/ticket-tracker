@@ -12,7 +12,7 @@ func convert(user database.User) data.User {
 		UpdatedAt: user.UpdatedAt,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
-		APIkey:    user.Apikey,
+		Email:     user.Email,
 	}
 }
 

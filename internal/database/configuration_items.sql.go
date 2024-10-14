@@ -14,9 +14,9 @@ import (
 )
 
 const createCIs = `-- name: CreateCIs :one
-INSERT INTO configuration_items (id, created_at, updated_at, name, company_id)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, name, company_id
+INSERT INTO configuration_items (id, created_at, updated_at, name)
+VALUES ($1, $2, $3, $4)
+RETURNING id, created_at, updated_at, name
 `
 
 type CreateCIsParams struct {
@@ -24,7 +24,6 @@ type CreateCIsParams struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
-	CompanyID uuid.UUID
 }
 
 func (q *Queries) CreateCIs(ctx context.Context, arg CreateCIsParams) (ConfigurationItem, error) {
@@ -33,7 +32,6 @@ func (q *Queries) CreateCIs(ctx context.Context, arg CreateCIsParams) (Configura
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Name,
-		arg.CompanyID,
 	)
 	var i ConfigurationItem
 	err := row.Scan(
@@ -41,7 +39,6 @@ func (q *Queries) CreateCIs(ctx context.Context, arg CreateCIsParams) (Configura
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.CompanyID,
 	)
 	return i, err
 }
@@ -49,7 +46,7 @@ func (q *Queries) CreateCIs(ctx context.Context, arg CreateCIsParams) (Configura
 const deleteCIs = `-- name: DeleteCIs :one
 DELETE FROM configuration_items 
 WHERE id = $1
-RETURNING id, created_at, updated_at, name, company_id
+RETURNING id, created_at, updated_at, name
 `
 
 func (q *Queries) DeleteCIs(ctx context.Context, id uuid.UUID) (ConfigurationItem, error) {
@@ -60,13 +57,12 @@ func (q *Queries) DeleteCIs(ctx context.Context, id uuid.UUID) (ConfigurationIte
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getCIs = `-- name: GetCIs :many
-SELECT count(*) OVER(), id, created_at, updated_at, name, company_id FROM configuration_items 
+SELECT count(*) OVER(), id, created_at, updated_at, name FROM configuration_items 
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY
 CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'ASC') THEN id END ASC,
@@ -95,7 +91,6 @@ type GetCIsRow struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
-	CompanyID uuid.UUID
 }
 
 func (q *Queries) GetCIs(ctx context.Context, arg GetCIsParams) ([]GetCIsRow, error) {
@@ -119,41 +114,6 @@ func (q *Queries) GetCIs(ctx context.Context, arg GetCIsParams) ([]GetCIsRow, er
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Name,
-			&i.CompanyID,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getCIsByCompanyID = `-- name: GetCIsByCompanyID :many
-SELECT id, created_at, updated_at, name, company_id FROM configuration_items
-WHERE company_id = $1
-`
-
-func (q *Queries) GetCIsByCompanyID(ctx context.Context, companyID uuid.UUID) ([]ConfigurationItem, error) {
-	rows, err := q.db.QueryContext(ctx, getCIsByCompanyID, companyID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ConfigurationItem
-	for rows.Next() {
-		var i ConfigurationItem
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.Name,
-			&i.CompanyID,
 		); err != nil {
 			return nil, err
 		}
@@ -169,7 +129,7 @@ func (q *Queries) GetCIsByCompanyID(ctx context.Context, companyID uuid.UUID) ([
 }
 
 const getCIsByID = `-- name: GetCIsByID :one
-SELECT id, created_at, updated_at, name, company_id FROM configuration_items
+SELECT id, created_at, updated_at, name FROM configuration_items
 WHERE id = $1
 `
 
@@ -181,13 +141,12 @@ func (q *Queries) GetCIsByID(ctx context.Context, id uuid.UUID) (ConfigurationIt
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.CompanyID,
 	)
 	return i, err
 }
 
 const getCIsLatest = `-- name: GetCIsLatest :many
-SELECT id, created_at, updated_at, name, company_id FROM configuration_items 
+SELECT id, created_at, updated_at, name FROM configuration_items 
 ORDER BY configuration_items.updated_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -211,7 +170,6 @@ func (q *Queries) GetCIsLatest(ctx context.Context, arg GetCIsLatestParams) ([]C
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Name,
-			&i.CompanyID,
 		); err != nil {
 			return nil, err
 		}
@@ -231,7 +189,7 @@ UPDATE configuration_items
 SET name = $2,
 updated_at = $3
 WHERE id = $1
-RETURNING id, created_at, updated_at, name, company_id
+RETURNING id, created_at, updated_at, name
 `
 
 type UpdateCIsParams struct {
@@ -248,7 +206,6 @@ func (q *Queries) UpdateCIs(ctx context.Context, arg UpdateCIsParams) (Configura
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Name,
-		&i.CompanyID,
 	)
 	return i, err
 }

@@ -36,7 +36,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	}
 	rows, err := db.GetCIsLatest(r.Context(), p)
 	if err != nil {
-		return nil, errors.New("couldn't find cis")
+		return nil, errors.New("couldn't find ci")
 	}
 	cis := convertMany(rows)
 	return cis, nil
@@ -57,11 +57,12 @@ func PostToDB(r *http.Request, db *database.Queries, ci data.CI) (data.CI, error
 	i, err := db.CreateCIs(r.Context(), database.CreateCIsParams{
 		ID:        ci.ID,
 		Name:      ci.Name,
+		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
 	response := convert(i)
 	if err != nil {
-		return data.CI{}, errors.New("couldn't find ci")
+		return data.CI{}, errors.New("couldn't create ci")
 	}
 	return response, nil
 }

@@ -12,8 +12,13 @@ export type CIField = {
   name: string;
 };
 
-export type CIData = {
+export type CIsData = {
   cis: CI[];
+  metadata: Metadata;
+};
+
+export type CIData = {
+  ci: CI;
   metadata: Metadata;
 };
 
@@ -24,18 +29,7 @@ export type CIsField = {
   name: string;
 };
 
-export type CIsForm = {
+export type CIForm = {
   id: string;
-  short_description: string;
-  description: string;
-  company_id: string;
-  assigned_to_id: string;
-  configuration_item_id: string;
-  state:
-    | "New"
-    | "Assigned"
-    | "In Progress"
-    | "Pending"
-    | "On Hold"
-    | "Resolved";
+  name: string;
 };

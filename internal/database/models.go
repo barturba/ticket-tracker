@@ -70,7 +70,6 @@ type ConfigurationItem struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
-	CompanyID uuid.UUID
 }
 
 type Incident struct {

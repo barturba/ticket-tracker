@@ -41,6 +41,14 @@ export default function EditUserForm({ user }: { user: UserForm }) {
               }
               errorMessage={state.errors?.last_name?.join(", ") || ""}
             />
+            {/* Email */}
+            <ShortDescriptionInput
+              label="Email"
+              name="email"
+              defaultValue={user.email}
+              invalid={!!state.errors?.email && state.errors.email.length > 0}
+              errorMessage={state.errors?.email?.join(", ") || ""}
+            />
           </FieldGroup>
 
           {/* Message Area */}

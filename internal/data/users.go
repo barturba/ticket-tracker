@@ -29,8 +29,8 @@ func ValidateUser(v *validator.Validator, user *User) {
 	// v.Check(user.APIkey != "", "api_key", "must be provided")
 	// v.Check(len(user.APIkey) == 64, "api_key", "must not be more than 64 bytes long")
 
-	// v.Check(user.Email != "", "email", "must be provided")
-	// v.Check(len(user.Email) <= 320, "email", "must not be more than 320 bytes long")
+	v.Check(user.Email != "", "email", "must be provided")
+	v.Check(len(user.Email) <= 320, "email", "must not be more than 320 bytes long")
 
 	// v.Check(len(user.Password) <= 255, "password", "must not be more than 255 bytes long")
 }

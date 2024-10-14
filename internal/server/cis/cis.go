@@ -149,7 +149,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			Name string
+			Name string `json:"Name"`
 		}
 
 		err := helpers.ReadJSON(w, r, &input)

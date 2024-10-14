@@ -6,6 +6,7 @@ export type User = {
   updated_at: string;
   first_name: string;
   last_name: string;
+  email: string;
 };
 
 export type UserField = {
@@ -29,10 +30,12 @@ export type UsersField = {
   updated_at: string;
   first_name: string;
   last_name: string;
+  email: string;
 };
 
 export type UserForm = {
   id: string;
   first_name: string;
   last_name: string;
+  email: string;
 };

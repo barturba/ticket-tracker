@@ -1,6 +1,6 @@
 -- +goose Up
 
-ALTER TABLE configuration_items DROP COLUMN organization_id;
+ALTER TABLE configuration_items DROP COLUMN IF EXIST organization_id;
 
 -- +goose Down
 

@@ -2,20 +2,33 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { IncidentState } from "@/app/lib/actions/incidents";
 import {
   ALL_ITEMS_LIMIT,
   ITEMS_PER_PAGE,
 } from "@/app/lib/definitions/constants";
-import { CIData } from "@/app/lib/definitions/cis";
+import { CIData, CIsData } from "@/app/lib/definitions/cis";
 
-// CIs
+export type CIState = {
+  message?: string;
+  errors?: {
+    name?: string[];
+  };
+};
+
+const FormSchemaCI = z.object({
+  id: z.string(),
+  name: z
+    .string({
+      required_error: "Please enter a name.",
+    })
+    .min(1, { message: "Name must be at least 1 character." }),
+});
 
 // GET
 export async function getCIs(
   query: string,
   currentPage: number
-): Promise<CIData> {
+): Promise<CIsData> {
   try {
     const url = new URL(`http://localhost:8080/v1/cis`);
 
@@ -28,19 +41,15 @@ export async function getCIs(
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const ciData: CIData = await data.json();
-      if (ciData) {
+      const CIsData: CIsData = await data.json();
+      if (CIsData) {
         return {
-          cis: ciData.cis,
-          metadata: ciData.metadata,
+          cis: CIsData.cis,
+          metadata: CIsData.metadata,
         };
       } else {
-        // console.log(`getCIs url: ${url.toString()}`);
-        // console.log(`getCIs error: !ciData`);
-        throw new Error("Failed to fetch cis data: !ciData");
+        throw new Error("Failed to fetch cis data: !CIsData");
       }
     } else {
       console.log(`getCIs url: ${url.toString()}`);
@@ -60,32 +69,28 @@ export async function getCIs(
 export async function getCIsAll(
   query: string,
   currentPage: number
-): Promise<CIData> {
+): Promise<CIsData> {
   try {
     const url = new URL(`http://localhost:8080/v1/cis_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
-    searchParams.set("sort", "name");
+    searchParams.set("sort", "-updated_at");
     searchParams.set("page", currentPage.toString());
     searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
 
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
-      const ciData: CIData = await data.json();
-      if (ciData) {
+      const CIsData: CIsData = await data.json();
+      if (CIsData) {
         return {
-          cis: ciData.cis,
-          metadata: ciData.metadata,
+          cis: CIsData.cis,
+          metadata: CIsData.metadata,
         };
       } else {
-        // console.log(`getCIs url: ${url.toString()}`);
-        // console.log(`getCIs error: !ciData`);
-        throw new Error("Failed to fetch cis data: !ciData");
+        throw new Error("Failed to fetch cis data: !CIsData");
       }
     } else {
       console.log(`getCIs url: ${url.toString()}`);
@@ -104,7 +109,6 @@ export async function getCIsAll(
 
 export async function fetchLatestCIs() {
   try {
-    console.log(`calling fetchLatestCIs()`);
     const url = new URL(`http://localhost:8080/v1/cis_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
@@ -113,8 +117,6 @@ export async function fetchLatestCIs() {
     const data = await fetch(url.toString(), {
       method: "GET",
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
     if (data.ok) {
       const cis = await data.json();
       if (cis) {
@@ -157,90 +159,56 @@ export async function getCI(id: string) {
   }
 }
 
-const FormSchemaCI = z.object({
-  id: z.string(),
-  shortDescription: z.string({
-    required_error: "Please enter a short description.",
-  }),
-  description: z.string({
-    required_error: "Please enter a description.",
-  }),
-  ciId: z.string({
-    invalid_type_error: "Please select a ci.",
-  }),
-  assignedToId: z.string({
-    invalid_type_error: "Please select a user to assign to.",
-  }),
-  configurationItemId: z.string({
-    invalid_type_error: "Please select a configuration item to assign to.",
-  }),
-  state: z.enum(["New", "Assigned", "In Progress", "On Hold", "Resolved"], {
-    invalid_type_error: "Please select an ci state.",
-  }),
-});
-
 // POST
 
 const CreateCI = FormSchemaCI.omit({ id: true });
-export async function createCI(prevState: IncidentState, formData: FormData) {
-  // Validate form fields using Zod
-  const validatedFields = CreateCI.safeParse({
-    shortDescription: formData.get("short_description"),
-    description: formData.get("description"),
-    ciId: formData.get("ci_id"),
-    assignedToId: formData.get("assigned_to_id"),
-    configurationItemId: formData.get("configuration_item_id"),
-    state: formData.get("state"),
+export async function createCI(
+  prevState: CIState,
+  formData: FormData
+): Promise<CIState> {
+  const validatedFields = UpdateCI.safeParse({
+    name: formData.get("name"),
   });
 
-  // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
-    console.log(
-      `createCI error: ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Missing Fields. Failed to Create CI.",
     };
   }
 
-  // Prepare data for sending to the API.
-  const {
-    shortDescription,
-    description,
-    ciId,
-    assignedToId,
-    configurationItemId,
-    state,
-  } = validatedFields.data;
+  // Validate form fields using Zod
+  const { name } = validatedFields.data;
+
   try {
     const url = new URL(`http://localhost:8080/v1/cis`);
-    await fetch(url.toString(), {
+    const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
-        short_description: shortDescription,
-        description: description,
-        ci_id: ciId,
-        assigned_to_id: assignedToId,
-        configuration_item_id: configurationItemId,
-        state: state,
+        name: name,
       }),
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-    // if (data.ok) {
-    //   console.log("got ok message");
-    //   const ci = await data.json();
-    //   if (ci) {
-    //     return ci;
-    //   }
-    // }
+    if (data.ok) {
+      const ci = await data.json();
+      if (ci) {
+        console.log(`createCI success`);
+      } else {
+        console.log(`createCI error: !ci`);
+        return {
+          message: "Database Error: Failed to Create CI.",
+        };
+      }
+    } else {
+      console.log(
+        `createCI error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Create CI.",
+      };
+    }
   } catch (error) {
-    // If a database error occurs, return a more specific error.
     console.log(`createCI error: ${error}`);
     return {
       message: "Database Error: Failed to Create CI.",
@@ -256,26 +224,15 @@ export async function createCI(prevState: IncidentState, formData: FormData) {
 const UpdateCI = FormSchemaCI.omit({ id: true });
 export async function updateCI(
   id: string,
-  prevState: IncidentState,
+  prevState: CIState,
   formData: FormData
-) {
+): Promise<CIState> {
+  // Parse the form data using Zod
   const validatedFields = UpdateCI.safeParse({
-    shortDescription: formData.get("short_description"),
-    description: formData.get("description"),
-    ciId: formData.get("ci_id"),
-    assignedToId: formData.get("assigned_to_id"),
-    configurationItemId: formData.get("configuration_item_id"),
-    state: formData.get("state"),
+    name: formData.get("name"),
   });
 
   if (!validatedFields.success) {
-    console.log(
-      `updateCI error: ${JSON.stringify(
-        validatedFields.error.flatten().fieldErrors,
-        null,
-        2
-      )}`
-    );
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Missing Fields. Failed to Update CI.",
@@ -283,42 +240,49 @@ export async function updateCI(
   }
 
   // Validate form fields using Zod
-  const {
-    shortDescription,
-    description,
-    ciId,
-    assignedToId,
-    configurationItemId,
-    state,
-  } = validatedFields.data;
+  const { name } = validatedFields.data;
 
   // Prepare data for sending to the API.
   try {
     const url = new URL(`http://localhost:8080/v1/cis/${id}`);
-    await fetch(url.toString(), {
+    console.log(`updateCI PUT`);
+    const data = await fetch(url.toString(), {
       method: "PUT",
       body: JSON.stringify({
-        id: id,
-        short_description: shortDescription,
-        description: description,
-        ci_id: ciId,
-        assigned_to_id: assignedToId,
-        configuration_item_id: configurationItemId,
-        state: state,
+        name: name,
       }),
     });
-    // Simulate slow load
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (data.ok) {
+      const ci = await data.json();
+      if (ci) {
+        console.log(`update success`);
+      } else {
+        console.log(`update error: !ci`);
+        return {
+          message: "Database Error: Failed to Update CI.",
+        };
+      }
+    } else {
+      console.log(
+        `update error: !data.ok ${data.status} ${JSON.stringify(
+          data.statusText
+        )}`
+      );
+      return {
+        message: "Database Error: Failed to Update CI.",
+      };
+    }
   } catch (error) {
-    // If a database error occurs, return a more specific error.
-    console.log(`updateCI error: ${error}`);
+    console.log(`createCI error: ${error}`);
     return {
       message: "Database Error: Failed to Update CI.",
     };
   }
   // Revalidate the cache for the cis page and redirect the user.
-  revalidatePath("/dashboard/cis");
-  redirect("/dashboard/cis");
+  revalidatePath(`/dashboard/cis/${id}/edit`);
+  return {
+    message: "Update Successful",
+  };
 }
 
 // DELETE

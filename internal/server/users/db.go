@@ -3,6 +3,7 @@ package users
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -76,13 +77,13 @@ func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User,
 		UpdatedAt: time.Now(),
 		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
 		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
-		Apikey:    user.APIkey,
-		Email:     user.Email,
-		Password:  sql.NullString{String: string(password.Hash), Valid: true},
+		// Apikey:    user.APIkey,
+		Email: user.Email,
+		// Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	response := convert(i)
 	if err != nil {
-		return data.User{}, errors.New("couldn't find user")
+		return data.User{}, errors.New("couldn't create user")
 	}
 	return response, nil
 }
@@ -102,11 +103,12 @@ func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, 
 		UpdatedAt: time.Now(),
 		FirstName: sql.NullString{String: user.FirstName, Valid: user.FirstName != ""},
 		LastName:  sql.NullString{String: user.LastName, Valid: user.LastName != ""},
-		Apikey:    user.APIkey,
-		Email:     user.Email,
-		Password:  sql.NullString{String: string(password.Hash), Valid: true},
+		// Apikey:    user.APIkey,
+		Email: user.Email,
+		// Password:  sql.NullString{String: string(password.Hash), Valid: true},
 	})
 	if err != nil {
+		log.Printf("put err %v\n", err)
 		return data.User{}, errors.New("couldn't update user")
 	}
 

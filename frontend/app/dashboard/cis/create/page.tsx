@@ -2,15 +2,15 @@ import { Metadata } from "next";
 import { getCIsAll } from "@/app/lib/actions/cis";
 import { getCompaniesAll } from "@/app/lib/actions/companies";
 import { getUsersAll } from "@/app/lib/actions/users";
-import CreateIncidentForm from "@/app/ui/sections/incidents/create-form";
+import CreateCIForm from "@/app/ui/sections/cis/create-form";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 
 export const metadata: Metadata = {
-  title: "Create Incident",
+  title: "Create CI",
 };
 
-export default async function CreateIncident() {
+export default async function CreateCI() {
   const [usersData, companiesData, cisData] = await Promise.all([
     getUsersAll("", 1),
     getCompaniesAll("", 1),
@@ -19,13 +19,9 @@ export default async function CreateIncident() {
 
   return (
     <>
-      <HeadingEdit name="Incidents" backLink="/dashboard/incidents" />
-      <HeadingSubEdit
-        name={`Create Incident`}
-        badgeState={"New"}
-        badgeText={"New"}
-      />
-      <CreateIncidentForm
+      <HeadingEdit name="CIs" backLink="/dashboard/cis" />
+      <HeadingSubEdit name={`Create CI`} badgeState={"New"} badgeText={"New"} />
+      <CreateCIForm
         companies={companiesData.companies}
         users={usersData.users}
         cis={cisData.cis}

@@ -1,6 +1,6 @@
 -- name: CreateCIs :one
-INSERT INTO configuration_items (id, created_at, updated_at, name, company_id)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO configuration_items (id, created_at, updated_at, name)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetCIs :many
@@ -26,11 +26,6 @@ LIMIT $1 OFFSET $2;
 -- name: GetCIsByID :one
 SELECT * FROM configuration_items
 WHERE id = $1;
-
-
--- name: GetCIsByCompanyID :many
-SELECT * FROM configuration_items
-WHERE company_id = $1;
 
 -- name: UpdateCIs :one
 UPDATE configuration_items

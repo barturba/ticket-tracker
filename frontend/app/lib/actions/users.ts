@@ -13,6 +13,7 @@ export type UserState = {
   errors?: {
     first_name?: string[];
     last_name?: string[];
+    email?: string[];
   };
 };
 
@@ -28,6 +29,11 @@ const FormSchemaUser = z.object({
       required_error: "Please enter the last name.",
     })
     .min(1, { message: "last name must be at least 1 character." }),
+  email: z
+    .string({
+      required_error: "Please enter the email.",
+    })
+    .min(1, { message: "email must be at least 1 character." }),
 });
 
 // GET
@@ -175,6 +181,7 @@ export async function createUser(
   const validatedFields = UpdateUser.safeParse({
     first_name: formData.get("first_name"),
     last_name: formData.get("last_name"),
+    email: formData.get("email"),
   });
 
   if (!validatedFields.success) {
@@ -185,7 +192,7 @@ export async function createUser(
   }
 
   // Validate form fields using Zod
-  const { first_name, last_name } = validatedFields.data;
+  const { first_name, last_name, email } = validatedFields.data;
 
   try {
     const url = new URL(`http://localhost:8080/v1/users`);
@@ -194,6 +201,7 @@ export async function createUser(
       body: JSON.stringify({
         first_name: first_name,
         last_name: last_name,
+        email: email,
       }),
     });
     if (data.ok) {
@@ -239,6 +247,7 @@ export async function updateUser(
   const validatedFields = UpdateUser.safeParse({
     first_name: formData.get("first_name"),
     last_name: formData.get("last_name"),
+    email: formData.get("email"),
   });
 
   if (!validatedFields.success) {
@@ -250,7 +259,7 @@ export async function updateUser(
   console.log(`updateUser PUT`);
   console.log(`id: ${id} ${JSON.stringify(validatedFields)}`);
   // Validate form fields using Zod
-  const { first_name, last_name } = validatedFields.data;
+  const { first_name, last_name, email } = validatedFields.data;
 
   // Prepare data for sending to the API.
   try {
@@ -261,6 +270,7 @@ export async function updateUser(
       body: JSON.stringify({
         first_name: first_name,
         last_name: last_name,
+        email: email,
       }),
     });
     if (data.ok) {
