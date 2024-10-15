@@ -28,7 +28,7 @@ export async function getCIs(
   currentPage: number
 ): Promise<CIsData> {
   try {
-    const url = new URL(`http://backend:8080/v1/cis`);
+    const url = new URL(`http://${process.env.BACKEND}}:8080/v1/cis`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -69,7 +69,7 @@ export async function getCIsAll(
   currentPage: number
 ): Promise<CIsData> {
   try {
-    const url = new URL(`http://backend:8080/v1/cis_all`);
+    const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -107,7 +107,7 @@ export async function getCIsAll(
 
 export async function fetchLatestCIs() {
   try {
-    const url = new URL(`http://backend:8080/v1/cis_latest`);
+    const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
     searchParams.set("page", "1");
@@ -132,7 +132,7 @@ export async function fetchLatestCIs() {
 }
 
 export async function getCI(id: string) {
-  const url = new URL(`http://backend:8080/v1/cis/${id}`);
+  const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis/${id}`);
 
   const searchParams = url.searchParams;
   searchParams.set("id", id);
@@ -179,7 +179,7 @@ export async function createCI(
   const { name } = validatedFields.data;
 
   try {
-    const url = new URL(`http://backend:8080/v1/cis`);
+    const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis`);
     const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
@@ -242,7 +242,7 @@ export async function updateCI(
 
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://backend:8080/v1/cis/${id}`);
+    const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis/${id}`);
     console.log(`updateCI PUT`);
     const data = await fetch(url.toString(), {
       method: "PUT",
@@ -288,7 +288,7 @@ export async function updateCI(
 export async function deleteCI(id: string) {
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://backend:8080/v1/cis/${id}`);
+    const url = new URL(`http://${process.env.BACKEND}:8080/v1/cis/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
     });

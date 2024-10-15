@@ -52,28 +52,14 @@ CREATE TABLE public.configuration_items (
 
 
 
-CREATE TABLE public.goose_db_version (
-    id integer NOT NULL,
-    version_id bigint NOT NULL,
-    is_applied boolean NOT NULL,
-    tstamp timestamp without time zone DEFAULT now()
-);
 
 
 
 
-CREATE SEQUENCE public.goose_db_version_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 
 
-ALTER SEQUENCE public.goose_db_version_id_seq OWNED BY public.goose_db_version.id;
 
 
 
@@ -104,7 +90,6 @@ CREATE TABLE public.users (
 
 
 
-ALTER TABLE ONLY public.goose_db_version ALTER COLUMN id SET DEFAULT nextval('public.goose_db_version_id_seq'::regclass);
 
 
 
@@ -327,33 +312,6 @@ e11b9751-91b4-430d-a55a-0c93d1267d09	2024-10-14 00:30:34.208044	2024-10-14 00:30
 
 
 
-COPY public.goose_db_version (id, version_id, is_applied, tstamp) FROM stdin;
-1	0	t	2024-10-11 15:32:45.897104
-2	1	t	2024-10-11 15:32:49.681997
-3	2	t	2024-10-11 15:32:49.685591
-4	3	t	2024-10-11 15:32:49.693341
-5	4	t	2024-10-11 15:32:49.695958
-6	5	t	2024-10-11 15:32:49.696966
-7	6	t	2024-10-11 15:32:49.699285
-8	7	t	2024-10-11 15:32:49.701085
-9	8	t	2024-10-11 15:32:49.703388
-10	9	t	2024-10-11 15:32:49.704577
-11	10	t	2024-10-11 15:32:49.707752
-12	11	t	2024-10-11 15:32:49.709702
-13	12	t	2024-10-11 15:32:49.710463
-14	13	t	2024-10-11 15:32:49.711869
-15	14	t	2024-10-11 15:32:49.712687
-16	15	t	2024-10-11 15:32:49.713517
-17	16	t	2024-10-11 15:32:49.714489
-18	17	t	2024-10-11 15:32:49.715055
-19	18	t	2024-10-11 15:32:49.716874
-20	19	t	2024-10-11 15:32:49.719481
-21	20	t	2024-10-11 15:32:49.721034
-22	21	t	2024-10-11 15:32:49.72241
-23	22	t	2024-10-14 00:30:20.333032
-24	23	t	2024-10-14 10:52:50.646553
-25	24	t	2024-10-14 11:41:33.172632
-\.
 
 
 
@@ -588,7 +546,6 @@ e2bf5381-ca71-4a44-aee2-09f3967625ea	2024-10-14 10:50:58.790861	2024-10-14 11:05
 
 
 
-SELECT pg_catalog.setval('public.goose_db_version_id_seq', 25, true);
 
 
 
@@ -601,9 +558,6 @@ ALTER TABLE ONLY public.configuration_items
     ADD CONSTRAINT configuration_items_pkey PRIMARY KEY (id);
 
 
-
-ALTER TABLE ONLY public.goose_db_version
-    ADD CONSTRAINT goose_db_version_pkey PRIMARY KEY (id);
 
 
 
