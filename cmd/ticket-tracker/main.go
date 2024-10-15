@@ -41,35 +41,31 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	// Create a structured logger for logging messages.
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
+	// Create a config structure to hold the configuration values.
+	var config data.Config
+
 	// Load ENV variables from .env file.
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Couldn't load .env file")
 	}
 
-	// Create a config structure to hold the configuration values.
-	var config data.Config
+	// Get the environment type.
+	env := os.Getenv("ENV")
+	if env != "development" && env != "production" {
+		env = "production" // Default to production if not set.
+	}
 
 	// Get the host name.
 	host := os.Getenv("SERVER_HOST")
 	if host == "" {
-		log.Fatal("HOST environment variable is not set")
+		log.Fatal("SERVER_HOST environment variable is not set")
 	}
 
 	// Get the port number.
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable is not set")
-	}
-
-	// Get the environment type.
-	env := os.Getenv("ENV")
-	if env == "" {
-		log.Fatal("ENV environment variable is not set")
-	}
-	if env != "development" && env != "production" {
-		log.Fatal("ENV environment variable must be set to 'development' or 'production'")
-
+		log.Fatal("SERVER_PORT environment variable is not set")
 	}
 
 	// Set the database URL based on the environment.
