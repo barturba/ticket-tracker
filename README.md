@@ -69,44 +69,62 @@ The frontend uses the following npm packages, among others:
 - Create a .env file in the root directory of your project with the following format:
 
   ```bash .env
-  ENV="development"
-  HOST="localhost"
-  PORT="8080"
-  DATABASE_URL="postgres://YOUR-NAME:@localhost:5432/ticket-tracker?sslmode=disable"
-  JWT_SECRET="GENERATE-ME"
-  ADMIN_PASSWORD="pass123"
+  # Application Environment
+  ENV="production"
+
+  # Server Configuration
+  SERVER_HOST="0.0.0.0"
+  SERVER_PORT="8080"
+
+  # Security Settings
+  JWT_SECRET="GENERATE-SECRET-HERE"    # Use a secure method to generate this secret
+
+  # Database Configuration
+  DB_HOST="db"
+  DB_PORT="5432"
+  DB_USER="tickettrackeradmin"
+  DB_PASSWORD="GENERATE-PASSWORD-HERE" # Use a secure method to generate this password
+  DB_NAME="tickettrackerdb"
+
+  # Database URLs
+  DATABASE_URL_DEV="postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}?sslmode=disable"
+  DATABASE_URL_PROD="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
+
   ```
 
-- **ENV:** Set the environment. For development, use "development".
-- **HOST:** Specify the host for the server.
-- **PORT:** Set the port the application will run on.
-- **DATABASE_URL:** Provide your PostgreSQL connection string, replacing YOUR-NAME with your database username.
-- **JWT_SECRET:** Generate a secret for JSON Web Token encryption. Use the following command to generate a secure key:
+- **ENV**: Defines the application environment. Use "development" for local testing or "production" for deployment.
+- **SERVER_HOST**: The server's host address. Use "0.0.0.0" to allow external access.
+- **SERVER_PORT**: Specifies the port the server will listen on.
+- **JWT_SECRET**: Secret key for signing JSON Web Tokens. Use a strong, randomly generated string here.
+- **DB_HOST**: The hostname for the database. Set to "db" if using Docker Compose.
+- **DB_PORT**: The port the database is running on (typically 5432 for PostgreSQL).
+- **DB_USER**: Database username for authentication.
+- **DB_PASSWORD**: Password for the database user. Use a strong password.
+- **DB_NAME**: Name of the database to connect to.
+- **DATABASE_URL_DEV**: Connection string for the development database.
+- **DATABASE_URL_PROD**: Connection string for the production database, pointing to the host specified in DB_HOST.
 
-  ```bash
-  openssl rand -base64 60
-  ```
+Use the following command to generate a secure JWT secret:
 
-- **ADMIN_PASSWORD:** Set the password for the admin user.
+```bash
+openssl rand -base64 60
+```
 
-4. **Build and run the backend application:**
+4. **Build and run the application**
+   Once you have (Docker)[https://www.docker.com/] and (Docker Compose)[https://docs.docker.com/compose/] installed, setting up TicketTracker is as easy as running:
 
    ```bash
-   make
+   docker-compose up --build
    ```
 
-5. **Build and run the frontend:**
+This command will build and start all the necessary services. You can then access the application by navigating to http://localhost:3000 in your web browser.
 
-- Open a new terminal in the root of the project and run the following commands:
-
-  ```bash
-  cd frontend
-  pnpm install
-  pnpm dev
-  ```
-
-6. **Access the application:** Open a web browser and go to `http://localhost:3000`.
+5. **Access the application:** Open a web browser and go to `http://localhost:3000`.
 
 ## Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/barturba/ticket-tracker/issues).
+
+```
+
+```
