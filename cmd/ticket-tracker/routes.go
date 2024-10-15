@@ -7,9 +7,14 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/server/cis"
 	"github.com/barturba/ticket-tracker/internal/server/companies"
+	"github.com/barturba/ticket-tracker/internal/server/healthcheck"
 	"github.com/barturba/ticket-tracker/internal/server/incidents"
 	"github.com/barturba/ticket-tracker/internal/server/users"
 )
+
+func addRouteHealthcheck(mux *http.ServeMux, logger *slog.Logger) {
+	mux.Handle("GET /v1/healthcheck", healthcheck.Get(logger))
+}
 
 func addRoutesIncidents(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
 	mux.Handle("GET /v1/incidents", incidents.Get(logger, db))

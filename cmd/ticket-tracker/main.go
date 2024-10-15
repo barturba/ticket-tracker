@@ -125,6 +125,7 @@ func newServer(logger *slog.Logger, config data.Config, db *database.Queries) ht
 
 	mux := http.NewServeMux()
 
+	addRouteHealthcheck(mux, logger)
 	addRoutesIncidents(mux, logger, db)
 	addRoutesCompanies(mux, logger, db)
 	addRoutesUsers(mux, logger, db)
