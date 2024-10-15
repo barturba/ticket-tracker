@@ -124,7 +124,3 @@ This command will build and start all the necessary services. You can then acces
 ## Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/barturba/ticket-tracker/issues).
-
-```
-
-```
