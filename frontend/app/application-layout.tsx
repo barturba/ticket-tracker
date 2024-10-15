@@ -76,7 +76,7 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
           <NavbarSection>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
-                <Avatar src="/users/user.jpg" square />
+                <Avatar src="/users/user.png" square />
               </DropdownButton>
               <AccountDropdownMenu anchor="bottom end" />
             </Dropdown>
