@@ -39,7 +39,7 @@ export async function getUsers(
   currentPage: number
 ): Promise<UsersData> {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users`);
+    const url = new URL(`${process.env.BACKEND}/v1/users`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -80,7 +80,7 @@ export async function getUsersAll(
   currentPage: number
 ): Promise<UsersData> {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users_all`);
+    const url = new URL(`${process.env.BACKEND}/v1/users_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -118,7 +118,7 @@ export async function getUsersAll(
 
 export async function fetchLatestUsers() {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users_latest`);
+    const url = new URL(`${process.env.BACKEND}/v1/users_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
     searchParams.set("page", "1");
@@ -143,7 +143,7 @@ export async function fetchLatestUsers() {
 }
 
 export async function getUser(id: string) {
-  const url = new URL(`http://${process.env.BACKEND}/v1/users/${id}`);
+  const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
 
   const searchParams = url.searchParams;
   searchParams.set("id", id);
@@ -192,7 +192,7 @@ export async function createUser(
   const { first_name, last_name, email } = validatedFields.data;
 
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users`);
+    const url = new URL(`${process.env.BACKEND}/v1/users`);
     const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
@@ -260,7 +260,7 @@ export async function updateUser(
 
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users/${id}`);
+    const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
     console.log(`updateUser PUT`);
     const data = await fetch(url.toString(), {
       method: "PUT",
@@ -308,7 +308,7 @@ export async function updateUser(
 export async function deleteUser(id: string) {
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/users/${id}`);
+    const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
     });

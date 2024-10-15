@@ -27,7 +27,7 @@ export async function getCompanies(
   currentPage: number
 ): Promise<CompaniesData> {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -68,7 +68,7 @@ export async function getCompaniesAll(
   currentPage: number
 ): Promise<CompaniesData> {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies_all`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -106,7 +106,7 @@ export async function getCompaniesAll(
 
 export async function fetchLatestCompanies() {
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies_latest`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
     searchParams.set("page", "1");
@@ -131,7 +131,7 @@ export async function fetchLatestCompanies() {
 }
 
 export async function getCompany(id: string) {
-  const url = new URL(`http://${process.env.BACKEND}/v1/companies/${id}`);
+  const url = new URL(`${process.env.BACKEND}/v1/companies/${id}`);
 
   const searchParams = url.searchParams;
   searchParams.set("id", id);
@@ -178,7 +178,7 @@ export async function createCompany(
   const { name } = validatedFields.data;
 
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies`);
     const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
@@ -241,7 +241,7 @@ export async function updateCompany(
 
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies/${id}`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies/${id}`);
     console.log(`updateCompany PUT`);
     const data = await fetch(url.toString(), {
       method: "PUT",
@@ -287,7 +287,7 @@ export async function updateCompany(
 export async function deleteCompany(id: string) {
   // Prepare data for sending to the API.
   try {
-    const url = new URL(`http://${process.env.BACKEND}/v1/companies/${id}`);
+    const url = new URL(`${process.env.BACKEND}/v1/companies/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
     });
