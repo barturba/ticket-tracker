@@ -45,10 +45,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	var config data.Config
 
 	// Load ENV variables from .env file.
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Couldn't load .env file")
-	}
+	_ = godotenv.Load()
 
 	// Get the environment type.
 	env := os.Getenv("ENV")
