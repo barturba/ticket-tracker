@@ -9,8 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
-// Incidents
-
+// Incident represents an incident record in the ticket-tracker system.
+// It contains information about the incident such as its ID, creation and update timestamps,
+// short and detailed descriptions, associated configuration item and company IDs, assigned user,
+// and the current state of the incident.
 type Incident struct {
 	ID                  uuid.UUID          `json:"id"`
 	CreatedAt           time.Time          `json:"created_at"`
@@ -24,6 +26,10 @@ type Incident struct {
 	State               database.StateEnum `json:"state"`
 }
 
+// The ValidateIncident function validates the fields of an Incident instance using the provided
+// validator. It ensures that required fields are provided and that string fields do not exceed
+// their maximum lengths. It also checks that the state field has a valid value from the predefined
+// set of state enums.
 func ValidateIncident(v *validator.Validator, incident *Incident) {
 	v.Check(incident.ID != uuid.UUID{}, "id", "must be provided")
 
@@ -51,5 +57,4 @@ func ValidateIncident(v *validator.Validator, incident *Incident) {
 		stateStrings = append(stateStrings, string(s))
 	}
 	v.Check(validator.PermittedValue(string(incident.State), stateStrings...), "state", "invalid state value")
-
 }

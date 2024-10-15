@@ -1,3 +1,4 @@
+// Package cis provides HTTP handlers for managing Configuration Items (CIs).
 package cis
 
 import (
@@ -8,13 +9,12 @@ import (
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/errutil"
-	"github.com/barturba/ticket-tracker/internal/helpers"
+	"github.com/barturba/ticket-tracker/internal/json"
 	"github.com/barturba/ticket-tracker/validator"
 	"github.com/google/uuid"
 )
 
-// GET
-
+// Get handles GET requests to retrieve a list of CIs based on query parameters and filters.
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -50,10 +50,11 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/cis")
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"cis": cis, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"cis": cis, "metadata": metadata})
 	})
 }
 
+// GetAll handles GET requests to retrieve all CIs with a large page size limit.
 func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -89,10 +90,11 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/cis")
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"cis": cis, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"cis": cis, "metadata": metadata})
 	})
 }
 
+// GetLatest handles GET requests to retrieve the latest CIs based on pagination and sorting.
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -122,13 +124,14 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/cis_latest")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
+// GetByID handles GET requests to retrieve a specific CI by its UUID.
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -140,19 +143,18 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/cis/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-// POST
-
+// Post handles POST requests to create a new CI.
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Name string `json:"Name"`
 		}
 
-		err := helpers.ReadJSON(w, r, &input)
+		err := json.ReadJSON(w, r, &input)
 		if err != nil {
 			errutil.BadRequestResponse(w, r, logger, err)
 			return
@@ -176,15 +178,14 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "POST /v1/ci")
-		helpers.RespondWithJSON(w, http.StatusCreated, i)
+		json.RespondWithJSON(w, http.StatusCreated, i)
 	})
 }
 
-// PUT
-
+// Put handles PUT requests to update an existing CI by its UUID.
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -194,7 +195,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			Name string `json:"name"`
 		}
 
-		err = helpers.ReadJSON(w, r, &input)
+		err = json.ReadJSON(w, r, &input)
 		if err != nil {
 			errutil.BadRequestResponse(w, r, logger, err)
 			return
@@ -219,15 +220,14 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "PUT /v1/cis", "id", id)
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-// DELETE
-
+// Delete handles DELETE requests to remove a CI by its UUID.
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -240,6 +240,6 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "DELETE /v1/cis", "id", id)
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "ci successfully deleted"})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "ci successfully deleted"})
 	})
 }

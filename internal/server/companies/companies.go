@@ -8,7 +8,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/errutil"
-	"github.com/barturba/ticket-tracker/internal/helpers"
+	"github.com/barturba/ticket-tracker/internal/json"
 	"github.com/barturba/ticket-tracker/validator"
 	"github.com/google/uuid"
 )
@@ -50,7 +50,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/companies")
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"companies": companies, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"companies": companies, "metadata": metadata})
 	})
 }
 
@@ -89,7 +89,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/companies")
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"companies": companies, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"companies": companies, "metadata": metadata})
 	})
 }
 
@@ -122,13 +122,13 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/companies_latest")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -140,7 +140,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/companies/{id}")
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
@@ -152,7 +152,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			Name string `json:"name"`
 		}
 
-		err := helpers.ReadJSON(w, r, &input)
+		err := json.ReadJSON(w, r, &input)
 		if err != nil {
 			errutil.BadRequestResponse(w, r, logger, err)
 			return
@@ -178,7 +178,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "POST /v1/company")
-		helpers.RespondWithJSON(w, http.StatusCreated, i)
+		json.RespondWithJSON(w, http.StatusCreated, i)
 	})
 }
 
@@ -186,7 +186,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -196,7 +196,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			Name string `json:"name"`
 		}
 
-		err = helpers.ReadJSON(w, r, &input)
+		err = json.ReadJSON(w, r, &input)
 		if err != nil {
 			errutil.BadRequestResponse(w, r, logger, err)
 			return
@@ -221,7 +221,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "PUT /v1/companies", "id", id)
-		helpers.RespondWithJSON(w, http.StatusOK, i)
+		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
@@ -229,7 +229,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := helpers.ReadUUIDPath(*r)
+		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			errutil.NotFoundResponse(w, r, logger)
 			return
@@ -242,6 +242,6 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "DELETE /v1/companies", "id", id)
-		helpers.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "company successfully deleted"})
+		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "company successfully deleted"})
 	})
 }

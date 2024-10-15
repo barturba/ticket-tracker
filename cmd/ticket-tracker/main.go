@@ -21,6 +21,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// main is the entry point for the ticket-tracker application. It calls the run function.
 func main() {
 	ctx := context.Background()
 	if err := run(ctx, os.Stdout, os.Args); err != nil {
@@ -30,6 +31,9 @@ func main() {
 	fmt.Printf("the ticket-tracker has started\n")
 }
 
+// run initializes the application, loads environment variables, sets up the configuration,
+// opens a database connection, and starts the HTTP server. It also handles graceful shutdown
+// on receiving an interrupt signal.
 func run(ctx context.Context, w io.Writer, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
@@ -113,7 +117,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	return nil
 }
 
-// NewServer sets up the HTTP server by creating a new ServeMux and adding
+// newServer sets up the HTTP server by creating a new ServeMux and adding
 // routes for incidents, companies, users, and configuration items.
 //
 // Returns an HTTP handler that can be used by the HTTP server.

@@ -1,5 +1,3 @@
-// Package cis provides functions to interact with the database for Configuration Items (CIs).
-// It includes functions to retrieve, create, update, and delete CIs from the database.
 package cis
 
 import (

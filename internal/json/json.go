@@ -1,11 +1,12 @@
-package helpers
+// Package json provides utility functions for handling JSON encoding and decoding
+// in HTTP requests and responses.
+package json
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -13,18 +14,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func RespondWithError(w http.ResponseWriter, code int, msg string) {
-	if code > 499 {
-		log.Printf("Responding with 5XX error: %s", msg)
-	}
-	type errorResponse struct {
-		Error string `json:"error"`
-	}
-	RespondWithJSON(w, code, errorResponse{
-		Error: msg,
-	})
-}
-
+// RespondWithJSON encodes the given payload to JSON and writes it to the response
+// writer with the specified HTTP status code.
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, err := json.Marshal(payload)
 	if err != nil {
@@ -37,15 +28,9 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func ReadUUIDPath(r http.Request) (uuid.UUID, error) {
-	idStr := r.PathValue("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return uuid.Nil, errors.New("invalid id parameter")
-	}
-	return id, nil
-}
-
+// ReadJSON reads and decodes JSON from the request body into the provided destination
+// struct. It also performs various checks and returns detailed error messages for
+// different types of JSON decoding errors.
 func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	maxBytes := 1_048_576
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
@@ -99,6 +84,8 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	return nil
 }
 
+// WriteJSON encodes the given data to JSON with indentation and writes it to the
+// response writer with the specified HTTP status code and headers.
 func WriteJSON(w http.ResponseWriter, status int, data data.Envelope, headers http.Header) error {
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
@@ -116,4 +103,15 @@ func WriteJSON(w http.ResponseWriter, status int, data data.Envelope, headers ht
 	w.Write(js)
 
 	return nil
+}
+
+// ReadUUIDPath extracts and parses a UUID from the request path, returning an error
+// if the UUID is invalid.
+func ReadUUIDPath(r http.Request) (uuid.UUID, error) {
+	idStr := r.PathValue("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return uuid.Nil, errors.New("invalid id parameter")
+	}
+	return id, nil
 }

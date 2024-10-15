@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["barturba"]
+  "cSpell.words": ["barturba"],
+  "makefile.configureOnOpen": false
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Users
+// User represents a user in the system with fields for ID, creation and update timestamps, first name, last name, and email.
 type User struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -17,6 +17,12 @@ type User struct {
 	Email     string    `json:"email,omitempty"`
 }
 
+// ValidateUser validates the fields of a User struct using the provided validator.
+// It checks that:
+// - ID is provided and is not an empty UUID.
+// - FirstName is not more than 50 bytes long.
+// - LastName is not more than 50 bytes long.
+// - Email is provided and is not more than 320 bytes long.
 func ValidateUser(v *validator.Validator, user *User) {
 	v.Check(user.ID != uuid.UUID{}, "id", "must be provided")
 
