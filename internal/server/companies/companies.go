@@ -2,6 +2,7 @@
 package companies
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -142,7 +143,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/companies/{id}")
+		logger.Info("msg", "handle", fmt.Sprintf("GET /v1/companies/%s", id))
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }

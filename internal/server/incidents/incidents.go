@@ -2,6 +2,7 @@ package incidents
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -150,7 +151,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incident/{id}")
+		logger.Info("msg", "handle", fmt.Sprintf("GET /v1/incidents/%s", id))
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
