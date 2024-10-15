@@ -5,6 +5,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 )
 
+// convert converts a single database.Company to data.Company.
 func convert(company database.Company) data.Company {
 	return data.Company{
 		ID:        company.ID,
@@ -14,6 +15,7 @@ func convert(company database.Company) data.Company {
 	}
 }
 
+// convertMany converts a slice of database.Company to a slice of data.Company.
 func convertMany(companies []database.Company) []data.Company {
 	var items []data.Company
 	for _, item := range companies {
@@ -22,6 +24,8 @@ func convertMany(companies []database.Company) []data.Company {
 	return items
 }
 
+// convertRowsAndMetadata converts a slice of database.GetCompaniesRow to a slice of data.Company
+// and calculates metadata based on the provided filters.
 func convertRowsAndMetadata(rows []database.GetCompaniesRow, filters data.Filters) ([]data.Company, data.Metadata) {
 	var output []data.Company
 	var totalRecords int64 = 0
@@ -33,6 +37,7 @@ func convertRowsAndMetadata(rows []database.GetCompaniesRow, filters data.Filter
 	return output, metadata
 }
 
+// convertRowAndCount converts a single database.GetCompaniesRow to data.Company and updates the count.
 func convertRowAndCount(row database.GetCompaniesRow, count *int64) data.Company {
 	outputRow := data.Company{
 		ID:        row.ID,

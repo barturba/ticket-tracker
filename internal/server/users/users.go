@@ -1,3 +1,4 @@
+// Package users provides functions for managing user resources.
 package users
 
 import (
@@ -14,8 +15,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// Get retrieves a list of users with optional filtering, sorting, and pagination.
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -58,6 +58,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetAll retrieves all users with optional filtering, sorting, and pagination.
 func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -100,6 +101,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetLatest retrieves the latest users with optional filtering, sorting, and pagination.
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -133,6 +135,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetByID retrieves a single user by their unique identifier.
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -151,8 +154,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// POST
-
+// Post creates a new user.
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -192,8 +194,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// PUT
-
+// Put updates an existing user by their unique identifier.
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -240,8 +241,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// DELETE
-
+// Delete deletes an existing user by their unique identifier.
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)

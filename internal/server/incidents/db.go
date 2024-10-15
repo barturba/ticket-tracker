@@ -11,8 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// GetFromDB retrieves incidents from the database based on the provided query and filters.
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.Incident, data.Metadata, error) {
 	p := database.GetIncidentsParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
@@ -29,6 +28,7 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return incidents, metadata, nil
 }
 
+// GetAllFromDB retrieves all incidents from the database based on the provided filters.
 func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) ([]data.Incident, data.Metadata, error) {
 	p := database.GetIncidentsParams{
 		Limit:    1_000_000,
@@ -44,6 +44,7 @@ func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) (
 	return incidents, metadata, nil
 }
 
+// GetLatestFromDB retrieves the latest incidents from the database based on the provided limit and offset.
 func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {
 	p := database.GetIncidentsLatestParams{
 		Limit:  int32(limit),
@@ -57,6 +58,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	return incidents, nil
 }
 
+// GetByIDFromDB retrieves an incident from the database based on the provided incident ID.
 func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
 	record, err := db.GetIncidentByID(r.Context(), id)
 	if err != nil {
@@ -66,8 +68,7 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.In
 	return incident, nil
 }
 
-// POST
-
+// PostToDB inserts a new incident into the database.
 func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
 	i, err := db.CreateIncident(r.Context(), database.CreateIncidentParams{
 		ID:                  incident.ID,
@@ -86,8 +87,7 @@ func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (da
 	return response, nil
 }
 
-// PUT
-
+// PutToDB updates an existing incident in the database.
 func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
 	i, err := db.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:                  incident.ID,
@@ -108,8 +108,7 @@ func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (dat
 	return response, nil
 }
 
-// DELETE
-
+// DeleteFromDB deletes an incident from the database based on the provided incident ID.
 func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
 	i, err := db.DeleteIncidentByID(r.Context(), id)
 	if err != nil {

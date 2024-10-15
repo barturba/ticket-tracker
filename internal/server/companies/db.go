@@ -11,8 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// GetFromDB retrieves a list of companies from the database based on the provided query and filters.
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.Company, data.Metadata, error) {
 	p := database.GetCompaniesParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
@@ -31,6 +30,7 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return companies, metadata, nil
 }
 
+// GetLatestFromDB retrieves the latest companies from the database based on the provided limit and offset.
 func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Company, error) {
 	p := database.GetCompaniesLatestParams{
 		Limit:  int32(limit),
@@ -44,6 +44,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	return companies, nil
 }
 
+// GetByIDFromDB retrieves a company from the database based on the provided company ID.
 func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Company, error) {
 	record, err := db.GetCompanyByID(r.Context(), id)
 	if err != nil {
@@ -53,8 +54,7 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Co
 	return company, nil
 }
 
-// POST
-
+// PostToDB inserts a new company into the database.
 func PostToDB(r *http.Request, db *database.Queries, company data.Company) (data.Company, error) {
 	i, err := db.CreateCompany(r.Context(), database.CreateCompanyParams{
 		ID:        company.ID,
@@ -69,8 +69,7 @@ func PostToDB(r *http.Request, db *database.Queries, company data.Company) (data
 	return response, nil
 }
 
-// PUT
-
+// PutToDB updates an existing company in the database.
 func PutToDB(r *http.Request, db *database.Queries, company data.Company) (data.Company, error) {
 	i, err := db.UpdateCompany(r.Context(), database.UpdateCompanyParams{
 		ID:        company.ID,
@@ -86,8 +85,7 @@ func PutToDB(r *http.Request, db *database.Queries, company data.Company) (data.
 	return response, nil
 }
 
-// DB
-
+// DeleteFromDB deletes a company from the database based on the provided company ID.
 func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Company, error) {
 	i, err := db.DeleteCompanyByID(r.Context(), id)
 	if err != nil {

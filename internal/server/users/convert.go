@@ -5,6 +5,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 )
 
+// convert converts a database.User to a data.User.
 func convert(user database.User) data.User {
 	return data.User{
 		ID:        user.ID,
@@ -16,6 +17,7 @@ func convert(user database.User) data.User {
 	}
 }
 
+// convertMany converts a slice of database.User to a slice of data.User.
 func convertMany(users []database.User) []data.User {
 	var items []data.User
 	for _, item := range users {
@@ -24,6 +26,8 @@ func convertMany(users []database.User) []data.User {
 	return items
 }
 
+// convertRowsAndMetadata converts a slice of database.GetUsersRow to a slice of data.User
+// and calculates the metadata based on the provided filters.
 func convertRowsAndMetadata(rows []database.GetUsersRow, filters data.Filters) ([]data.User, data.Metadata) {
 	var output []data.User
 	var totalRecords int64 = 0
@@ -35,6 +39,7 @@ func convertRowsAndMetadata(rows []database.GetUsersRow, filters data.Filters) (
 	return output, metadata
 }
 
+// convertRowAndCount converts a database.GetUsersRow to a data.User and updates the count.
 func convertRowAndCount(row database.GetUsersRow, count *int64) data.User {
 	outputRow := data.User{
 		ID:        row.ID,

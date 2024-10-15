@@ -12,8 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// GetFromDB retrieves users from the database based on the provided query and filters.
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.User, data.Metadata, error) {
 	p := database.GetUsersParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
@@ -30,6 +29,7 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	return users, metadata, nil
 }
 
+// GetCountFromDB retrieves the count of users from the database based on the provided query.
 func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, offset int) (int64, error) {
 	count, err := db.GetUsersCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
@@ -38,6 +38,7 @@ func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, 
 	return count, nil
 }
 
+// GetLatestFromDB retrieves the latest users from the database based on the provided limit and offset.
 func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.User, error) {
 	p := database.GetUsersLatestParams{
 		Limit:  int32(limit),
@@ -51,6 +52,7 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) (
 	return users, nil
 }
 
+// GetByIDFromDB retrieves a user from the database based on the provided user ID.
 func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
 	record, err := db.GetUserByID(r.Context(), id)
 	if err != nil {
@@ -60,8 +62,7 @@ func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Us
 	return user, nil
 }
 
-// POST
-
+// PostToDB creates a new user in the database based on the provided user data.
 func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
 
 	i, err := db.CreateUser(r.Context(), database.CreateUserParams{
@@ -79,8 +80,7 @@ func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User,
 	return response, nil
 }
 
-// PUT
-
+// PutToDB updates an existing user in the database based on the provided user data.
 func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
 
 	i, err := db.UpdateUser(r.Context(), database.UpdateUserParams{
@@ -100,8 +100,7 @@ func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, 
 	return response, nil
 }
 
-// DELETE
-
+// DeleteFromDB deletes a user from the database based on the provided user ID.
 func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
 	i, err := db.DeleteUserByID(r.Context(), id)
 	if err != nil {

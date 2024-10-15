@@ -1,3 +1,5 @@
+// Package incidents provides functions to convert database incident records
+// into data incident structures used within the application.
 package incidents
 
 import (
@@ -7,6 +9,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 )
 
+// convert converts a single database.Incident to a data.Incident.
 func convert(incident database.Incident) data.Incident {
 	return data.Incident{
 		ID:                  incident.ID,
@@ -21,6 +24,7 @@ func convert(incident database.Incident) data.Incident {
 	}
 }
 
+// convertMany converts a slice of database.Incident to a slice of data.Incident.
 func convertMany(incidents []database.Incident) []data.Incident {
 	var items []data.Incident
 	for _, item := range incidents {
@@ -29,6 +33,7 @@ func convertMany(incidents []database.Incident) []data.Incident {
 	return items
 }
 
+// convertLatestRow converts a single database.GetIncidentsLatestRow to a data.Incident.
 func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
 	return data.Incident{
 		ID:                  incident.ID,
@@ -43,6 +48,7 @@ func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
 	}
 }
 
+// convertLatestRowMany converts a slice of database.GetIncidentsLatestRow to a slice of data.Incident.
 func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []data.Incident {
 	var items []data.Incident
 	for _, item := range incidents {
@@ -51,6 +57,7 @@ func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []data.Inc
 	return items
 }
 
+// convertRow converts a single database.GetIncidentsRow to a data.Incident.
 func convertRow(incident database.GetIncidentsRow) data.Incident {
 	return data.Incident{
 		ID:                  incident.ID,
@@ -65,6 +72,7 @@ func convertRow(incident database.GetIncidentsRow) data.Incident {
 	}
 }
 
+// convertRowMany converts a slice of database.GetIncidentsRow to a slice of data.Incident.
 func convertRowMany(incidents []database.GetIncidentsRow) []data.Incident {
 	var items []data.Incident
 	for _, item := range incidents {
@@ -73,6 +81,8 @@ func convertRowMany(incidents []database.GetIncidentsRow) []data.Incident {
 	return items
 }
 
+// convertRowsAndMetadata converts a slice of database.GetIncidentsRow to a slice of data.Incident
+// and calculates metadata based on the provided filters.
 func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filters) ([]data.Incident, data.Metadata) {
 	var output []data.Incident
 	var totalRecords int64 = 0
@@ -84,6 +94,8 @@ func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filter
 	return output, metadata
 }
 
+// convertRowAndCount converts a single database.GetIncidentsRow to a data.Incident
+// and updates the total record count.
 func convertRowAndCount(row database.GetIncidentsRow, count *int64) data.Incident {
 	outputRow := data.Incident{
 		ID:                  row.ID,

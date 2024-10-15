@@ -1,3 +1,4 @@
+// Package companies provides HTTP handlers for managing company data.
 package companies
 
 import (
@@ -13,8 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
+// Get retrieves a list of companies based on query parameters and filters.
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -54,6 +54,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetAll retrieves all companies with a large page size limit.
 func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -93,6 +94,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetLatest retrieves the latest companies based on pagination and sorting.
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -126,6 +128,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
+// GetByID retrieves a single company by its UUID.
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -144,8 +147,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// POST
-
+// Post creates a new company with the provided JSON data.
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -182,8 +184,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// PUT
-
+// Put updates an existing company identified by its UUID with the provided JSON data.
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -225,8 +226,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// DELETE
-
+// Delete deletes a company identified by its UUID.
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)

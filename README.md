@@ -38,7 +38,7 @@ The following Go modules are required for this project:
 
 - [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Version 5.2.1
 - [google/uuid](https://github.com/google/uuid) - Version 1.6.0
-- [joho/godotenv](github.com/joho/godotenv) - Version 1.5.1
+- [joho/godotenv](https://github.com/joho/godotenv) - Version 1.5.1
 - [x/crypto](https://pkg.go.dev/golang.org/x/crypto) - Version 0.27.0
 
 ### NPM Packages

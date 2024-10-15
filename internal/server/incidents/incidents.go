@@ -14,8 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// GET
-
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -157,8 +155,6 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// POST
-
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -204,8 +200,6 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		json.RespondWithJSON(w, http.StatusCreated, i)
 	})
 }
-
-// PUT
 
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -257,8 +251,6 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
-
-// DELETE
 
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
