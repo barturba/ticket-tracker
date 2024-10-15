@@ -51,13 +51,13 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	var config data.Config
 
 	// Get the host name.
-	host := os.Getenv("HOST")
+	host := os.Getenv("SERVER_HOST")
 	if host == "" {
 		log.Fatal("HOST environment variable is not set")
 	}
 
 	// Get the port number.
-	port := os.Getenv("PORT")
+	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		log.Fatal("PORT environment variable is not set")
 	}
@@ -67,11 +67,23 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	if env == "" {
 		log.Fatal("ENV environment variable is not set")
 	}
+	if env != "development" && env != "production" {
+		log.Fatal("ENV environment variable must be set to 'development' or 'production'")
 
-	// Get the database url.
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		log.Fatal("DATABASE_URL environment variable is not set")
+	}
+
+	// Set the database URL based on the environment.
+	dbURL := ""
+	if env == "development" {
+		dbURL = os.Getenv("DATABASE_URL_DEV")
+		if dbURL == "" {
+			log.Fatal("DATABASE_URL_DEV environment variable is not set")
+		}
+	} else {
+		dbURL = os.Getenv("DATABASE_URL_PROD")
+		if dbURL == "" {
+			log.Fatal("DATABASE_URL_PROD environment variable is not set")
+		}
 	}
 
 	// Set the configuration values.
@@ -84,6 +96,13 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	logger.Info("started database connection", "stats", db.Stats(), "connection", dbURL, "err", err)
+	logger.Info("pinging db")
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	logger.Info("pinged db", "err", err)
 	dbQueries := database.New(db)
 
 	// Create a new server instance.
@@ -94,7 +113,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	}
 	// Start the HTTP server in a new goroutine.
 	go func() {
-		logger.Info("starting server", "addr", httpServer.Addr, "env", config.Env)
+		logger.Info("starting server", "addr", httpServer.Addr, "env", config.Env, "host", config.Host, "port", config.Port)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("error listening and serving", "error", err)
 		}

@@ -48,7 +48,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		users, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		users, metadata, err := GetFromDB(r, db, logger, input.Query, input.Filters)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return
@@ -91,7 +91,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		users, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		users, metadata, err := GetFromDB(r, db, logger, input.Query, input.Filters)
 		if err != nil {
 			errutil.ServerErrorResponse(w, r, logger, err)
 			return

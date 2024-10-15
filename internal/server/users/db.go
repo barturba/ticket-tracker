@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 )
 
 // GetFromDB retrieves users from the database based on the provided query and filters.
-func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.User, data.Metadata, error) {
+func GetFromDB(r *http.Request, db *database.Queries, logger *slog.Logger, query string, filters data.Filters) ([]data.User, data.Metadata, error) {
 	p := database.GetUsersParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
@@ -23,6 +24,7 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	}
 	rows, err := db.GetUsers(r.Context(), p)
 	if err != nil {
+		logger.Error("couldn't find users", "error", err)
 		return nil, data.Metadata{}, errors.New("couldn't find users")
 	}
 	users, metadata := convertRowsAndMetadata(rows, filters)
