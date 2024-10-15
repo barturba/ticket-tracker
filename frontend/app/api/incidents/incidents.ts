@@ -190,7 +190,7 @@ export async function createIncident(
   prevState: IncidentState,
   formData: FormData
 ): Promise<IncidentState> {
-  const validatedFields = UpdateIncident.safeParse({
+  const validatedFields = CreateIncident.safeParse({
     shortDescription: formData.get("short_description"),
     description: formData.get("description"),
     assignedToId: formData.get("assigned_to_id"),

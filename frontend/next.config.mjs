@@ -4,6 +4,7 @@ const nextConfig = {
     formats: ["image/webp"],
   },
   reactStrictMode: false,
+  output: "standalone",
 };
 
 export default nextConfig;

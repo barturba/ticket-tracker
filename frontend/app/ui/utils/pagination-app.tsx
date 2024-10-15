@@ -40,10 +40,11 @@ export default function PaginationApp({ totalPages }: { totalPages: number }) {
             if (page === "...") position = "middle";
 
             if (position === "middle") {
-              return <PaginationGap />;
+              return <PaginationGap key={`gap-${index}`} />;
             } else {
               return (
                 <PaginationPage
+                  key={`page-${page}`}
                   current={currentPage === page}
                   href={createPageURL(page)}
                 >

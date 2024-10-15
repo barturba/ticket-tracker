@@ -9,7 +9,7 @@ export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  let user = await getUser(params.id);
+  const user = await getUser(params.id);
 
   return {
     title: user && `User #${user.id}`,

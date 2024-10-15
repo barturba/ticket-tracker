@@ -66,7 +66,7 @@ function AccountDropdownMenu({
   );
 }
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
-  let pathname = usePathname();
+  const pathname = usePathname();
 
   return (
     <SidebarLayout

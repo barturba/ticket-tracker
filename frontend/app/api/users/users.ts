@@ -175,7 +175,7 @@ export async function createUser(
   prevState: UserState,
   formData: FormData
 ): Promise<UserState> {
-  const validatedFields = UpdateUser.safeParse({
+  const validatedFields = CreateUser.safeParse({
     first_name: formData.get("first_name"),
     last_name: formData.get("last_name"),
     email: formData.get("email"),

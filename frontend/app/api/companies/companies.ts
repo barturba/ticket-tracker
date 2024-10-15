@@ -163,7 +163,7 @@ export async function createCompany(
   prevState: CompanyState,
   formData: FormData
 ): Promise<CompanyState> {
-  const validatedFields = UpdateCompany.safeParse({
+  const validatedFields = CreateCompany.safeParse({
     name: formData.get("name"),
   });
 

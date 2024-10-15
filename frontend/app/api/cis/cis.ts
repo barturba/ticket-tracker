@@ -164,7 +164,7 @@ export async function createCI(
   prevState: CIState,
   formData: FormData
 ): Promise<CIState> {
-  const validatedFields = UpdateCI.safeParse({
+  const validatedFields = CreateCI.safeParse({
     name: formData.get("name"),
   });
 

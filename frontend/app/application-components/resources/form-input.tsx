@@ -15,7 +15,7 @@ export default function FormInput({
   id: string;
   name: string;
   placeholder: string;
-  inputs: any[];
+  inputs: { id: string; name: string }[];
   defaultValue?: string;
   invalid?: boolean;
   errorMessage?: string;
