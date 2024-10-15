@@ -53,7 +53,7 @@ export async function getIncidents(
 
     // console.log('Fetching revenue data...');
     // await new Promise((resolve) => setTimeout(resolve, 3000));
-    const url = new URL(`http://${process.env.BACKEND}:8080/v1/incidents`);
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents`);
     console.log(`getIncidents query: ${query} url ${url.toString()}`);
 
     const searchParams = url.searchParams;
@@ -96,7 +96,7 @@ export async function getIncidentsAll(
   currentPage: number
 ): Promise<IncidentsData> {
   try {
-    const url = new URL(`http://${process.env.BACKEND}:8080/v1/incidents_all`);
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents_all`);
 
     const searchParams = url.searchParams;
     searchParams.set("query", query);
@@ -134,9 +134,7 @@ export async function getIncidentsAll(
 
 export async function getIncidentsLatest() {
   try {
-    const url = new URL(
-      `http://${process.env.BACKEND}:8080/v1/incidents_latest`
-    );
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents_latest`);
     const searchParams = url.searchParams;
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
     searchParams.set("page", "1");
@@ -161,7 +159,7 @@ export async function getIncidentsLatest() {
 }
 
 export async function getIncident(id: string) {
-  const url = new URL(`http://${process.env.BACKEND}:8080/v1/incidents/${id}`);
+  const url = new URL(`http://${process.env.BACKEND}/v1/incidents/${id}`);
 
   const searchParams = url.searchParams;
   searchParams.set("id", id);
@@ -220,7 +218,7 @@ export async function createIncident(
   } = validatedFields.data;
 
   try {
-    const url = new URL(`http://${process.env.BACKEND}:8080/v1/incidents`);
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents`);
     const data = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({
@@ -300,9 +298,7 @@ export async function updateIncident(
 
   // Prepare data for sending to the API.
   try {
-    const url = new URL(
-      `http://${process.env.BACKEND}:8080/v1/incidents/${id}`
-    );
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents/${id}`);
     console.log(`updateIncident PUT`);
     const data = await fetch(url.toString(), {
       method: "PUT",
@@ -353,9 +349,7 @@ export async function updateIncident(
 export async function deleteIncident(id: string) {
   // Prepare data for sending to the API.
   try {
-    const url = new URL(
-      `http://${process.env.BACKEND}:8080/v1/incidents/${id}`
-    );
+    const url = new URL(`http://${process.env.BACKEND}/v1/incidents/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
     });
