@@ -29,9 +29,6 @@ export default function FormInput({
         defaultValue={defaultValue}
         invalid={!!invalid}
       >
-        <option value="" disabled>
-          {placeholder}&hellip;
-        </option>
         {inputs.map((input) => (
           <option key={input.id} value={input.id}>
             {input.name}
