@@ -91,7 +91,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	logger.Info("started database connection", "stats", db.Stats())
 
 	// Ping the database to verify the connection.
-	logger.Info("pinging db")
+	logger.Info("pinging db to verify the connection")
 	err = db.Ping()
 	if err != nil {
 		panic(err)
