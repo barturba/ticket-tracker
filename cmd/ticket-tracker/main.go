@@ -88,13 +88,14 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger.Info("started database connection", "stats", db.Stats(), "connection", dbURL, "err", err)
+	logger.Info("started database connection", "stats", db.Stats())
+
+	// Ping the database to verify the connection.
 	logger.Info("pinging db")
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
-	logger.Info("pinged db", "err", err)
 	dbQueries := database.New(db)
 
 	// Create a new server instance.
