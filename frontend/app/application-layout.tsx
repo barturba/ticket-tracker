@@ -4,8 +4,6 @@ import {
   HomeIcon,
   Square2StackIcon,
   ArrowRightStartOnRectangleIcon,
-  LightBulbIcon,
-  ShieldCheckIcon,
   UserCircleIcon,
   CpuChipIcon,
   UserGroupIcon,
@@ -40,6 +38,7 @@ import {
   DropdownMenu,
 } from "@/app/components/dropdown";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Button } from "./components/button";
 function AccountDropdownMenu({
   anchor,
 }: {
@@ -184,7 +183,16 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
         </Sidebar>
       }
     >
-      {children}
+      {!session?.user ? (
+        <>
+          <div>Not authenticated</div>
+          <Button onClick={() => signIn()} className="-my-0.5">
+            Sign in
+          </Button>
+        </>
+      ) : (
+        children
+      )}
     </SidebarLayout>
   );
 }
