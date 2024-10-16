@@ -9,7 +9,7 @@ primary_region = 'den'
 [build]
 
 [env]
-  BACKEND = "https://app-weathered-shadow-227.fly.dev"
+  BACKEND = "https://ticket-tracker-307400454387.us-central1.run.app"
 
 [http_service]
   internal_port = 3000
