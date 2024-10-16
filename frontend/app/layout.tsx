@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import type React from "react";
 import { ApplicationLayout } from "@/app/application-layout";
 import NextTopLoader from "nextjs-toploader";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: {
@@ -19,6 +20,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session } = useSession();
   return (
     <html
       lang="en"
@@ -30,6 +32,17 @@ export default async function RootLayout({
       </head>
       <body>
         <NextTopLoader />
+        {session && session.user ? (
+          <>
+            Signed in as {session.user.email} <br />
+            <button onClick={() => signOut()}>Sign out</button>
+          </>
+        ) : (
+          <>
+            Not signed in <br />
+            <button onClick={() => signIn()}>Sign in</button>
+          </>
+        )}
         <ApplicationLayout>{children}</ApplicationLayout>
       </body>
     </html>
