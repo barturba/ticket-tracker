@@ -10,19 +10,19 @@ import (
 
 // Filters represents the pagination and sorting parameters.
 type Filters struct {
-	Page         int
-	PageSize     int
+	Page         int32
+	PageSize     int32
 	Sort         string
 	SortSafelist []string
 }
 
 // Limit returns the number of items per page.
-func (f Filters) Limit() int {
+func (f Filters) Limit() int32 {
 	return f.PageSize
 }
 
 // Offset returns the offset for the current page.
-func (f Filters) Offset() int {
+func (f Filters) Offset() int32 {
 	return (f.Page - 1) * f.PageSize
 }
 
@@ -46,20 +46,21 @@ func (f Filters) SortDirection() string {
 
 // ReadInt reads an integer query parameter from the URL values. If the parameter is missing or invalid,
 // it returns the default value and adds an error to the validator.
-func ReadInt(qs url.Values, key string, defaultValue int, v *validator.Validator) int {
+func ReadInt(qs url.Values, key string, defaultValue int32, v *validator.Validator) int32 {
 	s := qs.Get(key)
 
 	if s == "" {
 		return defaultValue
 	}
 
-	i, err := strconv.Atoi(s)
+	i, err := strconv.ParseInt(s, 10, 32)
 	if err != nil {
 		v.AddError(key, "must be an integer value")
 		return defaultValue
 	}
+	v32 := int32(i)
 
-	return i
+	return v32
 }
 
 // ReadString reads a string query parameter from the URL values. If the parameter is missing,

@@ -101,9 +101,13 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	// Create a new server instance.
 	srv := newServer(logger, config, dbQueries)
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, config.Port),
-		Handler: srv,
+		Addr:         net.JoinHostPort(config.Host, config.Port),
+		Handler:      srv,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
+
 	// Start the HTTP server in a new goroutine.
 	go func() {
 		logger.Info("starting server", "addr", httpServer.Addr, "env", config.Env, "host", config.Host, "port", config.Port)

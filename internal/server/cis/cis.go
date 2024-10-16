@@ -60,8 +60,8 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Query  string
-			Limit  int
-			Offset int
+			Limit  int32
+			Offset int32
 			data.Filters
 		}
 

@@ -26,15 +26,23 @@ func convertMany(cis []database.ConfigurationItem) []data.CI {
 
 // The convertRowsAndMetadata function converts a slice of database.GetCIsRow to a slice of data.CI
 // and calculates metadata based on the provided filters.
-func convertRowsAndMetadata(rows []database.GetCIsRow, filters data.Filters) ([]data.CI, data.Metadata) {
+func convertRowsAndMetadata(rows []database.GetCIsRow, filters data.Filters) ([]data.CI, data.Metadata, error) {
 	var output []data.CI
 	var totalRecords int64 = 0
+
 	for _, row := range rows {
 		outputRow := convertRowAndCount(row, &totalRecords)
 		output = append(output, outputRow)
 	}
-	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
-	return output, metadata
+
+	// Prevent conversion exploits
+	v32, err := data.ConvertInt64to32(totalRecords)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
+
+	metadata := data.CalculateMetadata(v32, filters.Page, filters.PageSize)
+	return output, metadata, nil
 }
 
 // The convertRowAndCount function converts a single database.GetCIsRow to a data.CI and updates the count.

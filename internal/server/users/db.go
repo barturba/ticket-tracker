@@ -27,7 +27,10 @@ func GetFromDB(r *http.Request, db *database.Queries, logger *slog.Logger, query
 		logger.Error("couldn't find users", "error", err)
 		return nil, data.Metadata{}, errors.New("couldn't find users")
 	}
-	users, metadata := convertRowsAndMetadata(rows, filters)
+	users, metadata, err := convertRowsAndMetadata(rows, filters)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
 	return users, metadata, nil
 }
 
@@ -41,10 +44,10 @@ func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, 
 }
 
 // GetLatestFromDB retrieves the latest users from the database based on the provided limit and offset.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.User, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.User, error) {
 	p := database.GetUsersLatestParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:  limit,
+		Offset: offset,
 	}
 	rows, err := db.GetUsersLatest(r.Context(), p)
 	if err != nil {

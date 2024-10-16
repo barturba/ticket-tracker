@@ -1,5 +1,10 @@
 package data
 
+import (
+	"errors"
+	"math"
+)
+
 // Config represents the application configuration settings.
 type Config struct {
 	Host     string
@@ -14,16 +19,16 @@ type Envelope map[string]any
 
 // Metadata represents pagination metadata.
 type Metadata struct {
-	CurrentPage  int `json:"current_page,omitempty"`  // Current page number
-	PageSize     int `json:"page_size,omitempty"`     // Number of items per page
-	FirstPage    int `json:"first_page,omitempty"`    // First page number
-	LastPage     int `json:"last_page,omitempty"`     // Last page number
-	TotalRecords int `json:"total_records,omitempty"` // Total number of records
+	CurrentPage  int32 `json:"current_page,omitempty"`  // Current page number
+	PageSize     int32 `json:"page_size,omitempty"`     // Number of items per page
+	FirstPage    int32 `json:"first_page,omitempty"`    // First page number
+	LastPage     int32 `json:"last_page,omitempty"`     // Last page number
+	TotalRecords int32 `json:"total_records,omitempty"` // Total number of records
 }
 
 // CalculateMetadata calculates the pagination metadata values given the total number of records,
 // current page, and page size values.
-func CalculateMetadata(totalRecords, page, pageSize int) Metadata {
+func CalculateMetadata(totalRecords, page, pageSize int32) Metadata {
 	if totalRecords == 0 {
 		return Metadata{}
 	}
@@ -35,4 +40,18 @@ func CalculateMetadata(totalRecords, page, pageSize int) Metadata {
 		LastPage:     (totalRecords + pageSize - 1) / pageSize,
 		TotalRecords: totalRecords,
 	}
+}
+
+// ConvertInt64to32 converts an int64 value to an int32 value.
+// If the input value is negative, it returns 0.
+// If the input value exceeds the maximum value of int32, it returns math.MaxInt32.
+// Otherwise, it returns the input value cast to int32.
+func ConvertInt64to32(x int64) (int32, error) {
+	if x < 0 {
+		return 0, errors.New("negative value")
+	}
+	if x > math.MaxInt32 {
+		return math.MaxInt32, errors.New("overload value")
+	}
+	return int32(x), nil
 }

@@ -20,12 +20,16 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, err := json.Marshal(payload)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		if _, writeErr := w.Write([]byte(err.Error())); writeErr != nil {
+			http.Error(w, writeErr.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	if _, err := w.Write(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // ReadJSON reads and decodes JSON from the request body into the provided destination
@@ -100,7 +104,9 @@ func WriteJSON(w http.ResponseWriter, status int, data data.Envelope, headers ht
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(js)
+	if _, err := w.Write(js); err != nil {
+		return err
+	}
 
 	return nil
 }

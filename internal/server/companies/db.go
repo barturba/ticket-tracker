@@ -25,16 +25,19 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 		return nil, data.Metadata{}, errors.New("couldn't find companies")
 	}
 
-	companies, metadata := convertRowsAndMetadata(rows, filters)
+	companies, metadata, err := convertRowsAndMetadata(rows, filters)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
 
 	return companies, metadata, nil
 }
 
 // GetLatestFromDB retrieves the latest companies from the database based on the provided limit and offset.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Company, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.Company, error) {
 	p := database.GetCompaniesLatestParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:  limit,
+		Offset: offset,
 	}
 	rows, err := db.GetCompaniesLatest(r.Context(), p)
 	if err != nil {
