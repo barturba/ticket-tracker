@@ -19,7 +19,7 @@ build/ticket-tracker:
 	go build -ldflags="-s -w" -o=./bin/ticket-tracker ./cmd/ticket-tracker
     GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o=./bin/darwin_arm64/ticket-tracker ./cmd/ticket-tracker
 
-## build/prod/ticket-tracker/: build the cmd/ticket-tracker application
+## build/prod/ticket-tracker/: build the cmd/ticket-tracker application for production
 .PHONY: build/prod/ticket-tracker
 build/prod/ticket-tracker:
 	@echo 'Building cmd/ticket-tracker for production ...'
