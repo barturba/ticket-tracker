@@ -24,15 +24,6 @@ func convert(incident database.Incident) data.Incident {
 	}
 }
 
-// convertMany converts a slice of database.Incident to a slice of data.Incident.
-func convertMany(incidents []database.Incident) []data.Incident {
-	var items []data.Incident
-	for _, item := range incidents {
-		items = append(items, convert(item))
-	}
-	return items
-}
-
 // convertLatestRow converts a single database.GetIncidentsLatestRow to a data.Incident.
 func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
 	return data.Incident{
