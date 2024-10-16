@@ -124,3 +124,28 @@ This command will build and start all the necessary services. You can then acces
 ## Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/barturba/ticket-tracker/issues).
+
+## 🤝 Contributing
+
+### Clone the repo
+
+```bash
+git clone https://github.com/barturba/ticket-tracker@latest
+cd ticket-tracker
+```
+
+### Build the project
+
+```bash
+make build/ticket-tracker
+```
+
+### Run the project
+
+```bash
+make
+```
+
+### Submit a pull request
+
+If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
