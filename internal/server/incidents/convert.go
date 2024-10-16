@@ -48,30 +48,6 @@ func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []data.Inc
 	return items
 }
 
-// convertRow converts a single database.GetIncidentsRow to a data.Incident.
-func convertRow(incident database.GetIncidentsRow) data.Incident {
-	return data.Incident{
-		ID:                  incident.ID,
-		CreatedAt:           incident.CreatedAt,
-		UpdatedAt:           incident.UpdatedAt,
-		ShortDescription:    incident.ShortDescription,
-		Description:         incident.Description,
-		ConfigurationItemID: incident.ConfigurationItemID,
-		CompanyID:           incident.CompanyID,
-		AssignedToID:        incident.AssignedTo,
-		State:               incident.State,
-	}
-}
-
-// convertRowMany converts a slice of database.GetIncidentsRow to a slice of data.Incident.
-func convertRowMany(incidents []database.GetIncidentsRow) []data.Incident {
-	var items []data.Incident
-	for _, item := range incidents {
-		items = append(items, convertRow(item))
-	}
-	return items
-}
-
 // convertRowsAndMetadata converts a slice of database.GetIncidentsRow to a slice of data.Incident
 // and calculates metadata based on the provided filters.
 func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filters) ([]data.Incident, data.Metadata) {
