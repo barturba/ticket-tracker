@@ -41,9 +41,6 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	// Create a structured logger for logging messages.
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// Create a config structure to hold the configuration values.
-	var config data.Config
-
 	// Load ENV variables from .env file.
 	_ = godotenv.Load()
 
@@ -79,10 +76,12 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 		}
 	}
 
-	// Set the configuration values.
-	config.Env = env
-	config.Host = host
-	config.Port = port
+	// Create a config structure to hold the configuration values.
+	config := data.Config{
+		Env:  env,
+		Host: host,
+		Port: port,
+	}
 
 	// Open a database connection
 	db, err := sql.Open("postgres", dbURL)
