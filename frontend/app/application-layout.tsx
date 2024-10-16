@@ -10,6 +10,7 @@ import {
   CpuChipIcon,
   UserGroupIcon,
   BuildingOffice2Icon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -23,6 +24,7 @@ import { SidebarLayout } from "@/app/components/sidebar-layout";
 import {
   Sidebar,
   SidebarBody,
+  SidebarFooter,
   SidebarHeader,
   SidebarItem,
   SidebarLabel,
@@ -37,6 +39,7 @@ import {
   DropdownLabel,
   DropdownMenu,
 } from "@/app/components/dropdown";
+import { signIn, signOut, useSession } from "next-auth/react";
 function AccountDropdownMenu({
   anchor,
 }: {
@@ -67,6 +70,7 @@ function AccountDropdownMenu({
 }
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <SidebarLayout
@@ -142,6 +146,45 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>
+          <SidebarFooter className="max-lg:hidden">
+            <Dropdown>
+              {session?.user ? (
+                <>
+                  <DropdownButton as={SidebarItem}>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <Avatar
+                        src={sessionStorage?.user?.image}
+                        className="size-10"
+                        square
+                        alt=""
+                      />
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
+                          {sessionStorage?.user?.name}
+                        </span>
+                        <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
+                          {sessionStorage?.user?.email}
+                        </span>
+                      </span>
+                    </span>
+                    <ChevronUpIcon />
+                  </DropdownButton>
+                  <DropdownButton as={SidebarItem}>
+                    <UserCircleIcon />
+                    <SidebarLabel onClick={() => signOut()}>
+                      Sign out
+                    </SidebarLabel>
+                  </DropdownButton>
+                </>
+              ) : (
+                <DropdownButton as={SidebarItem}>
+                  <UserCircleIcon />
+                  <SidebarLabel onClick={() => signIn()}>Sign in</SidebarLabel>
+                </DropdownButton>
+              )}
+              <AccountDropdownMenu anchor="top start" />
+            </Dropdown>
+          </SidebarFooter>
         </Sidebar>
       }
     >

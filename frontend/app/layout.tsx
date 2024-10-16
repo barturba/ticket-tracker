@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import type React from "react";
 import { ApplicationLayout } from "@/app/application-layout";
 import NextTopLoader from "nextjs-toploader";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: {
@@ -30,7 +31,10 @@ export default async function RootLayout({
       </head>
       <body>
         <NextTopLoader />
-        <ApplicationLayout>{children}</ApplicationLayout>
+
+        <SessionProvider>
+          <ApplicationLayout>{children}</ApplicationLayout>
+        </SessionProvider>
       </body>
     </html>
   );

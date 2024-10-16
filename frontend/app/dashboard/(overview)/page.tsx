@@ -1,12 +1,7 @@
-import { SessionProvider } from "next-auth/react";
 import Dashboard from "./dashboard";
 
 export default function Administrator() {
-  return (
-    <SessionProvider>
-      <Dashboard />
-    </SessionProvider>
-  );
+  return <Dashboard />;
 }
 // import AppHeading from "@/app/application-components/heading";
 // import { getIncidents } from "@/app/api/incidents/incidents";
