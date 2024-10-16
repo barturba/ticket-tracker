@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 import type { CompaniesData } from "@/app/api/companies/companies.d";
+import setAlert from "@/app/lib/setAlert";
 
 export type CompanyState = {
   message?: string;
@@ -211,6 +212,7 @@ export async function createCompany(
       message: "Database Error: Failed to Create Company.",
     };
   }
+  await setAlert({ type: "success", value: "Company created successfully!" });
   // Revalidate the cache for the companies page and redirect the user.
   revalidatePath("/dashboard/companies");
   redirect("/dashboard/companies");
@@ -275,8 +277,10 @@ export async function updateCompany(
       message: "Database Error: Failed to Update Company.",
     };
   }
+  await setAlert({ type: "success", value: "Company updated successfully!" });
   // Revalidate the cache for the companies page and redirect the user.
-  revalidatePath(`/dashboard/companies/${id}/edit`);
+  revalidatePath("/dashboard/companies");
+  redirect("/dashboard/companies");
   return {
     message: "Update Successful",
   };
@@ -291,6 +295,7 @@ export async function deleteCompany(id: string) {
     await fetch(url.toString(), {
       method: "DELETE",
     });
+    await setAlert({ type: "success", value: "Company deleted successfully!" });
     // Revalidate the cache for the company page
     revalidatePath("/dashboard/companies");
     return { message: "Deleted Company." };

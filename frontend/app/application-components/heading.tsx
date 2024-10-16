@@ -1,5 +1,7 @@
+"use client";
 import { Heading } from "@/app/components/heading";
 import { Button } from "@/app/components/button";
+import Alert from "./alert";
 
 export default function AppHeading({
   name,
@@ -11,11 +13,14 @@ export default function AppHeading({
   createLink: string;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div className="max-sm:w-full sm:flex-1">
-        <Heading>{name}</Heading>
+    <>
+      <Alert />
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-sm:w-full sm:flex-1">
+          <Heading>{name}</Heading>
+        </div>
+        <Button href={createLink}>{createLabel}</Button>
       </div>
-      <Button href={createLink}>{createLabel}</Button>
-    </div>
+    </>
   );
 }

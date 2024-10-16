@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 
 import type { CIsData } from "@/app/api/cis/cis.d";
+import setAlert from "@/app/lib/setAlert";
 
 export type CIState = {
   message?: string;
@@ -212,6 +213,7 @@ export async function createCI(
       message: "Database Error: Failed to Create CI.",
     };
   }
+  await setAlert({ type: "success", value: "CI created successfully!" });
   // Revalidate the cache for the cis page and redirect the user.
   revalidatePath("/dashboard/cis");
   redirect("/dashboard/cis");
@@ -276,8 +278,10 @@ export async function updateCI(
       message: "Database Error: Failed to Update CI.",
     };
   }
+  await setAlert({ type: "success", value: "CI updated successfully!" });
   // Revalidate the cache for the cis page and redirect the user.
-  revalidatePath(`/dashboard/cis/${id}/edit`);
+  revalidatePath("/dashboard/cis");
+  redirect("/dashboard/cis");
   return {
     message: "Update Successful",
   };
@@ -292,6 +296,7 @@ export async function deleteCI(id: string) {
     await fetch(url.toString(), {
       method: "DELETE",
     });
+    await setAlert({ type: "success", value: "CI deleted successfully!" });
     // Revalidate the cache for the ci page
     revalidatePath("/dashboard/cis");
     return { message: "Deleted CI." };

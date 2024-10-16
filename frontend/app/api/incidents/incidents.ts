@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 import { IncidentsData } from "@/app/api/incidents/incidents.d";
+import setAlert from "@/app/lib/setAlert";
 
 export type IncidentState = {
   message?: string;
@@ -256,9 +257,10 @@ export async function createIncident(
       message: "Database Error: Failed to Create Incident.",
     };
   }
+  await setAlert({ type: "success", value: "Incident created successfully!" });
   // Revalidate the cache for the incidents page and redirect the user.
   revalidatePath("/dashboard/incidents");
-  redirect("/dashboard/incidents");
+  redirect("/dashboard/incidents?alert='true'");
 }
 
 // PUT
@@ -337,8 +339,11 @@ export async function updateIncident(
       message: "Database Error: Failed to Update Incident.",
     };
   }
+  await setAlert({ type: "success", value: "Incident updated successfully!" });
+
   // Revalidate the cache for the incidents page and redirect the user.
-  revalidatePath(`/dashboard/incidents/${id}/edit`);
+  revalidatePath(`/dashboard/incidents`);
+  redirect(`/dashboard/incidents`);
   return {
     message: "Update Successful",
   };
@@ -352,6 +357,10 @@ export async function deleteIncident(id: string) {
     const url = new URL(`${process.env.BACKEND}/v1/incidents/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
+    });
+    await setAlert({
+      type: "success",
+      value: "Incident deleted successfully!",
     });
     // Revalidate the cache for the incident page
     revalidatePath("/dashboard/incidents");
