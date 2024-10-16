@@ -71,8 +71,6 @@ function AccountDropdownMenu({
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  console.log(`session`, JSON.stringify(session, null, 2));
-  console.log(`session.user`, JSON.stringify(session?.user, null, 2));
 
   return (
     <SidebarLayout
