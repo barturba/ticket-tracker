@@ -16,8 +16,8 @@ import (
 func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.CI, data.Metadata, error) {
 	p := database.GetCIsParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
-		Limit:    int32(filters.Limit()),
-		Offset:   int32(filters.Offset()),
+		Limit:    filters.Limit(),
+		Offset:   filters.Offset(),
 		OrderBy:  filters.SortColumn(),
 		OrderDir: filters.SortDirection(),
 	}
@@ -25,16 +25,19 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	if err != nil {
 		return nil, data.Metadata{}, errors.New("couldn't find cis")
 	}
-	cis, metadata := convertRowsAndMetadata(rows, filters)
+	cis, metadata, err := convertRowsAndMetadata(rows, filters)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
 	return cis, metadata, nil
 }
 
 // GetLatestFromDB retrieves the latest CIs from the database based on the provided limit and offset.
 // It returns the list of CIs and an error if any.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.CI, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.CI, error) {
 	p := database.GetCIsLatestParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:  limit,
+		Offset: offset,
 	}
 	rows, err := db.GetCIsLatest(r.Context(), p)
 	if err != nil {

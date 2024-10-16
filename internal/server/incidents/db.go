@@ -24,7 +24,10 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	if err != nil {
 		return nil, data.Metadata{}, errors.New("couldn't find incidents")
 	}
-	incidents, metadata := convertRowsAndMetadata(rows, filters)
+	incidents, metadata, err := convertRowsAndMetadata(rows, filters)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
 	return incidents, metadata, nil
 }
 
@@ -40,12 +43,15 @@ func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) (
 	if err != nil {
 		return nil, data.Metadata{}, errors.New("couldn't find incidents")
 	}
-	incidents, metadata := convertRowsAndMetadata(rows, filters)
+	incidents, metadata, err := convertRowsAndMetadata(rows, filters)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
 	return incidents, metadata, nil
 }
 
 // GetLatestFromDB retrieves the latest incidents from the database based on the provided limit and offset.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int) ([]data.Incident, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.Incident, error) {
 	p := database.GetIncidentsLatestParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),

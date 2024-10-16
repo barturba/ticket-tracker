@@ -26,15 +26,22 @@ func convertMany(companies []database.Company) []data.Company {
 
 // convertRowsAndMetadata converts a slice of database.GetCompaniesRow to a slice of data.Company
 // and calculates metadata based on the provided filters.
-func convertRowsAndMetadata(rows []database.GetCompaniesRow, filters data.Filters) ([]data.Company, data.Metadata) {
+func convertRowsAndMetadata(rows []database.GetCompaniesRow, filters data.Filters) ([]data.Company, data.Metadata, error) {
 	var output []data.Company
 	var totalRecords int64 = 0
 	for _, row := range rows {
 		outputRow := convertRowAndCount(row, &totalRecords)
 		output = append(output, outputRow)
 	}
-	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
-	return output, metadata
+
+	// Prevent conversion exploits
+	v32, err := data.ConvertInt64to32(totalRecords)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
+
+	metadata := data.CalculateMetadata(v32, filters.Page, filters.PageSize)
+	return output, metadata, nil
 }
 
 // convertRowAndCount converts a single database.GetCompaniesRow to data.Company and updates the count.

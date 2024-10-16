@@ -28,15 +28,22 @@ func convertMany(users []database.User) []data.User {
 
 // convertRowsAndMetadata converts a slice of database.GetUsersRow to a slice of data.User
 // and calculates the metadata based on the provided filters.
-func convertRowsAndMetadata(rows []database.GetUsersRow, filters data.Filters) ([]data.User, data.Metadata) {
+func convertRowsAndMetadata(rows []database.GetUsersRow, filters data.Filters) ([]data.User, data.Metadata, error) {
 	var output []data.User
 	var totalRecords int64 = 0
 	for _, row := range rows {
 		outputRow := convertRowAndCount(row, &totalRecords)
 		output = append(output, outputRow)
 	}
-	metadata := data.CalculateMetadata(int(totalRecords), filters.Page, filters.PageSize)
-	return output, metadata
+
+	// Prevent conversion exploits
+	v32, err := data.ConvertInt64to32(totalRecords)
+	if err != nil {
+		return nil, data.Metadata{}, err
+	}
+
+	metadata := data.CalculateMetadata(v32, filters.Page, filters.PageSize)
+	return output, metadata, nil
 }
 
 // convertRowAndCount converts a database.GetUsersRow to a data.User and updates the count.
