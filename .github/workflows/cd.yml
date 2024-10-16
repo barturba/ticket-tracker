@@ -31,7 +31,7 @@ jobs:
       - name: Build production
         run: make build/prod/ticket-tracker
 
-      - name: Build to Cloud
+      - name: Google Cloud Build
         run: gcloud builds submit --tag us-south1-docker.pkg.dev/ticket-tracker-438815/ticket-tracker-ar-repo/ticket-tracker:latest .
 
       - name: Deploy to Cloud Run
