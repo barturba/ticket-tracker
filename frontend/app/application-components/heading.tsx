@@ -2,6 +2,7 @@
 import { Heading } from "@/app/components/heading";
 import { Button } from "@/app/components/button";
 import Alert from "./alert";
+import { SignIn } from "./sign-in";
 
 export default function AppHeading({
   name,
@@ -15,6 +16,7 @@ export default function AppHeading({
   return (
     <>
       <Alert />
+      <SignIn />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-sm:w-full sm:flex-1">
           <Heading>{name}</Heading>
