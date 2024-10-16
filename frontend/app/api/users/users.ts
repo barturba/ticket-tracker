@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 import { UsersData } from "@/app/api/users/users.d";
+import setAlert from "@/app/lib/setAlert";
 
 export type UserState = {
   message?: string;
@@ -227,6 +228,7 @@ export async function createUser(
       message: "Database Error: Failed to Create User.",
     };
   }
+  await setAlert({ type: "success", value: "User created successfully!" });
   // Revalidate the cache for the users page and redirect the user.
   revalidatePath("/dashboard/users");
   redirect("/dashboard/users");
@@ -296,8 +298,10 @@ export async function updateUser(
       message: "Database Error: Failed to Update User.",
     };
   }
+  await setAlert({ type: "success", value: "User updated successfully!" });
   // Revalidate the cache for the users page and redirect the user.
-  revalidatePath(`/dashboard/users/${id}/edit`);
+  revalidatePath("/dashboard/users");
+  redirect("/dashboard/users");
   return {
     message: "Update Successful",
   };
@@ -312,6 +316,7 @@ export async function deleteUser(id: string) {
     await fetch(url.toString(), {
       method: "DELETE",
     });
+    await setAlert({ type: "success", value: "User deleted successfully!" });
     // Revalidate the cache for the user page
     revalidatePath("/dashboard/users");
     return { message: "Deleted User." };

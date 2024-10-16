@@ -16,6 +16,7 @@ import { CIField } from "@/app/api/cis/cis.d";
 import { CompanyField } from "@/app/api/companies/companies.d";
 import { IncidentForm } from "@/app/api/incidents/incidents.d";
 import { UserField } from "@/app/api/users/users.d";
+import { getCookies } from "cookies-next";
 
 export default function EditIncidentForm({
   incident,
