@@ -37,7 +37,6 @@ export default function CreateIncidentForm({
               label="Company"
               id="companyID"
               name="company_id"
-              placeholder="Select a company"
               inputs={companies}
               invalid={
                 state.errors?.companyId && state.errors.companyId.length > 0
@@ -50,7 +49,6 @@ export default function CreateIncidentForm({
               label="Assigned To"
               id="assignedToId"
               name="assigned_to_id"
-              placeholder="Select a user"
               inputs={users.map((user) => ({
                 id: user.id,
                 name: `${user.first_name} ${user.last_name}`,
@@ -67,7 +65,6 @@ export default function CreateIncidentForm({
               label="CI"
               id="configurationItemId"
               name="configuration_item_id"
-              placeholder="Select a CI"
               inputs={cis}
               invalid={
                 !!state.errors?.configurationItemId &&

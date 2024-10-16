@@ -5,7 +5,6 @@ export default function FormInput({
   label,
   id,
   name,
-  placeholder,
   inputs,
   defaultValue,
   invalid,
@@ -14,7 +13,6 @@ export default function FormInput({
   label: string;
   id: string;
   name: string;
-  placeholder: string;
   inputs: { id: string; name: string }[];
   defaultValue?: string;
   invalid?: boolean;

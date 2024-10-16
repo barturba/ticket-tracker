@@ -45,7 +45,6 @@ export default function EditIncidentForm({
               label="Company"
               id="companyID"
               name="company_id"
-              placeholder="Select a company"
               inputs={companies}
               defaultValue={incident.company_id}
               invalid={
@@ -59,7 +58,6 @@ export default function EditIncidentForm({
               label="Assigned To"
               id="assignedToId"
               name="assigned_to_id"
-              placeholder="Select a user"
               inputs={users.map((user) => ({
                 id: user.id,
                 name: `${user.first_name} ${user.last_name}`,
@@ -77,7 +75,6 @@ export default function EditIncidentForm({
               label="CI"
               id="configurationItemId"
               name="configuration_item_id"
-              placeholder="Select a CI"
               inputs={cis}
               defaultValue={incident.configuration_item_id}
               invalid={
