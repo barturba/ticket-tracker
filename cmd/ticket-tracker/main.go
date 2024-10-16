@@ -28,7 +28,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("the ticket-tracker has started\n")
+	fmt.Printf("ticket-tracker has started\n")
 }
 
 // run initializes the application, loads environment variables, sets up the configuration,
