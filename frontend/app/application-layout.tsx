@@ -32,7 +32,6 @@ import { Avatar } from "@/app/components/avatar";
 import {
   Dropdown,
   DropdownButton,
-  DropdownDivider,
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
@@ -46,20 +45,22 @@ function AccountDropdownMenu({
 }) {
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
-      {/* <DropdownItem href="#">
+      {/* 
+      <DropdownItem href="#">
         <UserCircleIcon />
         <DropdownLabel>My account</DropdownLabel>
       </DropdownItem>
-      <DropdownDivider /> */}
-      {/* <DropdownItem href="#">
+      <DropdownDivider /> 
+       <DropdownItem href="#">
         <ShieldCheckIcon />
         <DropdownLabel>Privacy policy</DropdownLabel>
       </DropdownItem>
       <DropdownItem href="#">
         <LightBulbIcon />
         <DropdownLabel>Share feedback</DropdownLabel>
-      </DropdownItem> */}
+      </DropdownItem> 
       <DropdownDivider />
+      */}
       <DropdownItem onClick={() => signOut()}>
         <ArrowRightStartOnRectangleIcon />
         <DropdownLabel>Sign out</DropdownLabel>
