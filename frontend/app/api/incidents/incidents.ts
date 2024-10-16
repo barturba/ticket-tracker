@@ -49,11 +49,6 @@ export async function getIncidents(
   currentPage: number
 ): Promise<IncidentsData> {
   try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
     const url = new URL(`${process.env.BACKEND}/v1/incidents`);
     console.log(`getIncidents query: ${query} url ${url.toString()}`);
 
@@ -69,7 +64,6 @@ export async function getIncidents(
     if (data.ok) {
       const IncidentsData: IncidentsData = await data.json();
       if (IncidentsData) {
-        new Promise((resolve) => setTimeout(resolve, 3000));
         return {
           incidents: IncidentsData.incidents,
           metadata: IncidentsData.metadata,
