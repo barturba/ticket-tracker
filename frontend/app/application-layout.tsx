@@ -47,21 +47,21 @@ function AccountDropdownMenu({
 }) {
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
-      <DropdownItem href="#">
+      {/* <DropdownItem href="#">
         <UserCircleIcon />
         <DropdownLabel>My account</DropdownLabel>
       </DropdownItem>
-      <DropdownDivider />
-      <DropdownItem href="#">
+      <DropdownDivider /> */}
+      {/* <DropdownItem href="#">
         <ShieldCheckIcon />
         <DropdownLabel>Privacy policy</DropdownLabel>
       </DropdownItem>
       <DropdownItem href="#">
         <LightBulbIcon />
         <DropdownLabel>Share feedback</DropdownLabel>
-      </DropdownItem>
+      </DropdownItem> */}
       <DropdownDivider />
-      <DropdownItem href="#">
+      <DropdownItem onClick={() => signOut()}>
         <ArrowRightStartOnRectangleIcon />
         <DropdownLabel>Sign out</DropdownLabel>
       </DropdownItem>
@@ -71,6 +71,8 @@ function AccountDropdownMenu({
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  console.log(`session`, JSON.stringify(session, null, 2));
+  console.log(`session.user`, JSON.stringify(session?.user, null, 2));
 
   return (
     <SidebarLayout
@@ -153,27 +155,21 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
                   <DropdownButton as={SidebarItem}>
                     <span className="flex min-w-0 items-center gap-3">
                       <Avatar
-                        src={sessionStorage?.user?.image}
+                        src={session?.user?.image}
                         className="size-10"
                         square
                         alt=""
                       />
                       <span className="min-w-0">
                         <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
-                          {sessionStorage?.user?.name}
+                          {session?.user?.name}
                         </span>
                         <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                          {sessionStorage?.user?.email}
+                          {session?.user?.email}
                         </span>
                       </span>
                     </span>
                     <ChevronUpIcon />
-                  </DropdownButton>
-                  <DropdownButton as={SidebarItem}>
-                    <UserCircleIcon />
-                    <SidebarLabel onClick={() => signOut()}>
-                      Sign out
-                    </SidebarLabel>
                   </DropdownButton>
                 </>
               ) : (
