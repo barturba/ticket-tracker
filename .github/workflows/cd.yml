@@ -31,5 +31,8 @@ jobs:
       - name: Build production
         run: make build/prod/ticket-tracker
 
-      - name: Deploy to Cloud Run
+      - name: Build to Cloud
         run: gcloud builds submit --tag us-south1-docker.pkg.dev/ticket-tracker-438815/ticket-tracker-ar-repo/ticket-tracker:latest .
+
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy ticket-tracker --image us-south1-docker.pkg.dev/ticket-tracker-438815/ticket-tracker-ar-repo/ticket-tracker:latest --region us-central1 --allow-unauthenticated --project ticket-tracker-438815 --max-instances=4
