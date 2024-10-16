@@ -37,7 +37,7 @@ jobs:
         run: make build/prod/ticket-tracker
 
       - name: Migrate database
-        run: ./migrateup.sh
+        run: chmod +x ./migrateup.sh && ./migrateup.sh
 
       - name: Google Cloud Build
         run: gcloud builds submit --tag us-south1-docker.pkg.dev/ticket-tracker-438815/ticket-tracker-ar-repo/ticket-tracker:latest .
