@@ -2,7 +2,7 @@
 
 ![Alt text](/ticket-tracker-in-action.gif "GIF video of TicketTracker")
 
-Live Demo - (https://frontend-patient-voice-578.fly.dev)[https://frontend-patient-voice-578.fly.dev]
+Live Demo - [https://frontend-patient-voice-578.fly.dev](https://frontend-patient-voice-578.fly.dev)
 
 ## Why?
 
