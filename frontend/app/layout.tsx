@@ -32,9 +32,9 @@ export default async function RootLayout({
       <body>
         <NextTopLoader showSpinner={false} />
 
-        <SessionProvider>
-          <ApplicationLayout>{children}</ApplicationLayout>
-        </SessionProvider>
+        {/* <SessionProvider> */}
+        <ApplicationLayout>{children}</ApplicationLayout>
+        {/* </SessionProvider> */}
       </body>
     </html>
   );
