@@ -30,7 +30,7 @@ export default async function RootLayout({
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body>
-        <NextTopLoader />
+        <NextTopLoader showSpinner={false} />
 
         <SessionProvider>
           <ApplicationLayout>{children}</ApplicationLayout>

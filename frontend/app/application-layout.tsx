@@ -86,7 +86,13 @@ export function ApplicationLayout({ children }: { children: React.ReactNode }) {
                   <Avatar src="/users/user.png" square />
                 )}
               </DropdownButton>
-              <AccountDropdownMenu anchor="bottom end" />
+              {session?.user ? (
+                <AccountDropdownMenu anchor="bottom end" />
+              ) : (
+                <Button onClick={() => signIn()} className="-my-0.5">
+                  Sign in
+                </Button>
+              )}
             </Dropdown>
           </NavbarSection>
         </Navbar>
