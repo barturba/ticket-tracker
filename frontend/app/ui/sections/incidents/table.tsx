@@ -67,7 +67,7 @@ export default function IncidentsTable({
                 <TableCell className="hidden sm:table-cell">
                   {incident.assigned_to_name}
                 </TableCell>
-                <TableCell className="text-zinc-500">
+                <TableCell className="text-zinc-500 sm:pr-0">
                   {formatDateToLocal(incident.updated_at)}
                 </TableCell>
               </TableRow>
