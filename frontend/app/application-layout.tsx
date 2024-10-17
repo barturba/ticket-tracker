@@ -70,8 +70,8 @@ function AccountDropdownMenu({
 }
 export function ApplicationLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  // const { data: session } = useSession();
-  const session = { user: { name: "Bartas", email: "", image: "" } };
+  const { data: session } = useSession();
+  // const session = { user: { name: "Bartas", email: "", image: "" } };
 
   return (
     <SidebarLayout
