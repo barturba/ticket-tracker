@@ -30,7 +30,9 @@ export default function IncidentsTable({
             <TableHeader className="hidden sm:table-cell">
               Assigned to
             </TableHeader>
-            <TableHeader className="sm:pr-0">Updated date</TableHeader>
+            <TableHeader className="hidden sm:table-cell">
+              Updated date
+            </TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -56,6 +58,10 @@ export default function IncidentsTable({
                     <dd className="mt-1 text-gray-500">
                       {incident.assigned_to_name}
                     </dd>
+                    <dt className="sr-only">Updated at</dt>
+                    <dd className="mt-1 text-zinc-500">
+                      {incident.updated_at}
+                    </dd>
                   </dl>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
@@ -67,7 +73,7 @@ export default function IncidentsTable({
                 <TableCell className="hidden sm:table-cell">
                   {incident.assigned_to_name}
                 </TableCell>
-                <TableCell className="text-zinc-500">
+                <TableCell className="text-zinc-500 hidden sm:table-cell">
                   {formatDateToLocal(incident.updated_at)}
                 </TableCell>
               </TableRow>
