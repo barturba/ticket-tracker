@@ -1,6 +1,10 @@
 -- Needed for authjs authentication
 
 -- +goose Up
+ALTER TABLE users ALTER COLUMN id SET DEFAULT gen_random_uuid();
+ALTER TABLE users ALTER COLUMN created_at SET DEFAULT now();
+ALTER TABLE users ALTER COLUMN updated_at SET DEFAULT now();
+
 CREATE TABLE verification_token
 (
     identifier TEXT NOT NULL,
@@ -12,8 +16,8 @@ CREATE TABLE verification_token
 
 CREATE TABLE accounts
 (
-    id SERIAL,
-    "userId" INTEGER NOT NULL,
+    id uuid default gen_random_uuid(),
+    "userId" uuid NOT NULL,
     type VARCHAR(255) NOT NULL,
     provider VARCHAR(255) NOT NULL,
     "providerAccountId" VARCHAR(255) NOT NULL,
@@ -28,14 +32,16 @@ CREATE TABLE accounts
     PRIMARY KEY (id)
 );
 
-CREATE TABLE session_state(
-    id SERIAL,
-    "userId" INTEGER NOT NULL,
-    expires TIMESTAMPTZ NOT NULL,
-    "sessionToken" VARCHAR(255) NOT NULL, 
-
-    PRIMARY KEY (id)
+CREATE TABLE sessions
+(
+  id uuid default gen_random_uuid(),
+  "userId" uuid NOT NULL,
+  expires TIMESTAMPTZ NOT NULL,
+  "sessionToken" VARCHAR(255) NOT NULL,
+ 
+  PRIMARY KEY (id)
 );
+ 
 
 ALTER TABLE users
 ADD "emailVerified" TIMESTAMPTZ,
@@ -46,9 +52,13 @@ ADD image TEXT;
 
 DROP TABLE verification_token;
 DROP TABLE accounts;
-DROP TABLE session_state;
+DROP TABLE sessions;
 
 ALTER TABLE users
 DROP COLUMN "emailVerified",
 DROP COLUMN name,
 DROP image;
+
+ALTER TABLE users ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE users ALTER COLUMN created_at DROP DEFAULT;
+ALTER TABLE users ALTER COLUMN updated_at DROP DEFAULT;

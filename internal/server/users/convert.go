@@ -14,6 +14,7 @@ func convert(user database.User) data.User {
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
 		Email:     user.Email,
+		Role:      user.Role,
 	}
 }
 

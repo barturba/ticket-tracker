@@ -58,6 +58,21 @@ func (ns NullStateEnum) Value() (driver.Value, error) {
 	return string(ns.StateEnum), nil
 }
 
+type Account struct {
+	ID                uuid.UUID
+	UserId            uuid.UUID
+	Type              string
+	Provider          string
+	ProviderAccountId string
+	RefreshToken      sql.NullString
+	AccessToken       sql.NullString
+	ExpiresAt         sql.NullInt64
+	IDToken           sql.NullString
+	Scope             sql.NullString
+	SessionState      sql.NullString
+	TokenType         sql.NullString
+}
+
 type Company struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
@@ -84,11 +99,28 @@ type Incident struct {
 	AssignedTo          uuid.NullUUID
 }
 
+type Session struct {
+	ID           uuid.UUID
+	UserId       uuid.UUID
+	Expires      time.Time
+	SessionToken string
+}
+
 type User struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	FirstName sql.NullString
-	LastName  sql.NullString
-	Email     string
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	FirstName     sql.NullString
+	LastName      sql.NullString
+	Email         string
+	EmailVerified sql.NullTime
+	Name          sql.NullString
+	Image         sql.NullString
+	Role          string
+}
+
+type VerificationToken struct {
+	Identifier string
+	Expires    time.Time
+	Token      string
 }
