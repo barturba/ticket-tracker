@@ -8,12 +8,12 @@ import (
 	"github.com/google/uuid"
 )
 
-// CI represents a configuration item.
+// CI represents a Configuration Item in the ticket-tracker system.
 type CI struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
+	ID        uuid.UUID `json:"id"`         // Unique identifier for the CI.
+	CreatedAt time.Time `json:"created_at"` // Timestamp when the CI was created.
+	UpdatedAt time.Time `json:"updated_at"` // Timestamp when the CI was last updated.
+	Name      string    `json:"name"`       // Name of the CI.
 }
 
 // ValidateCI checks the validity of a CI instance, ensuring that
