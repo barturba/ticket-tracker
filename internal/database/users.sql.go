@@ -16,7 +16,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO USERS (id, created_at, updated_at, first_name, last_name, email)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, created_at, updated_at, first_name, last_name, email
+RETURNING id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
 `
 
 type CreateUserParams struct {
@@ -45,6 +45,10 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
 	)
 	return i, err
 }
@@ -52,7 +56,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 const deleteUserByID = `-- name: DeleteUserByID :one
 DELETE FROM users 
 WHERE id = $1
-RETURNING id, created_at, updated_at, first_name, last_name, email
+RETURNING id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
 `
 
 func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -65,12 +69,16 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, first_name, last_name, email FROM USERS WHERE email = $1
+SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -83,12 +91,16 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, updated_at, first_name, last_name, email FROM USERS WHERE id = $1
+SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -101,12 +113,16 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, email FROM users 
+SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
 WHERE (email ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (last_name ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -134,13 +150,17 @@ type GetUsersParams struct {
 }
 
 type GetUsersRow struct {
-	Count     int64
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	FirstName sql.NullString
-	LastName  sql.NullString
-	Email     string
+	Count         int64
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	FirstName     sql.NullString
+	LastName      sql.NullString
+	Email         string
+	EmailVerified sql.NullTime
+	Name          sql.NullString
+	Image         sql.NullString
+	Role          string
 }
 
 func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersRow, error) {
@@ -166,6 +186,10 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersR
 			&i.FirstName,
 			&i.LastName,
 			&i.Email,
+			&i.EmailVerified,
+			&i.Name,
+			&i.Image,
+			&i.Role,
 		); err != nil {
 			return nil, err
 		}
@@ -181,23 +205,27 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersR
 }
 
 const getUsersByCompany = `-- name: GetUsersByCompany :many
-SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, companies.id, companies.created_at, companies.updated_at, name FROM users 
+SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", users.name, image, role, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
 LEFT JOIN companies 
 ON users.assigned_to = users.id
 ORDER BY users.name ASC
 `
 
 type GetUsersByCompanyRow struct {
-	ID          uuid.UUID
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	FirstName   sql.NullString
-	LastName    sql.NullString
-	Email       string
-	ID_2        uuid.NullUUID
-	CreatedAt_2 sql.NullTime
-	UpdatedAt_2 sql.NullTime
-	Name        sql.NullString
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	FirstName     sql.NullString
+	LastName      sql.NullString
+	Email         string
+	EmailVerified sql.NullTime
+	Name          sql.NullString
+	Image         sql.NullString
+	Role          string
+	ID_2          uuid.NullUUID
+	CreatedAt_2   sql.NullTime
+	UpdatedAt_2   sql.NullTime
+	Name_2        sql.NullString
 }
 
 func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow, error) {
@@ -216,10 +244,14 @@ func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow
 			&i.FirstName,
 			&i.LastName,
 			&i.Email,
+			&i.EmailVerified,
+			&i.Name,
+			&i.Image,
+			&i.Role,
 			&i.ID_2,
 			&i.CreatedAt_2,
 			&i.UpdatedAt_2,
-			&i.Name,
+			&i.Name_2,
 		); err != nil {
 			return nil, err
 		}
@@ -248,7 +280,7 @@ func (q *Queries) GetUsersCount(ctx context.Context, query sql.NullString) (int6
 }
 
 const getUsersLatest = `-- name: GetUsersLatest :many
-SELECT id, created_at, updated_at, first_name, last_name, email FROM users 
+SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
 ORDER BY users.updated_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -274,6 +306,10 @@ func (q *Queries) GetUsersLatest(ctx context.Context, arg GetUsersLatestParams) 
 			&i.FirstName,
 			&i.LastName,
 			&i.Email,
+			&i.EmailVerified,
+			&i.Name,
+			&i.Image,
+			&i.Role,
 		); err != nil {
 			return nil, err
 		}
@@ -295,7 +331,7 @@ first_name = $3,
 last_name = $4,
 email = $5
 WHERE ID = $1
-RETURNING id, created_at, updated_at, first_name, last_name, email
+RETURNING id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
 `
 
 type UpdateUserParams struct {
@@ -322,6 +358,10 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.FirstName,
 		&i.LastName,
 		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
 	)
 	return i, err
 }

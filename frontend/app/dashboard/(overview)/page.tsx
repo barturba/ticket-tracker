@@ -4,6 +4,8 @@ import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
 import { IncidentsData } from "@/app/api/incidents/incidents.d";
 import IncidentsTable from "../../ui/sections/incidents/table";
+import { useSession } from "next-auth/react";
+import SessionMetrics from "@/app/application-components/session-metrics";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -23,6 +25,7 @@ export default async function Incidents(props: {
 
   return (
     <>
+      <SessionMetrics />
       <AppHeading
         name="Dashboard - Recent Incidents"
         createLabel="Create Incident"
