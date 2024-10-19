@@ -31,9 +31,7 @@ func main() {
 	fmt.Printf("ticket-tracker has started\n")
 }
 
-// run initializes the application, loads environment variables, sets up the configuration,
-// opens a database connection, and starts the HTTP server. It also handles graceful shutdown
-// on receiving an interrupt signal.
+// run initializes and starts the application.
 func run(ctx context.Context, w io.Writer, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
