@@ -19,30 +19,8 @@ import (
 // Get retrieves a list of users with optional filtering, sorting, and pagination.
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{
-			"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"-first_name", "first_name",
-			"-last_name", "last_name",
-		}
+		input := parseFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
@@ -54,7 +32,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users")
+		logger.Info("handled GET /v1/users")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"users": users, "metadata": metadata})
 	})
 }
@@ -62,30 +40,10 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 // GetAll retrieves all users with optional filtering, sorting, and pagination.
 func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
-
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10_000_000, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{
-			"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"-first_name", "first_name",
-			"-last_name", "last_name",
-		}
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
@@ -97,42 +55,33 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users")
+
+		logger.Info("handled GET /v1/users_all")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"users": users, "metadata": metadata})
 	})
 }
 
-// GetLatest retrieves the latest users with optional filtering, sorting, and pagination.
+// GetLatest retrieves the latest users.
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		i, err := userrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		latestUsers, err := userrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users_latest")
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/users_latest")
+		json.RespondWithJSON(w, http.StatusOK, latestUsers)
 	})
 }
 
@@ -145,13 +94,14 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := userrepository.GetByIDFromDB(r, db, id)
+		user, err := userrepository.GetByIDFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users/{id}", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/users/{id}", "id", id)
+		json.RespondWithJSON(w, http.StatusOK, user)
 	})
 }
 
@@ -164,8 +114,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			Email     string `json:"email"`
 		}
 
-		err := json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
@@ -179,19 +128,19 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		v := validator.New()
-
 		if models.ValidateUser(v, user); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := userrepository.PostToDB(r, db, *user)
+
+		createdUser, err := userrepository.PostToDB(r, db, *user)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "POST /v1/user")
-		json.RespondWithJSON(w, http.StatusCreated, i)
+		logger.Info("handled POST /v1/users")
+		json.RespondWithJSON(w, http.StatusCreated, createdUser)
 	})
 }
 
@@ -210,8 +159,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			Email     string `json:"email"`
 		}
 
-		err = json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
@@ -225,20 +173,20 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		v := validator.New()
-
 		if models.ValidateUser(v, user); !v.Valid() {
 			log.Printf("Put %v\n", v.Errors)
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := userrepository.PutToDB(r, db, *user)
+
+		updatedUser, err := userrepository.PutToDB(r, db, *user)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/user/{id}", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, i)
+		logger.Info("handled PUT /v1/user/{id}")
+		json.RespondWithJSON(w, http.StatusOK, updatedUser)
 	})
 }
 
@@ -251,13 +199,37 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = userrepository.DeleteFromDB(r, db, id)
-		if err != nil {
+		if _, err = userrepository.DeleteFromDB(r, db, id); err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "DELETE /v1/user", "id", id)
+		logger.Info("handled DELETE /v1/users/{id}", "id", id)
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "user successfully deleted"})
 	})
+}
+
+func parseFilters(r *http.Request, v *validator.Validator) struct {
+	Query   string
+	Filters models.Filters
+} {
+	qs := r.URL.Query()
+	return struct {
+		Query   string
+		Filters models.Filters
+	}{
+		Query: models.ReadString(qs, "query", ""),
+		Filters: models.Filters{
+			Page:     models.ReadInt(qs, "page", 1, v),
+			PageSize: models.ReadInt(qs, "page_size", 10, v),
+			Sort:     models.ReadString(qs, "sort", "id"),
+			SortSafelist: []string{
+				"id", "-id",
+				"created_at", "-created_at",
+				"updated_at", "-updated_at",
+				"-first_name", "first_name",
+				"-last_name", "last_name",
+			},
+		},
+	}
 }
