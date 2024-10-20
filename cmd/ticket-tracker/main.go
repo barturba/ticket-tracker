@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/barturba/ticket-tracker/internal/api"
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/joho/godotenv"
@@ -139,11 +140,11 @@ func newServer(logger *slog.Logger, config data.Config, db *database.Queries) ht
 
 	mux := http.NewServeMux()
 
-	addRouteHealthcheck(mux, logger)
-	addRoutesIncidents(mux, logger, db)
-	addRoutesCompanies(mux, logger, db)
-	addRoutesUsers(mux, logger, db)
-	addRoutesConfigurationItems(mux, logger, db)
+	api.AddRouteHealthcheck(mux, logger)
+	api.AddRoutesIncidents(mux, logger, db)
+	api.AddRoutesCompanies(mux, logger, db)
+	api.AddRoutesUsers(mux, logger, db)
+	api.AddRoutesConfigurationItems(mux, logger, db)
 
 	var handler http.Handler = mux
 
