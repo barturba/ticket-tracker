@@ -1,14 +1,14 @@
 package config
 
 import (
-	"log"
+	"errors"
 	"os"
 
 	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/joho/godotenv"
 )
 
-func Config() models.Config {
+func Load() (models.Config, error) {
 
 	// Load ENV variables from .env file.
 	_ = godotenv.Load()
@@ -22,13 +22,13 @@ func Config() models.Config {
 	// Get the host name.
 	host := os.Getenv("SERVER_HOST")
 	if host == "" {
-		log.Fatal("SERVER_HOST environment variable is not set")
+		return models.Config{}, errors.New("SERVER_HOST environment variable is not set")
 	}
 
 	// Get the port number.
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
-		log.Fatal("SERVER_PORT environment variable is not set")
+		return models.Config{}, errors.New("SERVER_PORT environment variable is not set")
 	}
 
 	// Set the database URL based on the environment.
@@ -36,12 +36,12 @@ func Config() models.Config {
 	if env == "development" {
 		dbURL = os.Getenv("DATABASE_URL_DEV")
 		if dbURL == "" {
-			log.Fatal("DATABASE_URL_DEV environment variable is not set")
+			return models.Config{}, errors.New("DATABASE_URL_DEV environment variable is not set")
 		}
 	} else {
 		dbURL = os.Getenv("DATABASE_URL_PROD")
 		if dbURL == "" {
-			log.Fatal("DATABASE_URL_PROD environment variable is not set")
+			return models.Config{}, errors.New("DATABASE_URL_PROD environment variable is not set")
 		}
 	}
 
@@ -52,5 +52,5 @@ func Config() models.Config {
 		Port:  port,
 		DBURL: dbURL,
 	}
-	return config
+	return config, nil
 }
