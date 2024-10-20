@@ -87,9 +87,9 @@ func newServer(logger *slog.Logger, cfg models.Config, db *database.Queries) *ht
 	return &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
 		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 }
 
