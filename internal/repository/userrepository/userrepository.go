@@ -60,7 +60,7 @@ func GetLatestUsers(r *http.Request, logger *slog.Logger, db *database.Queries, 
 		return nil, errors.New("failed to retrieve recent users")
 	}
 
-	return convertMany(rows), nil
+	return convertManyUsers(rows), nil
 }
 
 // GetUserByID retrieves a user from the database based on the provided user ID.
@@ -71,7 +71,7 @@ func GetUserByID(r *http.Request, logger *slog.Logger, db *database.Queries, id 
 		return models.User{}, errors.New("failed to retrieve user")
 	}
 
-	return convert(record), nil
+	return convertUser(record), nil
 }
 
 // CreateUser creates a new user in the database.
@@ -91,7 +91,7 @@ func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 		return models.User{}, errors.New("failed to create user")
 	}
 
-	return convert(record), nil
+	return convertUser(record), nil
 }
 
 // UpdateUser updates an existing user in the database.
@@ -110,7 +110,7 @@ func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 		return models.User{}, errors.New("failed to update user")
 	}
 
-	return convert(record), nil
+	return convertUser(record), nil
 }
 
 // DeleteUser deletes a user from the database based on the provided user ID.
@@ -121,29 +121,28 @@ func DeleteUser(r *http.Request, logger *slog.Logger, db *database.Queries, id u
 		return models.User{}, errors.New("failed to delete user")
 	}
 
-	return convert(record), nil
+	return convertUser(record), nil
 }
 
-// convert converts a database.User to a models.User.
-func convert(user database.User) models.User {
+// convertUser converts a database.User to a models.User.
+func convertUser(dbUser database.User) models.User {
 	return models.User{
-		ID:        user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		FirstName: user.FirstName.String,
-		LastName:  user.LastName.String,
-		Email:     user.Email,
-		Role:      user.Role,
+		ID:        dbUser.ID,
+		CreatedAt: dbUser.CreatedAt,
+		UpdatedAt: dbUser.UpdatedAt,
+		FirstName: dbUser.FirstName.String,
+		LastName:  dbUser.LastName.String,
+		Email:     dbUser.Email,
 	}
 }
 
-// convertMany converts a slice of database.User to a slice of models.User.
-func convertMany(users []database.User) []models.User {
-	var items []models.User
-	for _, item := range users {
-		items = append(items, convert(item))
+// convertManyUsers transforms a slice of database.User to a slice of models.User.
+func convertManyUsers(dbUsers []database.User) []models.User {
+	users := make([]models.User, len(dbUsers))
+	for i, dbUser := range dbUsers {
+		users[i] = convertUser(dbUser)
 	}
-	return items
+	return users
 }
 
 // convertRowsAndMetadata converts a slice of database.GetUsersRow to a slice of models.User
