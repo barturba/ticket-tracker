@@ -1,22 +1,21 @@
-// Package userhandlers provides functions for managing user resources.
-package userhandlers
+package incidentHandler
 
 import (
-	"log"
+	"database/sql"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	userrepository "github.com/barturba/ticket-tracker/internal/repository/users"
+	incidentrepository "github.com/barturba/ticket-tracker/internal/repository/incidents"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
 )
 
-// Get retrieves a list of users with optional filtering, sorting, and pagination.
 func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -40,8 +39,10 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			"id", "-id",
 			"created_at", "-created_at",
 			"updated_at", "-updated_at",
-			"-first_name", "first_name",
-			"-last_name", "last_name",
+			"short_description", "-short_description",
+			"description", "-description",
+			"first_name", "-first_name",
+			"last_name", "-last_name",
 		}
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
@@ -49,17 +50,16 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		users, metadata, err := userrepository.GetFromDB(r, db, logger, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users")
-		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"users": users, "metadata": metadata})
+		logger.Info("msg", "handle", "GET /v1/incidents")
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
-// GetAll retrieves all users with optional filtering, sorting, and pagination.
 func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -76,6 +76,8 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Query = models.ReadString(qs, "query", "")
 
 		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
+
+		// Set the page size to a large value
 		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10_000_000, v)
 
 		input.Filters.Sort = models.ReadString(qs, "sort", "id")
@@ -83,26 +85,28 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			"id", "-id",
 			"created_at", "-created_at",
 			"updated_at", "-updated_at",
-			"-first_name", "first_name",
-			"-last_name", "last_name",
+			"short_description", "-short_description",
+			"description", "-description",
+			"first_name", "-first_name",
+			"last_name", "-last_name",
 		}
 
+		// Ignore the usual page size warnings since we're trying to get all values
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		users, metadata, err := userrepository.GetFromDB(r, db, logger, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users")
-		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"users": users, "metadata": metadata})
+		logger.Info("msg", "handle", "GET /v1/incidents-all")
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
-// GetLatest retrieves the latest users with optional filtering, sorting, and pagination.
 func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
@@ -126,17 +130,16 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := userrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		i, err := incidentrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users_latest")
+		logger.Info("msg", "handle", "GET /v1/incidents_latest")
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-// GetByID retrieves a single user by their unique identifier.
 func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -144,24 +147,25 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
-
-		i, err := userrepository.GetByIDFromDB(r, db, id)
+		i, err := incidentrepository.GetByIDFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/users/{id}", "id", id)
+		logger.Info("msg", "handle", fmt.Sprintf("GET /v1/incidents/%s", id))
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-// Post creates a new user.
 func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			FirstName string `json:"first_name"`
-			LastName  string `json:"last_name"`
-			Email     string `json:"email"`
+			ShortDescription    string             `json:"short_description"`
+			Description         string             `json:"description"`
+			ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+			CompanyID           uuid.UUID          `json:"company_id"`
+			AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+			State               database.StateEnum `json:"state"`
 		}
 
 		err := json.ReadJSON(w, r, &input)
@@ -170,32 +174,35 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		user := &models.User{
-			ID:        uuid.New(),
-			UpdatedAt: time.Now(),
-			FirstName: input.FirstName,
-			LastName:  input.LastName,
-			Email:     input.Email,
+		incident := &models.Incident{
+			ID:                  uuid.New(),
+			CreatedAt:           time.Now(),
+			UpdatedAt:           time.Now(),
+			ShortDescription:    input.ShortDescription,
+			Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
+			ConfigurationItemID: input.ConfigurationItemID,
+			CompanyID:           input.CompanyID,
+			AssignedToID:        uuid.NullUUID{UUID: input.AssignedToID, Valid: input.AssignedToID != uuid.Nil},
+			State:               input.State,
 		}
 
 		v := validator.New()
 
-		if models.ValidateUser(v, user); !v.Valid() {
+		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := userrepository.PostToDB(r, db, *user)
+		i, err := incidentrepository.PostToDB(r, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "POST /v1/user")
+		logger.Info("msg", "handle", "POST /v1/incident")
 		json.RespondWithJSON(w, http.StatusCreated, i)
 	})
 }
 
-// Put updates an existing user by their unique identifier.
 func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -205,9 +212,12 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		var input struct {
-			FirstName string `json:"first_name"`
-			LastName  string `json:"last_name"`
-			Email     string `json:"email"`
+			ShortDescription    string             `json:"short_description"`
+			Description         string             `json:"description"`
+			ConfigurationItemID uuid.UUID          `json:"configuration_item_id"`
+			CompanyID           uuid.UUID          `json:"company_id"`
+			AssignedToID        uuid.UUID          `json:"assigned_to_id"`
+			State               database.StateEnum `json:"state"`
 		}
 
 		err = json.ReadJSON(w, r, &input)
@@ -216,33 +226,34 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		user := &models.User{
-			ID:        id,
-			UpdatedAt: time.Now(),
-			FirstName: input.FirstName,
-			LastName:  input.LastName,
-			Email:     input.Email,
+		incident := &models.Incident{
+			ID:                  id,
+			UpdatedAt:           time.Now(),
+			ShortDescription:    input.ShortDescription,
+			Description:         sql.NullString{String: input.Description, Valid: input.Description != ""},
+			ConfigurationItemID: input.ConfigurationItemID,
+			CompanyID:           input.CompanyID,
+			AssignedToID:        uuid.NullUUID{UUID: input.AssignedToID, Valid: input.AssignedToID != uuid.Nil},
+			State:               input.State,
 		}
 
 		v := validator.New()
 
-		if models.ValidateUser(v, user); !v.Valid() {
-			log.Printf("Put %v\n", v.Errors)
+		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := userrepository.PutToDB(r, db, *user)
+		i, err := incidentrepository.PutToDB(r, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/user/{id}", "id", id)
+		logger.Info("msg", "handle", "PUT /v1/incident", "id", id)
 		json.RespondWithJSON(w, http.StatusOK, i)
 	})
 }
 
-// Delete deletes an existing user by their unique identifier.
 func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
@@ -251,13 +262,13 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = userrepository.DeleteFromDB(r, db, id)
+		_, err = incidentrepository.DeleteFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "DELETE /v1/user", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "user successfully deleted"})
+		logger.Info("msg", "handle", "DELETE /v1/incident", "id", id)
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "incident successfully deleted"})
 	})
 }
