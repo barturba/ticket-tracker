@@ -1,5 +1,5 @@
-// Package userHandler provides functions for managing user resources.
-package userHandler
+// Package userhandler provides functions for managing user resources.
+package userhandler
 
 import (
 	"log"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	userrepository "github.com/barturba/ticket-tracker/internal/repository/users"
+	"github.com/barturba/ticket-tracker/internal/repository/userrepository"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
@@ -27,11 +27,12 @@ func ListUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		users, metadata, err := userrepository.GetFromDB(r, db, logger, input.Query, input.Filters)
+		users, metadata, err := userrepository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
+
 		logger.Info("handled GET /v1/users")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"users": users, "metadata": metadata})
 	})
@@ -50,7 +51,7 @@ func ListAllUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		users, metadata, err := userrepository.GetFromDB(r, db, logger, input.Query, input.Filters)
+		users, metadata, err := userrepository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -74,7 +75,7 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		latestUsers, err := userrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		latestUsers, err := userrepository.GetLatestUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -94,7 +95,7 @@ func GetUserByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		user, err := userrepository.GetByIDFromDB(r, db, id)
+		user, err := userrepository.GetUserByID(r, logger, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -133,7 +134,7 @@ func CreateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		createdUser, err := userrepository.PostToDB(r, db, *user)
+		createdUser, err := userrepository.CreateUser(r, logger, db, *user)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -179,7 +180,7 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		updatedUser, err := userrepository.PutToDB(r, db, *user)
+		updatedUser, err := userrepository.UpdateUser(r, logger, db, *user)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -199,7 +200,7 @@ func DeleteUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		if _, err = userrepository.DeleteFromDB(r, db, id); err != nil {
+		if _, err = userrepository.DeleteUser(r, logger, db, id); err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}

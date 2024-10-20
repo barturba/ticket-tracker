@@ -8,7 +8,7 @@ import (
 	companyHandler "github.com/barturba/ticket-tracker/internal/api/handlers/companyhandler"
 	"github.com/barturba/ticket-tracker/internal/api/handlers/healthcheck"
 	incidentHandler "github.com/barturba/ticket-tracker/internal/api/handlers/incidenthandler"
-	userHandler "github.com/barturba/ticket-tracker/internal/api/handlers/userhandler"
+	"github.com/barturba/ticket-tracker/internal/api/handlers/userhandler"
 	"github.com/barturba/ticket-tracker/internal/database"
 )
 
@@ -35,13 +35,13 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) 
 	mux.Handle("DELETE /v1/companies/{id}", companyHandler.Delete(logger, db))
 
 	// Users
-	mux.Handle("GET /v1/users", userHandler.ListUsers(logger, db))
-	mux.Handle("GET /v1/users_all", userHandler.ListAllUsers(logger, db))
-	mux.Handle("POST /v1/users", userHandler.CreateUser(logger, db))
-	mux.Handle("GET /v1/users/{id}", userHandler.GetUserByID(logger, db))
-	mux.Handle("GET /v1/users_latest", userHandler.ListRecentUsers(logger, db))
-	mux.Handle("PUT /v1/users/{id}", userHandler.UpdateUser(logger, db))
-	mux.Handle("DELETE /v1/users/{id}", userHandler.DeleteUser(logger, db))
+	mux.Handle("GET /v1/users", userhandler.ListUsers(logger, db))
+	mux.Handle("GET /v1/users_all", userhandler.ListAllUsers(logger, db))
+	mux.Handle("POST /v1/users", userhandler.CreateUser(logger, db))
+	mux.Handle("GET /v1/users/{id}", userhandler.GetUserByID(logger, db))
+	mux.Handle("GET /v1/users_latest", userhandler.ListRecentUsers(logger, db))
+	mux.Handle("PUT /v1/users/{id}", userhandler.UpdateUser(logger, db))
+	mux.Handle("DELETE /v1/users/{id}", userhandler.DeleteUser(logger, db))
 
 	// Configuration Items
 	mux.Handle("GET /v1/cis", ciHandler.Get(logger, db))
