@@ -9,8 +9,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
-	"github.com/barturba/ticket-tracker/internal/json"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/pkg/validator"
 	"github.com/google/uuid"
 )

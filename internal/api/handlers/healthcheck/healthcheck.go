@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/data"
-	"github.com/barturba/ticket-tracker/internal/json"
+	"github.com/barturba/ticket-tracker/internal/utils/json"
 )
 
 // Declare a handler which writes a plain-text response with information about the

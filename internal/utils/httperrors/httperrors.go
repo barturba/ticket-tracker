@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/barturba/ticket-tracker/internal/data"
-	"github.com/barturba/ticket-tracker/internal/json"
+	"github.com/barturba/ticket-tracker/internal/utils/json"
 )
 
 // ErrorResponse sends a JSON response with the specified status code and error message.
