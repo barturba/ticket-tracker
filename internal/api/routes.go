@@ -35,13 +35,13 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) 
 	mux.Handle("DELETE /v1/companies/{id}", companyHandler.Delete(logger, db))
 
 	// Users
-	mux.Handle("GET /v1/users", userHandler.Get(logger, db))
-	mux.Handle("GET /v1/users_all", userHandler.GetAll(logger, db))
-	mux.Handle("POST /v1/users", userHandler.Post(logger, db))
-	mux.Handle("GET /v1/users/{id}", userHandler.GetByID(logger, db))
-	mux.Handle("GET /v1/users_latest", userHandler.GetLatest(logger, db))
-	mux.Handle("PUT /v1/users/{id}", userHandler.Put(logger, db))
-	mux.Handle("DELETE /v1/users/{id}", userHandler.Delete(logger, db))
+	mux.Handle("GET /v1/users", userHandler.ListUsers(logger, db))
+	mux.Handle("GET /v1/users_all", userHandler.ListAllUsers(logger, db))
+	mux.Handle("POST /v1/users", userHandler.CreateUser(logger, db))
+	mux.Handle("GET /v1/users/{id}", userHandler.GetUserByID(logger, db))
+	mux.Handle("GET /v1/users_latest", userHandler.ListRecentUsers(logger, db))
+	mux.Handle("PUT /v1/users/{id}", userHandler.UpdateUser(logger, db))
+	mux.Handle("DELETE /v1/users/{id}", userHandler.DeleteUser(logger, db))
 
 	// Configuration Items
 	mux.Handle("GET /v1/cis", ciHandler.Get(logger, db))

@@ -16,8 +16,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// Get retrieves a list of users with optional filtering, sorting, and pagination.
-func Get(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListUsers retrieves a list of users with optional filtering, sorting, and pagination.
+func ListUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 		input := parseFilters(r, v)
@@ -37,8 +37,8 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetAll retrieves all users with optional filtering, sorting, and pagination.
-func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListAllUsers retrieves all users with optional filtering, sorting, and pagination.
+func ListAllUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
@@ -61,8 +61,8 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetLatest retrieves the latest users.
-func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListRecentUsers retrieves the latest users.
+func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
@@ -85,8 +85,8 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetByID retrieves a single user by their unique identifier.
-func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetUserByID retrieves a single user by their unique identifier.
+func GetUserByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -105,8 +105,8 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// Post creates a new user.
-func Post(logger *slog.Logger, db *database.Queries) http.Handler {
+// CreateUser creates a new user.
+func CreateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			FirstName string `json:"first_name"`
@@ -144,8 +144,8 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// Put updates an existing user by their unique identifier.
-func Put(logger *slog.Logger, db *database.Queries) http.Handler {
+// UpdateUser updates an existing user by their unique identifier.
+func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -190,8 +190,8 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// Delete deletes an existing user by their unique identifier.
-func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
+// DeleteUser deletes an existing user by their unique identifier.
+func DeleteUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
