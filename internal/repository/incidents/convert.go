@@ -1,6 +1,6 @@
-// Package incidents provides functions to convert database incident records
+// Package incidentrepository provides functions to convert database incident records
 // into data incident structures used within the application.
-package incidents
+package incidentrepository
 
 import (
 	"fmt"

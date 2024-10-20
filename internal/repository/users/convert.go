@@ -1,4 +1,4 @@
-package users
+package userrepository
 
 import (
 	"github.com/barturba/ticket-tracker/internal/database"

@@ -1,5 +1,5 @@
-// Package companies provides HTTP handlers for managing company models.
-package companies
+// Package companyhandlers provides HTTP handlers for managing company models.
+package companyhandlers
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
+	companyrepository "github.com/barturba/ticket-tracker/internal/repository/companies"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
@@ -45,7 +46,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		companies, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		companies, metadata, err := companyrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -85,7 +86,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		companies, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		companies, metadata, err := companyrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -119,7 +120,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		i, err := companyrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -138,7 +139,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetByIDFromDB(r, db, id)
+		i, err := companyrepository.GetByIDFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -174,7 +175,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PostToDB(r, db, *company)
+		i, err := companyrepository.PostToDB(r, db, *company)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -216,7 +217,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PutToDB(r, db, *company)
+		i, err := companyrepository.PutToDB(r, db, *company)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -236,7 +237,7 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = DeleteFromDB(r, db, id)
+		_, err = companyrepository.DeleteFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return

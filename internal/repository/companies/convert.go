@@ -1,4 +1,4 @@
-package companies
+package companyrepository
 
 import (
 	"github.com/barturba/ticket-tracker/internal/database"

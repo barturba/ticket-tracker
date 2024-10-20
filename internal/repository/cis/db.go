@@ -1,4 +1,4 @@
-package cis
+package cirepository
 
 import (
 	"database/sql"

@@ -1,5 +1,5 @@
 // Package cis provides HTTP handlers for managing Configuration Items (CIs).
-package cis
+package cihandlers
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
+	cirepository "github.com/barturba/ticket-tracker/internal/repository/cis"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
@@ -45,7 +46,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		cis, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		cis, metadata, err := cirepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -85,7 +86,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		cis, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		cis, metadata, err := cirepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -119,7 +120,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		i, err := cirepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -138,7 +139,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetByIDFromDB(r, db, id)
+		i, err := cirepository.GetByIDFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -172,7 +173,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PostToDB(r, db, *ci)
+		i, err := cirepository.PostToDB(r, db, *ci)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -214,7 +215,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PutToDB(r, db, *ci)
+		i, err := cirepository.PutToDB(r, db, *ci)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -234,7 +235,7 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = DeleteFromDB(r, db, id)
+		_, err = cirepository.DeleteFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return

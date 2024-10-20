@@ -1,4 +1,4 @@
-package incidents
+package incidenthandlers
 
 import (
 	"database/sql"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
+	incidentrepository "github.com/barturba/ticket-tracker/internal/repository/incidents"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
@@ -49,7 +50,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incidents, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -96,7 +97,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incidents, metadata, err := GetFromDB(r, db, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -129,7 +130,7 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		i, err := incidentrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -146,7 +147,7 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
-		i, err := GetByIDFromDB(r, db, id)
+		i, err := incidentrepository.GetByIDFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -191,7 +192,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PostToDB(r, db, *incident)
+		i, err := incidentrepository.PostToDB(r, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -242,7 +243,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := PutToDB(r, db, *incident)
+		i, err := incidentrepository.PutToDB(r, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -261,7 +262,7 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = DeleteFromDB(r, db, id)
+		_, err = incidentrepository.DeleteFromDB(r, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return

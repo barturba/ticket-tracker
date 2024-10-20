@@ -1,4 +1,4 @@
-package companies
+package companyrepository
 
 import (
 	"database/sql"

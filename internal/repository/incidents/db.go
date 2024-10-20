@@ -1,4 +1,4 @@
-package incidents
+package incidentrepository
 
 import (
 	"database/sql"

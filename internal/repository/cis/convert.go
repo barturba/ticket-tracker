@@ -1,4 +1,4 @@
-package cis
+package cirepository
 
 import (
 	"github.com/barturba/ticket-tracker/internal/database"
