@@ -4,7 +4,7 @@ package data
 import (
 	"time"
 
-	"github.com/barturba/ticket-tracker/pkg/validator"
+	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
 )
 

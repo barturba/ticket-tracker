@@ -11,7 +11,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
-	"github.com/barturba/ticket-tracker/pkg/validator"
+	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
 )
 
