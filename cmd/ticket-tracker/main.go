@@ -100,6 +100,11 @@ func initDatabase(dbURL string) (*sql.DB, error) {
 		return nil, err
 	}
 
+	// Set connection pool settings
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxIdleTime(5 * time.Minute)
+
 	// Ping the database to verify the connection.
 	err = db.Ping()
 	if err != nil {
