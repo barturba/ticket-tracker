@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/barturba/ticket-tracker/validator"
+	"github.com/barturba/ticket-tracker/pkg/validator"
 )
 
 // Filters represents the pagination and sorting parameters.

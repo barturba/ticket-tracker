@@ -9,9 +9,9 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
-	"github.com/barturba/ticket-tracker/internal/errutil"
 	"github.com/barturba/ticket-tracker/internal/json"
-	"github.com/barturba/ticket-tracker/validator"
+	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/pkg/validator"
 	"github.com/google/uuid"
 )
 
@@ -44,13 +44,13 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if data.ValidateFilters(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
 		users, metadata, err := GetFromDB(r, db, logger, input.Query, input.Filters)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/users")
@@ -87,13 +87,13 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if data.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
 		users, metadata, err := GetFromDB(r, db, logger, input.Query, input.Filters)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/users")
@@ -121,13 +121,13 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 		input.Filters.SortSafelist = []string{"id"}
 
 		if data.ValidateFilters(v, input.Filters); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
 		i, err := GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/users_latest")
@@ -140,13 +140,13 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			errutil.NotFoundResponse(w, r, logger)
+			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
 
 		i, err := GetByIDFromDB(r, db, id)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/users/{id}", "id", id)
@@ -165,7 +165,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		err := json.ReadJSON(w, r, &input)
 		if err != nil {
-			errutil.BadRequestResponse(w, r, logger, err)
+			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -180,12 +180,12 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		v := validator.New()
 
 		if data.ValidateUser(v, user); !v.Valid() {
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 		i, err := PostToDB(r, db, *user)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -199,7 +199,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			errutil.NotFoundResponse(w, r, logger)
+			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
 
@@ -211,7 +211,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		err = json.ReadJSON(w, r, &input)
 		if err != nil {
-			errutil.BadRequestResponse(w, r, logger, err)
+			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -227,12 +227,12 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		if data.ValidateUser(v, user); !v.Valid() {
 			log.Printf("Put %v\n", v.Errors)
-			errutil.FailedValidationResponse(w, r, logger, v.Errors)
+			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 		i, err := PutToDB(r, db, *user)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -246,13 +246,13 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			errutil.NotFoundResponse(w, r, logger)
+			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
 
 		_, err = DeleteFromDB(r, db, id)
 		if err != nil {
-			errutil.ServerErrorResponse(w, r, logger, err)
+			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
