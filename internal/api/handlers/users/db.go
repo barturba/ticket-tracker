@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/google/uuid"
 )
 
 // GetFromDB retrieves users from the database based on the provided query and filters.
-func GetFromDB(r *http.Request, db *database.Queries, logger *slog.Logger, query string, filters data.Filters) ([]data.User, data.Metadata, error) {
+func GetFromDB(r *http.Request, db *database.Queries, logger *slog.Logger, query string, filters models.Filters) ([]models.User, models.Metadata, error) {
 	p := database.GetUsersParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
@@ -25,11 +25,11 @@ func GetFromDB(r *http.Request, db *database.Queries, logger *slog.Logger, query
 	rows, err := db.GetUsers(r.Context(), p)
 	if err != nil {
 		logger.Error("couldn't find users", "error", err)
-		return nil, data.Metadata{}, errors.New("couldn't find users")
+		return nil, models.Metadata{}, errors.New("couldn't find users")
 	}
 	users, metadata, err := convertRowsAndMetadata(rows, filters)
 	if err != nil {
-		return nil, data.Metadata{}, err
+		return nil, models.Metadata{}, err
 	}
 	return users, metadata, nil
 }
@@ -44,7 +44,7 @@ func GetCountFromDB(r *http.Request, db *database.Queries, query string, limit, 
 }
 
 // GetLatestFromDB retrieves the latest users from the database based on the provided limit and offset.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.User, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]models.User, error) {
 	p := database.GetUsersLatestParams{
 		Limit:  limit,
 		Offset: offset,
@@ -58,17 +58,17 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32)
 }
 
 // GetByIDFromDB retrieves a user from the database based on the provided user ID.
-func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
+func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.User, error) {
 	record, err := db.GetUserByID(r.Context(), id)
 	if err != nil {
-		return data.User{}, errors.New("couldn't find user")
+		return models.User{}, errors.New("couldn't find user")
 	}
 	user := convert(record)
 	return user, nil
 }
 
-// PostToDB creates a new user in the database based on the provided user data.
-func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
+// PostToDB creates a new user in the database based on the provided user models.
+func PostToDB(r *http.Request, db *database.Queries, user models.User) (models.User, error) {
 
 	i, err := db.CreateUser(r.Context(), database.CreateUserParams{
 		ID:        user.ID,
@@ -80,13 +80,13 @@ func PostToDB(r *http.Request, db *database.Queries, user data.User) (data.User,
 	})
 	response := convert(i)
 	if err != nil {
-		return data.User{}, errors.New("couldn't create user")
+		return models.User{}, errors.New("couldn't create user")
 	}
 	return response, nil
 }
 
-// PutToDB updates an existing user in the database based on the provided user data.
-func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, error) {
+// PutToDB updates an existing user in the database based on the provided user models.
+func PutToDB(r *http.Request, db *database.Queries, user models.User) (models.User, error) {
 
 	i, err := db.UpdateUser(r.Context(), database.UpdateUserParams{
 		ID:        user.ID,
@@ -97,7 +97,7 @@ func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, 
 	})
 	if err != nil {
 		log.Printf("put err %v\n", err)
-		return data.User{}, errors.New("couldn't update user")
+		return models.User{}, errors.New("couldn't update user")
 	}
 
 	response := convert(i)
@@ -106,10 +106,10 @@ func PutToDB(r *http.Request, db *database.Queries, user data.User) (data.User, 
 }
 
 // DeleteFromDB deletes a user from the database based on the provided user ID.
-func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.User, error) {
+func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.User, error) {
 	i, err := db.DeleteUserByID(r.Context(), id)
 	if err != nil {
-		return data.User{}, errors.New("couldn't delete user")
+		return models.User{}, errors.New("couldn't delete user")
 	}
 
 	response := convert(i)

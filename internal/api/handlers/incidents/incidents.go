@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
@@ -21,19 +21,19 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			Query  string
 			Limit  int
 			Offset int
-			data.Filters
+			models.Filters
 		}
 
 		v := validator.New()
 
 		var qs = r.URL.Query()
 
-		input.Query = data.ReadString(qs, "query", "")
+		input.Query = models.ReadString(qs, "query", "")
 
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10, v)
+		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10, v)
 
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.Sort = models.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{
 			"id", "-id",
 			"created_at", "-created_at",
@@ -44,7 +44,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			"last_name", "-last_name",
 		}
 
-		if data.ValidateFilters(v, input.Filters); !v.Valid() {
+		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
@@ -55,7 +55,7 @@ func Get(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/incidents")
-		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"incidents": incidents, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
@@ -65,21 +65,21 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			Query  string
 			Limit  int
 			Offset int
-			data.Filters
+			models.Filters
 		}
 
 		v := validator.New()
 
 		var qs = r.URL.Query()
 
-		input.Query = data.ReadString(qs, "query", "")
+		input.Query = models.ReadString(qs, "query", "")
 
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
+		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
 
 		// Set the page size to a large value
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 10_000_000, v)
+		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10_000_000, v)
 
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.Sort = models.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{
 			"id", "-id",
 			"created_at", "-created_at",
@@ -91,7 +91,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		// Ignore the usual page size warnings since we're trying to get all values
-		if data.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
+		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
@@ -102,7 +102,7 @@ func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 		logger.Info("msg", "handle", "GET /v1/incidents-all")
-		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"incidents": incidents, "metadata": metadata})
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
@@ -111,20 +111,20 @@ func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
 		var input struct {
 			Limit  int
 			Offset int
-			data.Filters
+			models.Filters
 		}
 
 		v := validator.New()
 
 		var qs = r.URL.Query()
 
-		input.Filters.Page = data.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = data.ReadInt(qs, "page_size", 20, v)
+		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
+		input.Filters.PageSize = models.ReadInt(qs, "page_size", 20, v)
 
-		input.Filters.Sort = data.ReadString(qs, "sort", "id")
+		input.Filters.Sort = models.ReadString(qs, "sort", "id")
 		input.Filters.SortSafelist = []string{"id"}
 
-		if data.ValidateFilters(v, input.Filters); !v.Valid() {
+		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
@@ -173,7 +173,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incident := &data.Incident{
+		incident := &models.Incident{
 			ID:                  uuid.New(),
 			CreatedAt:           time.Now(),
 			UpdatedAt:           time.Now(),
@@ -187,7 +187,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 
-		if data.ValidateIncident(v, incident); !v.Valid() {
+		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
@@ -225,7 +225,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incident := &data.Incident{
+		incident := &models.Incident{
 			ID:                  id,
 			UpdatedAt:           time.Now(),
 			ShortDescription:    input.ShortDescription,
@@ -238,7 +238,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 
-		if data.ValidateIncident(v, incident); !v.Valid() {
+		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
@@ -268,6 +268,6 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		logger.Info("msg", "handle", "DELETE /v1/incident", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, data.Envelope{"message": "incident successfully deleted"})
+		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "incident successfully deleted"})
 	})
 }

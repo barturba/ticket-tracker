@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/barturba/ticket-tracker/internal/data"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/joho/godotenv"
 )
 
-func Config() data.Config {
+func Config() models.Config {
 
 	// Load ENV variables from .env file.
 	_ = godotenv.Load()
@@ -46,7 +46,7 @@ func Config() data.Config {
 	}
 
 	// Create a config structure to hold the configuration values.
-	config := data.Config{
+	config := models.Config{
 		Env:   env,
 		Host:  host,
 		Port:  port,

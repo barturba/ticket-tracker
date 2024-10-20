@@ -5,13 +5,13 @@ package incidents
 import (
 	"fmt"
 
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 )
 
-// convert converts a single database.Incident to a data.Incident.
-func convert(incident database.Incident) data.Incident {
-	return data.Incident{
+// convert converts a single database.Incident to a models.Incident.
+func convert(incident database.Incident) models.Incident {
+	return models.Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
 		UpdatedAt:           incident.UpdatedAt,
@@ -24,9 +24,9 @@ func convert(incident database.Incident) data.Incident {
 	}
 }
 
-// convertLatestRow converts a single database.GetIncidentsLatestRow to a data.Incident.
-func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
-	return data.Incident{
+// convertLatestRow converts a single database.GetIncidentsLatestRow to a models.Incident.
+func convertLatestRow(incident database.GetIncidentsLatestRow) models.Incident {
+	return models.Incident{
 		ID:                  incident.ID,
 		CreatedAt:           incident.CreatedAt,
 		UpdatedAt:           incident.UpdatedAt,
@@ -39,20 +39,20 @@ func convertLatestRow(incident database.GetIncidentsLatestRow) data.Incident {
 	}
 }
 
-// convertLatestRowMany converts a slice of database.GetIncidentsLatestRow to a slice of data.Incident.
-func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []data.Incident {
-	var items []data.Incident
+// convertLatestRowMany converts a slice of database.GetIncidentsLatestRow to a slice of models.Incident.
+func convertLatestRowMany(incidents []database.GetIncidentsLatestRow) []models.Incident {
+	var items []models.Incident
 	for _, item := range incidents {
 		items = append(items, convertLatestRow(item))
 	}
 	return items
 }
 
-// convertRowsAndMetadata converts a slice of database.GetIncidentsRow to a slice of data.Incident
+// convertRowsAndMetadata converts a slice of database.GetIncidentsRow to a slice of models.Incident
 // and calculates metadata based on the provided filters.
-func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filters) ([]data.Incident, data.Metadata, error) {
+func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters models.Filters) ([]models.Incident, models.Metadata, error) {
 
-	var output []data.Incident
+	var output []models.Incident
 	var totalRecords int64 = 0
 	for _, row := range rows {
 		outputRow := convertRowAndCount(row, &totalRecords)
@@ -60,19 +60,19 @@ func convertRowsAndMetadata(rows []database.GetIncidentsRow, filters data.Filter
 	}
 
 	// Prevent conversion exploits
-	v32, err := data.ConvertInt64to32(totalRecords)
+	v32, err := models.ConvertInt64to32(totalRecords)
 	if err != nil {
-		return nil, data.Metadata{}, err
+		return nil, models.Metadata{}, err
 	}
 
-	metadata := data.CalculateMetadata(v32, filters.Page, filters.PageSize)
+	metadata := models.CalculateMetadata(v32, filters.Page, filters.PageSize)
 	return output, metadata, nil
 }
 
-// convertRowAndCount converts a single database.GetIncidentsRow to a data.Incident
+// convertRowAndCount converts a single database.GetIncidentsRow to a models.Incident
 // and updates the total record count.
-func convertRowAndCount(row database.GetIncidentsRow, count *int64) data.Incident {
-	outputRow := data.Incident{
+func convertRowAndCount(row database.GetIncidentsRow, count *int64) models.Incident {
+	outputRow := models.Incident{
 		ID:                  row.ID,
 		CreatedAt:           row.CreatedAt,
 		UpdatedAt:           row.UpdatedAt,

@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/barturba/ticket-tracker/internal/data"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/google/uuid"
 )
 
@@ -90,7 +90,7 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 
 // WriteJSON encodes the given data to JSON with indentation and writes it to the
 // response writer with the specified HTTP status code and headers.
-func WriteJSON(w http.ResponseWriter, status int, data data.Envelope, headers http.Header) error {
+func WriteJSON(w http.ResponseWriter, status int, data models.Envelope, headers http.Header) error {
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err

@@ -1,5 +1,5 @@
-// Data provides the data structures and validation logic.
-package data
+// models provides the data structures and validation logic.
+package models
 
 import (
 	"time"

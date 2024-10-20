@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/google/uuid"
 )
 
 // GetFromDB retrieves incidents from the database based on the provided query and filters.
-func GetFromDB(r *http.Request, db *database.Queries, query string, filters data.Filters) ([]data.Incident, data.Metadata, error) {
+func GetFromDB(r *http.Request, db *database.Queries, query string, filters models.Filters) ([]models.Incident, models.Metadata, error) {
 	p := database.GetIncidentsParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
@@ -22,17 +22,17 @@ func GetFromDB(r *http.Request, db *database.Queries, query string, filters data
 	}
 	rows, err := db.GetIncidents(r.Context(), p)
 	if err != nil {
-		return nil, data.Metadata{}, errors.New("couldn't find incidents")
+		return nil, models.Metadata{}, errors.New("couldn't find incidents")
 	}
 	incidents, metadata, err := convertRowsAndMetadata(rows, filters)
 	if err != nil {
-		return nil, data.Metadata{}, err
+		return nil, models.Metadata{}, err
 	}
 	return incidents, metadata, nil
 }
 
 // GetAllFromDB retrieves all incidents from the database based on the provided filters.
-func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) ([]data.Incident, data.Metadata, error) {
+func GetAllFromDB(r *http.Request, db *database.Queries, filters models.Filters) ([]models.Incident, models.Metadata, error) {
 	p := database.GetIncidentsParams{
 		Limit:    1_000_000,
 		Offset:   int32(filters.Offset()),
@@ -41,17 +41,17 @@ func GetAllFromDB(r *http.Request, db *database.Queries, filters data.Filters) (
 	}
 	rows, err := db.GetIncidents(r.Context(), p)
 	if err != nil {
-		return nil, data.Metadata{}, errors.New("couldn't find incidents")
+		return nil, models.Metadata{}, errors.New("couldn't find incidents")
 	}
 	incidents, metadata, err := convertRowsAndMetadata(rows, filters)
 	if err != nil {
-		return nil, data.Metadata{}, err
+		return nil, models.Metadata{}, err
 	}
 	return incidents, metadata, nil
 }
 
 // GetLatestFromDB retrieves the latest incidents from the database based on the provided limit and offset.
-func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]data.Incident, error) {
+func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32) ([]models.Incident, error) {
 	p := database.GetIncidentsLatestParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
@@ -65,17 +65,17 @@ func GetLatestFromDB(r *http.Request, db *database.Queries, limit, offset int32)
 }
 
 // GetByIDFromDB retrieves an incident from the database based on the provided incident ID.
-func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
+func GetByIDFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.Incident, error) {
 	record, err := db.GetIncidentByID(r.Context(), id)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
+		return models.Incident{}, errors.New("couldn't find incident")
 	}
 	incident := convert(record)
 	return incident, nil
 }
 
 // PostToDB inserts a new incident into the database.
-func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
+func PostToDB(r *http.Request, db *database.Queries, incident models.Incident) (models.Incident, error) {
 	i, err := db.CreateIncident(r.Context(), database.CreateIncidentParams{
 		ID:                  incident.ID,
 		CreatedAt:           time.Now(),
@@ -88,13 +88,13 @@ func PostToDB(r *http.Request, db *database.Queries, incident data.Incident) (da
 	})
 	response := convert(i)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't find incident")
+		return models.Incident{}, errors.New("couldn't find incident")
 	}
 	return response, nil
 }
 
 // PutToDB updates an existing incident in the database.
-func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (data.Incident, error) {
+func PutToDB(r *http.Request, db *database.Queries, incident models.Incident) (models.Incident, error) {
 	i, err := db.UpdateIncident(r.Context(), database.UpdateIncidentParams{
 		ID:                  incident.ID,
 		UpdatedAt:           time.Now(),
@@ -106,7 +106,7 @@ func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (dat
 		AssignedTo:          incident.AssignedToID,
 	})
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't update incident")
+		return models.Incident{}, errors.New("couldn't update incident")
 	}
 
 	response := convert(i)
@@ -115,10 +115,10 @@ func PutToDB(r *http.Request, db *database.Queries, incident data.Incident) (dat
 }
 
 // DeleteFromDB deletes an incident from the database based on the provided incident ID.
-func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (data.Incident, error) {
+func DeleteFromDB(r *http.Request, db *database.Queries, id uuid.UUID) (models.Incident, error) {
 	i, err := db.DeleteIncidentByID(r.Context(), id)
 	if err != nil {
-		return data.Incident{}, errors.New("couldn't delete incident")
+		return models.Incident{}, errors.New("couldn't delete incident")
 	}
 
 	response := convert(i)

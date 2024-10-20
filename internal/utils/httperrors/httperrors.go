@@ -5,14 +5,14 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/barturba/ticket-tracker/internal/data"
+	"github.com/barturba/ticket-tracker/internal/models"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 )
 
 // ErrorResponse sends a JSON response with the specified status code and error message.
 // If writing the JSON response fails, it logs the error and sends a 500 Internal Server Error response.
 func ErrorResponse(w http.ResponseWriter, r *http.Request, logger *slog.Logger, status int, message any) {
-	env := data.Envelope{"error": message}
+	env := models.Envelope{"error": message}
 
 	err := json.WriteJSON(w, status, env, nil)
 	if err != nil {

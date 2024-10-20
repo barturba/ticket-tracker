@@ -1,4 +1,4 @@
-package data
+package models
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type Config struct {
 // used when returning JSON data from an endpoint.
 type Envelope map[string]any
 
-// Metadata represents pagination metadata.
+// Metadata represents pagination metamodels.
 type Metadata struct {
 	CurrentPage  int32 `json:"current_page,omitempty"`  // Current page number
 	PageSize     int32 `json:"page_size,omitempty"`     // Number of items per page

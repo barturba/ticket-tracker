@@ -17,8 +17,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/api"
 	"github.com/barturba/ticket-tracker/internal/config"
-	"github.com/barturba/ticket-tracker/internal/data"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 	_ "github.com/lib/pq"
 )
 
@@ -97,7 +97,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 // routes for incidents, companies, users, and configuration items.
 //
 // Returns an HTTP handler that can be used by the HTTP server.
-func newServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
+func newServer(logger *slog.Logger, config models.Config, db *database.Queries) http.Handler {
 
 	mux := http.NewServeMux()
 
