@@ -11,6 +11,7 @@ type Config struct {
 	Port     string
 	Env      string // Environment (e.g., development, production)
 	PageSize int
+	DBURL    string
 }
 
 // Envelope is a type alias for a map that can hold any type of value. It is
