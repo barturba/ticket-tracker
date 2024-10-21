@@ -1,163 +1,113 @@
-package incidenthandlers
+// Package incidenthandler provides functions for managing incident resources.
+package incidenthandler
 
 import (
 	"database/sql"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	incidentrepository "github.com/barturba/ticket-tracker/internal/repository/incidents"
+	"github.com/barturba/ticket-tracker/internal/repository/incidentrepository"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
 )
 
-func Get(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListIncidents retrieves a list of incidents with optional filtering, sorting, and pagination.
+func ListIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{
-			"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"short_description", "-short_description",
-			"description", "-description",
-			"first_name", "-first_name",
-			"last_name", "-last_name",
-		}
+		input := parseFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents")
+
+		logger.Info("handled GET /v1/incidents")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
-func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListAllIncidents retrieves all incidents with optional filtering, sorting, and pagination.
+func ListAllIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 10_000_000
 
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-
-		// Set the page size to a large value
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10_000_000, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{
-			"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"short_description", "-short_description",
-			"description", "-description",
-			"first_name", "-first_name",
-			"last_name", "-last_name",
-		}
-
-		// Ignore the usual page size warnings since we're trying to get all values
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		incidents, metadata, err := incidentrepository.GetFromDB(r, db, input.Query, input.Filters)
+		incidents, metadata, err := incidentrepository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents-all")
+
+		logger.Info("handled GET /v1/incidents_all")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"incidents": incidents, "metadata": metadata})
 	})
 }
 
-func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListRecentIncidents retrieves the latest incidents.
+func ListRecentIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		i, err := incidentrepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		latestIncidents, err := incidentrepository.GetLatestIncidents(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/incidents_latest")
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/incidents_latest")
+		json.RespondWithJSON(w, http.StatusOK, latestIncidents)
 	})
 }
 
-func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetIncidentByID retrieves a single incident by their unique identifier.
+func GetIncidentByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
 			httperrors.NotFoundResponse(w, r, logger)
 			return
 		}
-		i, err := incidentrepository.GetByIDFromDB(r, db, id)
+
+		incident, err := incidentrepository.GetIncidentByID(r, logger, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", fmt.Sprintf("GET /v1/incidents/%s", id))
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/incidents/{id}", "id", id)
+		json.RespondWithJSON(w, http.StatusOK, incident)
 	})
 }
 
-func Post(logger *slog.Logger, db *database.Queries) http.Handler {
+// CreateIncident creates a new incident.
+func CreateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			ShortDescription    string             `json:"short_description"`
@@ -168,8 +118,7 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 			State               database.StateEnum `json:"state"`
 		}
 
-		err := json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
@@ -187,23 +136,24 @@ func Post(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		v := validator.New()
-
 		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := incidentrepository.PostToDB(r, db, *incident)
+
+		createdIncident, err := incidentrepository.CreateIncident(r, logger, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "POST /v1/incident")
-		json.RespondWithJSON(w, http.StatusCreated, i)
+		logger.Info("handled POST /v1/incidents")
+		json.RespondWithJSON(w, http.StatusCreated, createdIncident)
 	})
 }
 
-func Put(logger *slog.Logger, db *database.Queries) http.Handler {
+// UpdateIncident updates an existing incident by their unique identifier.
+func UpdateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -220,8 +170,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			State               database.StateEnum `json:"state"`
 		}
 
-		err = json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
@@ -238,23 +187,24 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		v := validator.New()
-
 		if models.ValidateIncident(v, incident); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := incidentrepository.PutToDB(r, db, *incident)
+
+		updatedIncident, err := incidentrepository.UpdateIncident(r, logger, db, *incident)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/incident", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, i)
+		logger.Info("handled PUT /v1/incident/{id}")
+		json.RespondWithJSON(w, http.StatusOK, updatedIncident)
 	})
 }
 
-func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
+// DeleteIncident deletes an existing incident by their unique identifier.
+func DeleteIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -262,13 +212,39 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = incidentrepository.DeleteFromDB(r, db, id)
-		if err != nil {
+		if _, err = incidentrepository.DeleteIncident(r, logger, db, id); err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "DELETE /v1/incident", "id", id)
+		logger.Info("handled DELETE /v1/incidents/{id}", "id", id)
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "incident successfully deleted"})
 	})
+}
+
+func parseFilters(r *http.Request, v *validator.Validator) struct {
+	Query   string
+	Filters models.Filters
+} {
+	qs := r.URL.Query()
+	return struct {
+		Query   string
+		Filters models.Filters
+	}{
+		Query: models.ReadString(qs, "query", ""),
+		Filters: models.Filters{
+			Page:     models.ReadInt(qs, "page", 1, v),
+			PageSize: models.ReadInt(qs, "page_size", 10, v),
+			Sort:     models.ReadString(qs, "sort", "id"),
+			SortSafelist: []string{
+				"id", "-id",
+				"created_at", "-created_at",
+				"updated_at", "-updated_at",
+				"short_description", "-short_description",
+				"description", "-description",
+				"first_name", "-first_name",
+				"last_name", "-last_name",
+			},
+		},
+	}
 }

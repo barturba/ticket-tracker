@@ -78,11 +78,7 @@ func newServer(logger *slog.Logger, cfg models.Config, db *database.Queries) *ht
 	mux := http.NewServeMux()
 
 	// Add routes
-	api.AddRouteHealthcheck(mux, logger)
-	api.AddRoutesIncidents(mux, logger, db)
-	api.AddRoutesCompanies(mux, logger, db)
-	api.AddRoutesUsers(mux, logger, db)
-	api.AddRoutesConfigurationItems(mux, logger, db)
+	api.SetupRoutes(mux, logger, db)
 
 	return &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
