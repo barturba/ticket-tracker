@@ -48,14 +48,14 @@ func CountUsers(r *http.Request, logger *slog.Logger, db *database.Queries, quer
 	return count, nil
 }
 
-// GetLatestUsers retrieves the latest users from the database.
-func GetLatestUsers(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.User, error) {
-	params := database.GetLatestUsersParams{
+// ListRecentUsers retrieves the latest users from the database.
+func ListRecentUsers(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.User, error) {
+	params := database.ListRecentUsersParams{
 		Limit:  limit,
 		Offset: offset,
 	}
 
-	rows, err := db.GetLatestUsers(r.Context(), params)
+	rows, err := db.ListRecentUsers(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to retrieve recent users", "error", err)
 		return nil, errors.New("failed to retrieve recent users")

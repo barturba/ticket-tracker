@@ -73,7 +73,7 @@ func ListRecentCompanies(logger *slog.Logger, db *database.Queries) http.Handler
 			return
 		}
 
-		latestCompanies, err := repository.GetLatestCompanies(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestCompanies, err := repository.ListRecentCompanies(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -93,7 +93,7 @@ func GetCompanyByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		company, err := repository.GetCompanyByID(r, logger, db, id)
+		company, err := repository.GetCompany(r, logger, db, id)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return

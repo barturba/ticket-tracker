@@ -90,19 +90,41 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const getLatestUsers = `-- name: GetLatestUsers :many
+const getUser = `-- name: GetUser :one
+SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE id = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FirstName,
+		&i.LastName,
+		&i.Email,
+		&i.EmailVerified,
+		&i.Name,
+		&i.Image,
+		&i.Role,
+	)
+	return i, err
+}
+
+const listRecentUsers = `-- name: ListRecentUsers :many
 SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
 ORDER BY users.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
-type GetLatestUsersParams struct {
+type ListRecentUsersParams struct {
 	Limit  int32
 	Offset int32
 }
 
-func (q *Queries) GetLatestUsers(ctx context.Context, arg GetLatestUsersParams) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getLatestUsers, arg.Limit, arg.Offset)
+func (q *Queries) ListRecentUsers(ctx context.Context, arg ListRecentUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentUsers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -133,28 +155,6 @@ func (q *Queries) GetLatestUsers(ctx context.Context, arg GetLatestUsersParams) 
 		return nil, err
 	}
 	return items, nil
-}
-
-const getUser = `-- name: GetUser :one
-SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE id = $1
-`
-
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.FirstName,
-		&i.LastName,
-		&i.Email,
-		&i.EmailVerified,
-		&i.Name,
-		&i.Image,
-		&i.Role,
-	)
-	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many

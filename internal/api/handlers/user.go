@@ -73,7 +73,7 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		latestUsers, err := repository.GetLatestUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestUsers, err := repository.ListRecentUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
