@@ -44,7 +44,7 @@ export default function IncidentsTable({
                 title={`Incident #${incident.id}`}
               >
                 <TableCell className="sm:w-auto sm:max-w-none sm:pl-0">
-                  {incident.id}
+                  {incident.id.slice(0, 8)}
                   <dl className="font-normal lg:hidden">
                     <dt className="sr-only">State</dt>
                     <dd className="mt-1 truncate text-gray-700">

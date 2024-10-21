@@ -52,7 +52,7 @@ export default async function Users(props: {
               href={`/dashboard/users/${user.id}/edit`}
               title={`User #${user.id}`}
             >
-              <TableCell>{user.id}</TableCell>
+              <TableCell>{user.id.slice(0, 8)}</TableCell>
               <TableCell className="text-zinc-500">
                 {formatDateToLocal(user.updated_at)}
               </TableCell>
