@@ -13,6 +13,22 @@ import (
 	"github.com/google/uuid"
 )
 
+const countIncidents = `-- name: CountIncidents :one
+SELECT count(*) FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) CountIncidents(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countIncidents, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createIncident = `-- name: CreateIncident :one
 INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, configuration_item_id, company_id)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -56,14 +72,14 @@ func (q *Queries) CreateIncident(ctx context.Context, arg CreateIncidentParams) 
 	return i, err
 }
 
-const deleteIncidentByID = `-- name: DeleteIncidentByID :one
+const deleteIncident = `-- name: DeleteIncident :one
 DELETE FROM incidents 
 WHERE id = $1
 RETURNING id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to
 `
 
-func (q *Queries) DeleteIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
-	row := q.db.QueryRowContext(ctx, deleteIncidentByID, id)
+func (q *Queries) DeleteIncident(ctx context.Context, id uuid.UUID) (Incident, error) {
+	row := q.db.QueryRowContext(ctx, deleteIncident, id)
 	var i Incident
 	err := row.Scan(
 		&i.ID,
@@ -79,35 +95,14 @@ func (q *Queries) DeleteIncidentByID(ctx context.Context, id uuid.UUID) (Inciden
 	return i, err
 }
 
-const getIncidentByID = `-- name: GetIncidentByID :one
-SELECT id, created_at, updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to FROM incidents WHERE id = $1
-`
-
-func (q *Queries) GetIncidentByID(ctx context.Context, id uuid.UUID) (Incident, error) {
-	row := q.db.QueryRowContext(ctx, getIncidentByID, id)
-	var i Incident
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.ShortDescription,
-		&i.Description,
-		&i.ConfigurationItemID,
-		&i.CompanyID,
-		&i.State,
-		&i.AssignedTo,
-	)
-	return i, err
-}
-
-const getIncidentById = `-- name: GetIncidentById :one
+const getIncident = `-- name: GetIncident :one
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE incidents.id = $1
 `
 
-type GetIncidentByIdRow struct {
+type GetIncidentRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
@@ -129,9 +124,9 @@ type GetIncidentByIdRow struct {
 	Role                sql.NullString
 }
 
-func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetIncidentByIdRow, error) {
-	row := q.db.QueryRowContext(ctx, getIncidentById, id)
-	var i GetIncidentByIdRow
+func (q *Queries) GetIncident(ctx context.Context, id uuid.UUID) (GetIncidentRow, error) {
+	row := q.db.QueryRowContext(ctx, getIncident, id)
+	var i GetIncidentRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -156,7 +151,7 @@ func (q *Queries) GetIncidentById(ctx context.Context, id uuid.UUID) (GetInciden
 	return i, err
 }
 
-const getIncidents = `-- name: GetIncidents :many
+const listIncidents = `-- name: ListIncidents :many
 SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -182,7 +177,7 @@ incidents.id ASC
 LIMIT $1 OFFSET $2
 `
 
-type GetIncidentsParams struct {
+type ListIncidentsParams struct {
 	Limit    int32
 	Offset   int32
 	Query    sql.NullString
@@ -190,7 +185,7 @@ type GetIncidentsParams struct {
 	OrderDir string
 }
 
-type GetIncidentsRow struct {
+type ListIncidentsRow struct {
 	Count               int64
 	ID                  uuid.UUID
 	CreatedAt           time.Time
@@ -213,8 +208,8 @@ type GetIncidentsRow struct {
 	Role                sql.NullString
 }
 
-func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]GetIncidentsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidents,
+func (q *Queries) ListIncidents(ctx context.Context, arg ListIncidentsParams) ([]ListIncidentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listIncidents,
 		arg.Limit,
 		arg.Offset,
 		arg.Query,
@@ -225,9 +220,9 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsRow
+	var items []ListIncidentsRow
 	for rows.Next() {
-		var i GetIncidentsRow
+		var i ListIncidentsRow
 		if err := rows.Scan(
 			&i.Count,
 			&i.ID,
@@ -263,23 +258,7 @@ func (q *Queries) GetIncidents(ctx context.Context, arg GetIncidentsParams) ([]G
 	return items, nil
 }
 
-const getIncidentsCount = `-- name: GetIncidentsCount :one
-SELECT count(*) FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE (short_description ILIKE '%' || $1 || '%' or $1 is NULL)
-OR (description ILIKE '%' || $1 || '%' or $1 is NULL)
-OR (incidents.id::text ILIKE '%' || $1 || '%' or $1 is NULL)
-`
-
-func (q *Queries) GetIncidentsCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getIncidentsCount, query)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getIncidentsLatest = `-- name: GetIncidentsLatest :many
+const listRecentIncidents = `-- name: ListRecentIncidents :many
 SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -287,12 +266,12 @@ ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
-type GetIncidentsLatestParams struct {
+type ListRecentIncidentsParams struct {
 	Limit  int32
 	Offset int32
 }
 
-type GetIncidentsLatestRow struct {
+type ListRecentIncidentsRow struct {
 	ID                  uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
@@ -314,15 +293,15 @@ type GetIncidentsLatestRow struct {
 	Role                sql.NullString
 }
 
-func (q *Queries) GetIncidentsLatest(ctx context.Context, arg GetIncidentsLatestParams) ([]GetIncidentsLatestRow, error) {
-	rows, err := q.db.QueryContext(ctx, getIncidentsLatest, arg.Limit, arg.Offset)
+func (q *Queries) ListRecentIncidents(ctx context.Context, arg ListRecentIncidentsParams) ([]ListRecentIncidentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentIncidents, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetIncidentsLatestRow
+	var items []ListRecentIncidentsRow
 	for rows.Next() {
-		var i GetIncidentsLatestRow
+		var i ListRecentIncidentsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
