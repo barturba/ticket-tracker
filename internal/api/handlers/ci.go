@@ -1,5 +1,4 @@
-// Package cihandler provides functions for managing ci resources.
-package cihandler
+package handlers
 
 import (
 	"log/slog"
@@ -8,8 +7,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	"github.com/barturba/ticket-tracker/internal/repository/cirepository"
-	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/internal/repository"
+	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
@@ -19,16 +18,16 @@ import (
 func ListCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
-		input := parseFilters(r, v)
+		input := parseCIFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		cis, metadata, err := cirepository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
+		cis, metadata, err := repository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -42,17 +41,17 @@ func ListAllCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseCIFilters(r, v)
 		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		cis, metadata, err := cirepository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
+		cis, metadata, err := repository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -66,17 +65,17 @@ func ListRecentCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseCIFilters(r, v)
 		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		latestCIs, err := cirepository.GetLatestCIs(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestCIs, err := repository.ListRecentCI(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -85,18 +84,18 @@ func ListRecentCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetCIByID retrieves a single ci by their unique identifier.
-func GetCIByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetCI retrieves a single ci by their unique identifier.
+func GetCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		ci, err := cirepository.GetCIByID(r, logger, db, id)
+		ci, err := repository.GetCI(r, logger, db, id)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -113,7 +112,7 @@ func CreateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -125,13 +124,13 @@ func CreateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateCI(v, ci); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		createdCI, err := cirepository.CreateCI(r, logger, db, *ci)
+		createdCI, err := repository.CreateCI(r, logger, db, *ci)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -145,7 +144,7 @@ func UpdateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
@@ -154,7 +153,7 @@ func UpdateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -166,13 +165,13 @@ func UpdateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateCI(v, ci); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		updatedCI, err := cirepository.UpdateCI(r, logger, db, *ci)
+		updatedCI, err := repository.UpdateCI(r, logger, db, *ci)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -186,12 +185,12 @@ func DeleteCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		if _, err = cirepository.DeleteCI(r, logger, db, id); err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+		if _, err = repository.DeleteCI(r, logger, db, id); err != nil {
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -200,7 +199,7 @@ func DeleteCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func parseFilters(r *http.Request, v *validator.Validator) struct {
+func parseCIFilters(r *http.Request, v *validator.Validator) struct {
 	Query   string
 	Filters models.Filters
 } {

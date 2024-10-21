@@ -1,5 +1,4 @@
-// Package incidenthandler provides functions for managing incident resources.
-package incidenthandler
+package handlers
 
 import (
 	"database/sql"
@@ -9,8 +8,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	"github.com/barturba/ticket-tracker/internal/repository/incidentrepository"
-	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/internal/repository"
+	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
@@ -20,16 +19,16 @@ import (
 func ListIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
-		input := parseFilters(r, v)
+		input := parseIncidentFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		incidents, metadata, err := incidentrepository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
+		incidents, metadata, err := repository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -43,17 +42,17 @@ func ListAllIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseUserFilters(r, v)
 		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		incidents, metadata, err := incidentrepository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
+		incidents, metadata, err := repository.ListIncidents(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -67,17 +66,17 @@ func ListRecentIncidents(logger *slog.Logger, db *database.Queries) http.Handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseUserFilters(r, v)
 		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		latestIncidents, err := incidentrepository.GetLatestIncidents(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestIncidents, err := repository.GetLatestIncidents(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -91,13 +90,13 @@ func GetIncidentByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		incident, err := incidentrepository.GetIncidentByID(r, logger, db, id)
+		incident, err := repository.GetIncidentByID(r, logger, db, id)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -119,7 +118,7 @@ func CreateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -137,13 +136,13 @@ func CreateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateIncident(v, incident); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		createdIncident, err := incidentrepository.CreateIncident(r, logger, db, *incident)
+		createdIncident, err := repository.CreateIncident(r, logger, db, *incident)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -157,7 +156,7 @@ func UpdateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
@@ -171,7 +170,7 @@ func UpdateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -188,13 +187,13 @@ func UpdateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateIncident(v, incident); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		updatedIncident, err := incidentrepository.UpdateIncident(r, logger, db, *incident)
+		updatedIncident, err := repository.UpdateIncident(r, logger, db, *incident)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -208,12 +207,12 @@ func DeleteIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		if _, err = incidentrepository.DeleteIncident(r, logger, db, id); err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+		if _, err = repository.DeleteIncident(r, logger, db, id); err != nil {
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -222,7 +221,7 @@ func DeleteIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func parseFilters(r *http.Request, v *validator.Validator) struct {
+func parseIncidentFilters(r *http.Request, v *validator.Validator) struct {
 	Query   string
 	Filters models.Filters
 } {
