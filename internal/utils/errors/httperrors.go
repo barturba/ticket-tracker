@@ -1,5 +1,5 @@
 // Package errutil provides utility functions for handling and responding to errors in HTTP handlers.
-package httperrors
+package errors
 
 import (
 	"log/slog"

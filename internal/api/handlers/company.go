@@ -1,5 +1,4 @@
-// Package companyhandler provides functions for managing company resources.
-package companyhandler
+package handlers
 
 import (
 	"log/slog"
@@ -8,8 +7,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	"github.com/barturba/ticket-tracker/internal/repository/companyrepository"
-	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/internal/repository"
+	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
@@ -19,16 +18,16 @@ import (
 func ListCompanies(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
-		input := parseFilters(r, v)
+		input := parseCompanyFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		companies, metadata, err := companyrepository.ListCompanies(logger, db, r.Context(), input.Query, input.Filters)
+		companies, metadata, err := repository.ListCompanies(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -42,17 +41,17 @@ func ListAllCompanies(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseCompanyFilters(r, v)
 		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		companies, metadata, err := companyrepository.ListCompanies(logger, db, r.Context(), input.Query, input.Filters)
+		companies, metadata, err := repository.ListCompanies(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -66,17 +65,17 @@ func ListRecentCompanies(logger *slog.Logger, db *database.Queries) http.Handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseCompanyFilters(r, v)
 		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		latestCompanies, err := companyrepository.GetLatestCompanies(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestCompanies, err := repository.GetLatestCompanies(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -90,13 +89,13 @@ func GetCompanyByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		company, err := companyrepository.GetCompanyByID(r, logger, db, id)
+		company, err := repository.GetCompanyByID(r, logger, db, id)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -113,7 +112,7 @@ func CreateCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -126,13 +125,13 @@ func CreateCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateCompany(v, company); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		createdCompany, err := companyrepository.CreateCompany(r, logger, db, *company)
+		createdCompany, err := repository.CreateCompany(r, logger, db, *company)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -146,7 +145,7 @@ func UpdateCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
@@ -155,7 +154,7 @@ func UpdateCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -167,13 +166,13 @@ func UpdateCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateCompany(v, company); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		updatedCompany, err := companyrepository.UpdateCompany(r, logger, db, *company)
+		updatedCompany, err := repository.UpdateCompany(r, logger, db, *company)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -187,12 +186,12 @@ func DeleteCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		if _, err = companyrepository.DeleteCompany(r, logger, db, id); err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+		if _, err = repository.DeleteCompany(r, logger, db, id); err != nil {
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -201,7 +200,7 @@ func DeleteCompany(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func parseFilters(r *http.Request, v *validator.Validator) struct {
+func parseCompanyFilters(r *http.Request, v *validator.Validator) struct {
 	Query   string
 	Filters models.Filters
 } {

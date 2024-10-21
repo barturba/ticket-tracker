@@ -99,6 +99,13 @@ type Incident struct {
 	AssignedTo          uuid.NullUUID
 }
 
+type Permission struct {
+	ID        uuid.UUID
+	Code      string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
 type Session struct {
 	ID           uuid.UUID
 	UserId       uuid.UUID
@@ -117,6 +124,11 @@ type User struct {
 	Name          sql.NullString
 	Image         sql.NullString
 	Role          string
+}
+
+type UsersPermission struct {
+	UserID       uuid.UUID
+	PermissionID uuid.UUID
 }
 
 type VerificationToken struct {

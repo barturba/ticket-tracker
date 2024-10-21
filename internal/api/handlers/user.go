@@ -1,5 +1,4 @@
-// Package userhandler provides functions for managing user resources.
-package userhandler
+package handlers
 
 import (
 	"log/slog"
@@ -8,8 +7,8 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	"github.com/barturba/ticket-tracker/internal/repository/userrepository"
-	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
+	"github.com/barturba/ticket-tracker/internal/repository"
+	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
@@ -19,16 +18,16 @@ import (
 func ListUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
-		input := parseFilters(r, v)
+		input := parseUserFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		users, metadata, err := userrepository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
+		users, metadata, err := repository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -42,17 +41,17 @@ func ListAllUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseUserFilters(r, v)
 		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		users, metadata, err := userrepository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
+		users, metadata, err := repository.ListUsers(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -66,17 +65,17 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		v := validator.New()
 
-		input := parseFilters(r, v)
+		input := parseUserFilters(r, v)
 		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		latestUsers, err := userrepository.GetLatestUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestUsers, err := repository.GetLatestUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -85,18 +84,18 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetUserByID retrieves a single user by their unique identifier.
-func GetUserByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetUser retrieves a single user by their unique identifier.
+func GetUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		user, err := userrepository.GetUserByID(r, logger, db, id)
+		user, err := repository.GetUser(r, logger, db, id)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -115,7 +114,7 @@ func CreateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -129,13 +128,13 @@ func CreateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateUser(v, user); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		createdUser, err := userrepository.CreateUser(r, logger, db, *user)
+		createdUser, err := repository.CreateUser(r, logger, db, *user)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -149,7 +148,7 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
@@ -160,7 +159,7 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		if err := json.ReadJSON(w, r, &input); err != nil {
-			httperrors.BadRequestResponse(w, r, logger, err)
+			errors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
@@ -174,13 +173,13 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateUser(v, user); !v.Valid() {
-			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
+			errors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		updatedUser, err := userrepository.UpdateUser(r, logger, db, *user)
+		updatedUser, err := repository.UpdateUser(r, logger, db, *user)
 		if err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -194,12 +193,12 @@ func DeleteUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
-			httperrors.NotFoundResponse(w, r, logger)
+			errors.NotFoundResponse(w, r, logger)
 			return
 		}
 
-		if _, err = userrepository.DeleteUser(r, logger, db, id); err != nil {
-			httperrors.ServerErrorResponse(w, r, logger, err)
+		if _, err = repository.DeleteUser(r, logger, db, id); err != nil {
+			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
@@ -208,7 +207,7 @@ func DeleteUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-func parseFilters(r *http.Request, v *validator.Validator) struct {
+func parseUserFilters(r *http.Request, v *validator.Validator) struct {
 	Query   string
 	Filters models.Filters
 } {
