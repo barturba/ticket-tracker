@@ -16,7 +16,7 @@ import (
 
 // ListUsers retrieves users from the database based on the provided query and filters.
 func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, query string, filters models.Filters) ([]models.User, models.Metadata, error) {
-	params := database.GetUsersParams{
+	params := database.ListUsersParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
 		Offset:   int32(filters.Offset()),
@@ -24,7 +24,7 @@ func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, q
 		OrderDir: filters.SortDirection(),
 	}
 
-	rows, err := db.GetUsers(ctx, params)
+	rows, err := db.ListUsers(ctx, params)
 	if err != nil {
 		logger.Error("failed to retrieve users", "error", err)
 		return nil, models.Metadata{}, errors.New("failed to retrieve users")
@@ -40,7 +40,7 @@ func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, q
 
 // CountUsers retrieves the count of users from the database based on the provided query.
 func CountUsers(r *http.Request, logger *slog.Logger, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetUsersCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	count, err := db.CountUsers(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		logger.Error("failed to count users", "error", err)
 		return 0, errors.New("failed to count users")
@@ -50,12 +50,12 @@ func CountUsers(r *http.Request, logger *slog.Logger, db *database.Queries, quer
 
 // GetLatestUsers retrieves the latest users from the database.
 func GetLatestUsers(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.User, error) {
-	params := database.GetUsersLatestParams{
+	params := database.GetLatestUsersParams{
 		Limit:  limit,
 		Offset: offset,
 	}
 
-	rows, err := db.GetUsersLatest(r.Context(), params)
+	rows, err := db.GetLatestUsers(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to retrieve recent users", "error", err)
 		return nil, errors.New("failed to retrieve recent users")
@@ -116,7 +116,7 @@ func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 
 // DeleteUser deletes a user from the database based on the provided user ID.
 func DeleteUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
-	record, err := db.DeleteUserByID(r.Context(), id)
+	record, err := db.DeleteUser(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to delete user", "error", err, "id", id)
 		return models.User{}, errors.New("failed to delete user")
@@ -147,7 +147,7 @@ func convertManyUsers(dbUsers []database.User) []models.User {
 }
 
 // convertUsersAndMetadata converts a slice of database User records and filters into a slice of models.User and models.Metadata.
-func convertUsersAndMetadata(rows []database.GetUsersRow, filters models.Filters) ([]models.User, models.Metadata, error) {
+func convertUsersAndMetadata(rows []database.ListUsersRow, filters models.Filters) ([]models.User, models.Metadata, error) {
 	if len(rows) == 0 {
 		return nil, models.Metadata{}, nil
 	}
@@ -158,7 +158,7 @@ func convertUsersAndMetadata(rows []database.GetUsersRow, filters models.Filters
 		return nil, models.Metadata{}, fmt.Errorf("failed to convert total records count: %w", err)
 	}
 
-	users := convertManyGetUsersRowToUsers(rows)
+	users := convertManyListUsersRowToUsers(rows)
 	metadata, err := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
 	if err != nil {
 		return nil, models.Metadata{}, fmt.Errorf("failed to calculate metadata: %w", err)
@@ -167,8 +167,8 @@ func convertUsersAndMetadata(rows []database.GetUsersRow, filters models.Filters
 	return users, metadata, nil
 }
 
-// convertGetUsersRowToUser converts a database row of type GetUsersRow to a User model.
-func convertGetUsersRowToUser(row database.GetUsersRow) models.User {
+// convertListUsersRowToUser converts a database row of type ListUsersRow to a User model.
+func convertListUsersRowToUser(row database.ListUsersRow) models.User {
 	return models.User{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
@@ -180,11 +180,11 @@ func convertGetUsersRowToUser(row database.GetUsersRow) models.User {
 	}
 }
 
-// convertManyGetUsersRowToUsers converts a database.GetUsersRow to an array of models.User.
-func convertManyGetUsersRowToUsers(rows []database.GetUsersRow) []models.User {
+// convertManyListUsersRowToUsers converts a database.ListUsersRow to an array of models.User.
+func convertManyListUsersRowToUsers(rows []database.ListUsersRow) []models.User {
 	users := make([]models.User, len(rows))
 	for i, row := range rows {
-		users[i] = convertGetUsersRowToUser(row)
+		users[i] = convertListUsersRowToUser(row)
 	}
 	return users
 }

@@ -1,137 +1,92 @@
-// Package cis provides HTTP handlers for managing Configuration Items (CIs).
-package cihandlers
+// Package cihandler provides functions for managing ci resources.
+package cihandler
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
 	"github.com/barturba/ticket-tracker/internal/models"
-	cirepository "github.com/barturba/ticket-tracker/internal/repository/cis"
+	"github.com/barturba/ticket-tracker/internal/repository/cirepository"
 	"github.com/barturba/ticket-tracker/internal/utils/httperrors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
 	"github.com/google/uuid"
 )
 
-// Get handles GET requests to retrieve a list of CIs based on query parameters and filters.
-func Get(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListCIs retrieves a list of cis with optional filtering, sorting, and pagination.
+func ListCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
-
-		var qs = r.URL.Query()
-
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"name", "-name"}
+		input := parseFilters(r, v)
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		cis, metadata, err := cirepository.GetFromDB(r, db, input.Query, input.Filters)
+		cis, metadata, err := cirepository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/cis")
+
+		logger.Info("handled GET /v1/cis")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"cis": cis, "metadata": metadata})
 	})
 }
 
-// GetAll handles GET requests to retrieve all CIs with a large page size limit.
-func GetAll(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListAllCIs retrieves all cis with optional filtering, sorting, and pagination.
+func ListAllCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Query  string
-			Limit  int32
-			Offset int32
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
-
-		input.Query = models.ReadString(qs, "query", "")
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 10_000_000, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id", "-id",
-			"created_at", "-created_at",
-			"updated_at", "-updated_at",
-			"name", "-name"}
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 10_000_000
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		cis, metadata, err := cirepository.GetFromDB(r, db, input.Query, input.Filters)
+		cis, metadata, err := cirepository.ListCIs(logger, db, r.Context(), input.Query, input.Filters)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/cis")
+
+		logger.Info("handled GET /v1/cis_all")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"cis": cis, "metadata": metadata})
 	})
 }
 
-// GetLatest handles GET requests to retrieve the latest CIs based on pagination and sorting.
-func GetLatest(logger *slog.Logger, db *database.Queries) http.Handler {
+// ListRecentCIs retrieves the latest cis.
+func ListRecentCIs(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var input struct {
-			Limit  int
-			Offset int
-			models.Filters
-		}
-
 		v := validator.New()
 
-		var qs = r.URL.Query()
-
-		input.Filters.Page = models.ReadInt(qs, "page", 1, v)
-		input.Filters.PageSize = models.ReadInt(qs, "page_size", 20, v)
-
-		input.Filters.Sort = models.ReadString(qs, "sort", "id")
-		input.Filters.SortSafelist = []string{"id"}
+		input := parseFilters(r, v)
+		input.Filters.PageSize = 20
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
 
-		i, err := cirepository.GetLatestFromDB(r, db, input.Filters.Limit(), input.Filters.Offset())
+		latestCIs, err := cirepository.GetLatestCIs(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", "GET /v1/cis_latest")
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/cis_latest")
+		json.RespondWithJSON(w, http.StatusOK, latestCIs)
 	})
 }
 
-// GetByID handles GET requests to retrieve a specific CI by its UUID.
-func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetCIByID retrieves a single ci by their unique identifier.
+func GetCIByID(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -139,53 +94,54 @@ func GetByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		i, err := cirepository.GetByIDFromDB(r, db, id)
+		ci, err := cirepository.GetCIByID(r, logger, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
-		logger.Info("msg", "handle", fmt.Sprintf("GET /v1/cis/%s", id))
-		json.RespondWithJSON(w, http.StatusOK, i)
+
+		logger.Info("handled GET /v1/cis/{id}", "id", id)
+		json.RespondWithJSON(w, http.StatusOK, ci)
 	})
 }
 
-// Post handles POST requests to create a new CI.
-func Post(logger *slog.Logger, db *database.Queries) http.Handler {
+// CreateCI creates a new ci.
+func CreateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			Name string `json:"Name"`
+			Name string `json:"name"`
 		}
 
-		err := json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
 
 		ci := &models.CI{
-			ID:   uuid.New(),
-			Name: input.Name,
+			ID:        uuid.New(),
+			UpdatedAt: time.Now(),
+			Name:      input.Name,
 		}
 
 		v := validator.New()
-
 		if models.ValidateCI(v, ci); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := cirepository.PostToDB(r, db, *ci)
+
+		createdCI, err := cirepository.CreateCI(r, logger, db, *ci)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "POST /v1/ci")
-		json.RespondWithJSON(w, http.StatusCreated, i)
+		logger.Info("handled POST /v1/cis")
+		json.RespondWithJSON(w, http.StatusCreated, createdCI)
 	})
 }
 
-// Put handles PUT requests to update an existing CI by its UUID.
-func Put(logger *slog.Logger, db *database.Queries) http.Handler {
+// UpdateCI updates an existing ci by their unique identifier.
+func UpdateCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -197,8 +153,7 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 			Name string `json:"name"`
 		}
 
-		err = json.ReadJSON(w, r, &input)
-		if err != nil {
+		if err := json.ReadJSON(w, r, &input); err != nil {
 			httperrors.BadRequestResponse(w, r, logger, err)
 			return
 		}
@@ -210,24 +165,24 @@ func Put(logger *slog.Logger, db *database.Queries) http.Handler {
 		}
 
 		v := validator.New()
-
 		if models.ValidateCI(v, ci); !v.Valid() {
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
-		i, err := cirepository.PutToDB(r, db, *ci)
+
+		updatedCI, err := cirepository.UpdateCI(r, logger, db, *ci)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "PUT /v1/cis", "id", id)
-		json.RespondWithJSON(w, http.StatusOK, i)
+		logger.Info("handled PUT /v1/ci/{id}")
+		json.RespondWithJSON(w, http.StatusOK, updatedCI)
 	})
 }
 
-// Delete handles DELETE requests to remove a CI by its UUID.
-func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
+// DeleteCI deletes an existing ci by their unique identifier.
+func DeleteCI(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -235,13 +190,36 @@ func Delete(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		_, err = cirepository.DeleteFromDB(r, db, id)
-		if err != nil {
+		if _, err = cirepository.DeleteCI(r, logger, db, id); err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return
 		}
 
-		logger.Info("msg", "handle", "DELETE /v1/cis", "id", id)
+		logger.Info("handled DELETE /v1/cis/{id}", "id", id)
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"message": "ci successfully deleted"})
 	})
+}
+
+func parseFilters(r *http.Request, v *validator.Validator) struct {
+	Query   string
+	Filters models.Filters
+} {
+	qs := r.URL.Query()
+	return struct {
+		Query   string
+		Filters models.Filters
+	}{
+		Query: models.ReadString(qs, "query", ""),
+		Filters: models.Filters{
+			Page:     models.ReadInt(qs, "page", 1, v),
+			PageSize: models.ReadInt(qs, "page_size", 10, v),
+			Sort:     models.ReadString(qs, "sort", "id"),
+			SortSafelist: []string{
+				"id", "-id",
+				"created_at", "-created_at",
+				"updated_at", "-updated_at",
+				"-name", "name",
+			},
+		},
+	}
 }

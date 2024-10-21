@@ -18,6 +18,10 @@ CASE WHEN (@order_by::varchar = 'name' AND @order_dir::varchar = 'DESC') THEN na
 id ASC 
 LIMIT $1 OFFSET $2;
 
+-- name: GetCIsCount :one
+SELECT count(*) FROM configuration_items 
+WHERE (name ILIKE '%' || @query || '%' or @query is NULL);
+
 -- name: GetCIsLatest :many
 SELECT * FROM configuration_items 
 ORDER BY configuration_items.updated_at DESC

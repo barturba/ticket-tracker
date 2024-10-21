@@ -3,7 +3,7 @@ INSERT INTO USERS (id, created_at, updated_at, first_name, last_name, email)
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 
--- name: GetUsers :many
+-- name: ListUsers :many
 SELECT count(*) OVER(), * FROM users 
 WHERE (email ILIKE '%' || @query || '%' or @query is NULL)
 OR (first_name ILIKE '%' || @query || '%' or @query is NULL)
@@ -22,17 +22,17 @@ CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') T
 id ASC 
 LIMIT $1 OFFSET $2;
 
--- name: GetUsersCount :one
+-- name: CountUsers :one
 SELECT count(*) FROM users 
 WHERE (first_name ILIKE '%' || @query || '%' or @query is NULL)
 OR (last_name ILIKE '%' || @query || '%' or @query is NULL);
 
--- name: GetUsersLatest :many
+-- name: GetLatestUsers :many
 SELECT * FROM users 
 ORDER BY users.updated_at DESC
 LIMIT $1 OFFSET $2;
 
--- name: GetUsersByCompany :many
+-- name: GetUserByCompany :many
 SELECT * FROM users 
 LEFT JOIN companies 
 ON users.assigned_to = users.id
@@ -54,7 +54,7 @@ email = $5
 WHERE ID = $1
 RETURNING *;
 
--- name: DeleteUserByID :one
+-- name: DeleteUser :one
 DELETE FROM users 
 WHERE id = $1
 RETURNING *;

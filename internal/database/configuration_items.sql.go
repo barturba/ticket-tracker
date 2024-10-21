@@ -145,6 +145,18 @@ func (q *Queries) GetCIsByID(ctx context.Context, id uuid.UUID) (ConfigurationIt
 	return i, err
 }
 
+const getCIsCount = `-- name: GetCIsCount :one
+SELECT count(*) FROM configuration_items 
+WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) GetCIsCount(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCIsCount, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getCIsLatest = `-- name: GetCIsLatest :many
 SELECT id, created_at, updated_at, name FROM configuration_items 
 ORDER BY configuration_items.updated_at DESC

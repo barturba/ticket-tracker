@@ -13,6 +13,19 @@ import (
 	"github.com/google/uuid"
 )
 
+const countUsers = `-- name: CountUsers :one
+SELECT count(*) FROM users 
+WHERE (first_name ILIKE '%' || $1 || '%' or $1 is NULL)
+OR (last_name ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) CountUsers(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countUsers, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO USERS (id, created_at, updated_at, first_name, last_name, email)
 VALUES ($1, $2, $3, $4, $5, $6)
@@ -53,14 +66,14 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const deleteUserByID = `-- name: DeleteUserByID :one
+const deleteUser = `-- name: DeleteUser :one
 DELETE FROM users 
 WHERE id = $1
 RETURNING id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
 `
 
-func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, deleteUserByID, id)
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, deleteUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -75,6 +88,113 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) (User, error
 		&i.Role,
 	)
 	return i, err
+}
+
+const getLatestUsers = `-- name: GetLatestUsers :many
+SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
+ORDER BY users.updated_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetLatestUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetLatestUsers(ctx context.Context, arg GetLatestUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getLatestUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.FirstName,
+			&i.LastName,
+			&i.Email,
+			&i.EmailVerified,
+			&i.Name,
+			&i.Image,
+			&i.Role,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserByCompany = `-- name: GetUserByCompany :many
+SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", users.name, image, role, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
+LEFT JOIN companies 
+ON users.assigned_to = users.id
+ORDER BY users.name ASC
+`
+
+type GetUserByCompanyRow struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	FirstName     sql.NullString
+	LastName      sql.NullString
+	Email         string
+	EmailVerified sql.NullTime
+	Name          sql.NullString
+	Image         sql.NullString
+	Role          string
+	ID_2          uuid.NullUUID
+	CreatedAt_2   sql.NullTime
+	UpdatedAt_2   sql.NullTime
+	Name_2        sql.NullString
+}
+
+func (q *Queries) GetUserByCompany(ctx context.Context) ([]GetUserByCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserByCompany)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserByCompanyRow
+	for rows.Next() {
+		var i GetUserByCompanyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.FirstName,
+			&i.LastName,
+			&i.Email,
+			&i.EmailVerified,
+			&i.Name,
+			&i.Image,
+			&i.Role,
+			&i.ID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.Name_2,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
@@ -121,7 +241,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const getUsers = `-- name: GetUsers :many
+const listUsers = `-- name: ListUsers :many
 SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
 WHERE (email ILIKE '%' || $3 || '%' or $3 is NULL)
 OR (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -141,7 +261,7 @@ id ASC
 LIMIT $1 OFFSET $2
 `
 
-type GetUsersParams struct {
+type ListUsersParams struct {
 	Limit    int32
 	Offset   int32
 	Query    sql.NullString
@@ -149,7 +269,7 @@ type GetUsersParams struct {
 	OrderDir string
 }
 
-type GetUsersRow struct {
+type ListUsersRow struct {
 	Count         int64
 	ID            uuid.UUID
 	CreatedAt     time.Time
@@ -163,8 +283,8 @@ type GetUsersRow struct {
 	Role          string
 }
 
-func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersRow, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers,
+func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
+	rows, err := q.db.QueryContext(ctx, listUsers,
 		arg.Limit,
 		arg.Offset,
 		arg.Query,
@@ -175,131 +295,11 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]GetUsersR
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetUsersRow
+	var items []ListUsersRow
 	for rows.Next() {
-		var i GetUsersRow
+		var i ListUsersRow
 		if err := rows.Scan(
 			&i.Count,
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.FirstName,
-			&i.LastName,
-			&i.Email,
-			&i.EmailVerified,
-			&i.Name,
-			&i.Image,
-			&i.Role,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getUsersByCompany = `-- name: GetUsersByCompany :many
-SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", users.name, image, role, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
-LEFT JOIN companies 
-ON users.assigned_to = users.id
-ORDER BY users.name ASC
-`
-
-type GetUsersByCompanyRow struct {
-	ID            uuid.UUID
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	FirstName     sql.NullString
-	LastName      sql.NullString
-	Email         string
-	EmailVerified sql.NullTime
-	Name          sql.NullString
-	Image         sql.NullString
-	Role          string
-	ID_2          uuid.NullUUID
-	CreatedAt_2   sql.NullTime
-	UpdatedAt_2   sql.NullTime
-	Name_2        sql.NullString
-}
-
-func (q *Queries) GetUsersByCompany(ctx context.Context) ([]GetUsersByCompanyRow, error) {
-	rows, err := q.db.QueryContext(ctx, getUsersByCompany)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetUsersByCompanyRow
-	for rows.Next() {
-		var i GetUsersByCompanyRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.FirstName,
-			&i.LastName,
-			&i.Email,
-			&i.EmailVerified,
-			&i.Name,
-			&i.Image,
-			&i.Role,
-			&i.ID_2,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.Name_2,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getUsersCount = `-- name: GetUsersCount :one
-SELECT count(*) FROM users 
-WHERE (first_name ILIKE '%' || $1 || '%' or $1 is NULL)
-OR (last_name ILIKE '%' || $1 || '%' or $1 is NULL)
-`
-
-func (q *Queries) GetUsersCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getUsersCount, query)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getUsersLatest = `-- name: GetUsersLatest :many
-SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
-ORDER BY users.updated_at DESC
-LIMIT $1 OFFSET $2
-`
-
-type GetUsersLatestParams struct {
-	Limit  int32
-	Offset int32
-}
-
-func (q *Queries) GetUsersLatest(ctx context.Context, arg GetUsersLatestParams) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUsersLatest, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []User
-	for rows.Next() {
-		var i User
-		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
