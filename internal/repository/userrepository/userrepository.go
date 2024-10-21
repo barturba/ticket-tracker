@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -29,7 +30,7 @@ func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, q
 		return nil, models.Metadata{}, errors.New("failed to retrieve users")
 	}
 
-	users, metadata, err := convertRowsAndMetadata(rows, filters)
+	users, metadata, err := convertUsersAndMetadata(rows, filters)
 	if err != nil {
 		return nil, models.Metadata{}, err
 	}
@@ -145,36 +146,66 @@ func convertManyUsers(dbUsers []database.User) []models.User {
 	return users
 }
 
-// convertRowsAndMetadata converts a slice of database.GetUsersRow to a slice of models.User
-// and calculates the metadata based on the provided filters.
-func convertRowsAndMetadata(rows []database.GetUsersRow, filters models.Filters) ([]models.User, models.Metadata, error) {
-	var output []models.User
-	var totalRecords int64 = 0
-	for _, row := range rows {
-		outputRow := convertRowAndCount(row, &totalRecords)
-		output = append(output, outputRow)
+// convertUsersAndMetadata converts a slice of database User records and filters into a slice of models.User and models.Metadata.
+func convertUsersAndMetadata(rows []database.GetUsersRow, filters models.Filters) ([]models.User, models.Metadata, error) {
+	if len(rows) == 0 {
+		return nil, models.Metadata{}, nil
 	}
 
 	// Prevent conversion exploits
-	v32, err := models.ConvertInt64to32(totalRecords)
+	totalRecords, err := models.ConvertInt64to32(rows[0].Count)
 	if err != nil {
-		return nil, models.Metadata{}, err
+		return nil, models.Metadata{}, fmt.Errorf("failed to convert total records count: %w", err)
 	}
 
-	metadata := models.CalculateMetadata(v32, filters.Page, filters.PageSize)
-	return output, metadata, nil
+	users := convertManyGetUsersRowToUsers(rows)
+	metadata, err := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
+	if err != nil {
+		return nil, models.Metadata{}, fmt.Errorf("failed to calculate metadata: %w", err)
+	}
+
+	return users, metadata, nil
 }
 
-// convertRowAndCount converts a database.GetUsersRow to a models.User and updates the count.
-func convertRowAndCount(row database.GetUsersRow, count *int64) models.User {
-	outputRow := models.User{
+// convertGetUsersRowToUser converts a database row of type GetUsersRow to a User model.
+func convertGetUsersRowToUser(row database.GetUsersRow) models.User {
+	return models.User{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 		FirstName: row.FirstName.String,
 		LastName:  row.LastName.String,
+		Email:     row.Email,
+		Role:      row.Role,
 	}
-	*count = row.Count
+}
 
-	return outputRow
+// convertManyGetUsersRowToUsers converts a database.GetUsersRow to an array of models.User.
+func convertManyGetUsersRowToUsers(rows []database.GetUsersRow) []models.User {
+	users := make([]models.User, len(rows))
+	for i, row := range rows {
+		users[i] = convertGetUsersRowToUser(row)
+	}
+	return users
+}
+
+// calculateMetadata creates a models.Metadata struct based on the total
+// records, current page, and page size.
+func calculateMetadata(totalRecords, page, pageSize int32) (models.Metadata, error) {
+	if totalRecords < 0 || page < 1 || pageSize < 1 {
+		return models.Metadata{}, fmt.Errorf("invalid metadata parameters")
+	}
+
+	lastPage, err := models.SafeDivide(totalRecords, pageSize)
+	if err != nil {
+		return models.Metadata{}, fmt.Errorf("failed to calculate the last page: %w", err)
+	}
+
+	return models.Metadata{
+		CurrentPage:  page,
+		PageSize:     pageSize,
+		FirstPage:    1,
+		LastPage:     lastPage,
+		TotalRecords: totalRecords,
+	}, nil
 }

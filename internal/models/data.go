@@ -1,7 +1,7 @@
 package models
 
 import (
-	"errors"
+	"fmt"
 	"math"
 )
 
@@ -44,15 +44,20 @@ func CalculateMetadata(totalRecords, page, pageSize int32) Metadata {
 }
 
 // ConvertInt64to32 converts an int64 value to an int32 value.
-// If the input value is negative, it returns 0.
-// If the input value exceeds the maximum value of int32, it returns math.MaxInt32.
-// Otherwise, it returns the input value cast to int32.
-func ConvertInt64to32(x int64) (int32, error) {
-	if x < 0 {
-		return 0, errors.New("negative value")
+func ConvertInt64to32(value int64) (int32, error) {
+	if value < math.MinInt32 || value > math.MaxInt32 {
+		return 0, fmt.Errorf("value %d is out of int32 range", value)
 	}
-	if x > math.MaxInt32 {
-		return math.MaxInt32, errors.New("overload value")
+	return int32(value), nil
+}
+
+// SafeDivide performs safe division of two int32 values.
+func SafeDivide(dividend, divisor int32) (int32, error) {
+	if divisor == 0 {
+		return 0, fmt.Errorf("division by zero")
 	}
-	return int32(x), nil
+	if dividend == math.MinInt32 && divisor == -1 {
+		return 0, fmt.Errorf("integer overflow")
+	}
+	return dividend / divisor, nil
 }
