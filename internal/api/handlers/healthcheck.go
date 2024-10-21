@@ -12,7 +12,7 @@ import (
 // application status.
 func GetHealthcheck(logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("msg", "handle", "GET /v1/incidents")
+		logger.Info("msg", "handle", "GET /v1/healthcheck")
 		json.RespondWithJSON(w, http.StatusOK, models.Envelope{"status": "available"})
 	})
 }
