@@ -30,7 +30,7 @@ RETURNING *;
 -- name: GetUser :one
 SELECT * FROM USERS WHERE id = $1;
 
--- name: GetLatestUsers :many
+-- name: ListRecentUsers :many
 SELECT * FROM users 
 ORDER BY users.updated_at DESC
 LIMIT $1 OFFSET $2;

@@ -16,7 +16,7 @@ import (
 
 // ListCompanies retrieves companies from the database based on the provided query and filters.
 func ListCompanies(logger *slog.Logger, db *database.Queries, ctx context.Context, query string, filters models.Filters) ([]models.Company, models.Metadata, error) {
-	params := database.GetCompaniesParams{
+	params := database.ListCompaniesParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
 		Offset:   int32(filters.Offset()),
@@ -24,7 +24,7 @@ func ListCompanies(logger *slog.Logger, db *database.Queries, ctx context.Contex
 		OrderDir: filters.SortDirection(),
 	}
 
-	rows, err := db.GetCompanies(ctx, params)
+	rows, err := db.ListCompanies(ctx, params)
 	if err != nil {
 		logger.Error("failed to retrieve companies", "error", err)
 		return nil, models.Metadata{}, errors.New("failed to retrieve companies")
@@ -40,7 +40,7 @@ func ListCompanies(logger *slog.Logger, db *database.Queries, ctx context.Contex
 
 // CountCompanies retrieves the count of companies from the database based on the provided query.
 func CountCompanies(r *http.Request, logger *slog.Logger, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetCompaniesCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	count, err := db.CountCompanies(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		logger.Error("failed to count companies", "error", err)
 		return 0, errors.New("failed to count companies")
@@ -48,14 +48,14 @@ func CountCompanies(r *http.Request, logger *slog.Logger, db *database.Queries, 
 	return count, nil
 }
 
-// GetLatestCompanies retrieves the latest companies from the database.
-func GetLatestCompanies(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.Company, error) {
-	params := database.GetCompaniesLatestParams{
+// ListRecentCompanies retrieves the latest companies from the database.
+func ListRecentCompanies(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.Company, error) {
+	params := database.ListRecentCompaniesParams{
 		Limit:  limit,
 		Offset: offset,
 	}
 
-	rows, err := db.GetCompaniesLatest(r.Context(), params)
+	rows, err := db.ListRecentCompanies(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to retrieve recent companies", "error", err)
 		return nil, errors.New("failed to retrieve recent companies")
@@ -64,9 +64,9 @@ func GetLatestCompanies(r *http.Request, logger *slog.Logger, db *database.Queri
 	return convertManyCompanies(rows), nil
 }
 
-// GetCompanyByID retrieves a company from the database based on the provided company ID.
-func GetCompanyByID(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Company, error) {
-	record, err := db.GetCompanyByID(r.Context(), id)
+// GetCompany retrieves a company from the database based on the provided company ID.
+func GetCompany(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Company, error) {
+	record, err := db.GetCompany(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to retrieve company", "error", err, "company", id)
 		return models.Company{}, errors.New("failed to retrieve company")
@@ -112,7 +112,7 @@ func UpdateCompany(r *http.Request, logger *slog.Logger, db *database.Queries, c
 
 // DeleteCompany deletes a company from the database based on the provided company ID.
 func DeleteCompany(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Company, error) {
-	record, err := db.DeleteCompanyByID(r.Context(), id)
+	record, err := db.DeleteCompany(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to delete company", "error", err, "id", id)
 		return models.Company{}, errors.New("failed to delete company")
@@ -141,7 +141,7 @@ func convertManyCompanies(dbCompanies []database.Company) []models.Company {
 }
 
 // convertCompaniesAndMetadata converts a slice of database Company records and filters into a slice of models.Company and models.Metadata.
-func convertCompaniesAndMetadata(rows []database.GetCompaniesRow, filters models.Filters) ([]models.Company, models.Metadata, error) {
+func convertCompaniesAndMetadata(rows []database.ListCompaniesRow, filters models.Filters) ([]models.Company, models.Metadata, error) {
 	if len(rows) == 0 {
 		return nil, models.Metadata{}, nil
 	}
@@ -162,7 +162,7 @@ func convertCompaniesAndMetadata(rows []database.GetCompaniesRow, filters models
 }
 
 // convertGetCompaniesRowToCompany converts a database row of type GetCompaniesRow to a Company model.
-func convertGetCompaniesRowToCompany(row database.GetCompaniesRow) models.Company {
+func convertGetCompaniesRowToCompany(row database.ListCompaniesRow) models.Company {
 	return models.Company{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
@@ -172,7 +172,7 @@ func convertGetCompaniesRowToCompany(row database.GetCompaniesRow) models.Compan
 }
 
 // convertManyGetCompaniesRowToCompanies converts a database.GetCompaniesRow to an array of models.Company.
-func convertManyGetCompaniesRowToCompanies(rows []database.GetCompaniesRow) []models.Company {
+func convertManyGetCompaniesRowToCompanies(rows []database.ListCompaniesRow) []models.Company {
 	companies := make([]models.Company, len(rows))
 	for i, row := range rows {
 		companies[i] = convertGetCompaniesRowToCompany(row)

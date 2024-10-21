@@ -16,7 +16,7 @@ import (
 
 // ListIncidents retrieves incidents from the database based on the provided query and filters.
 func ListIncidents(logger *slog.Logger, db *database.Queries, ctx context.Context, query string, filters models.Filters) ([]models.Incident, models.Metadata, error) {
-	params := database.GetIncidentsParams{
+	params := database.ListIncidentsParams{
 		Query:    sql.NullString{String: query, Valid: query != ""},
 		Limit:    int32(filters.Limit()),
 		Offset:   int32(filters.Offset()),
@@ -24,7 +24,7 @@ func ListIncidents(logger *slog.Logger, db *database.Queries, ctx context.Contex
 		OrderDir: filters.SortDirection(),
 	}
 
-	rows, err := db.GetIncidents(ctx, params)
+	rows, err := db.ListIncidents(ctx, params)
 	if err != nil {
 		logger.Error("failed to retrieve incidents", "error", err)
 		return nil, models.Metadata{}, errors.New("failed to retrieve incidents")
@@ -40,7 +40,7 @@ func ListIncidents(logger *slog.Logger, db *database.Queries, ctx context.Contex
 
 // CountIncidents retrieves the count of incidents from the database based on the provided query.
 func CountIncidents(r *http.Request, logger *slog.Logger, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.GetIncidentsCount(r.Context(), sql.NullString{String: query, Valid: query != ""})
+	count, err := db.CountIncidents(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		logger.Error("failed to count incidents", "error", err)
 		return 0, errors.New("failed to count incidents")
@@ -48,31 +48,31 @@ func CountIncidents(r *http.Request, logger *slog.Logger, db *database.Queries, 
 	return count, nil
 }
 
-// GetLatestIncidents retrieves the latest incidents from the database.
-func GetLatestIncidents(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.Incident, error) {
-	params := database.GetIncidentsLatestParams{
+// ListRecentIncidents retrieves the latest incidents from the database.
+func ListRecentIncidents(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.Incident, error) {
+	params := database.ListRecentIncidentsParams{
 		Limit:  limit,
 		Offset: offset,
 	}
 
-	rows, err := db.GetIncidentsLatest(r.Context(), params)
+	rows, err := db.ListRecentIncidents(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to retrieve recent incidents", "error", err)
 		return nil, errors.New("failed to retrieve recent incidents")
 	}
 
-	return convertManyGetIncidentsLatestRowToIncidents(rows), nil
+	return convertManyListIncidentsLatestRowToIncidents(rows), nil
 }
 
-// GetIncidentByID retrieves a incident from the database based on the provided incident ID.
-func GetIncidentByID(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Incident, error) {
-	record, err := db.GetIncidentByID(r.Context(), id)
+// GetIncident retrieves a incident from the database based on the provided incident ID.
+func GetIncident(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Incident, error) {
+	record, err := db.GetIncident(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to retrieve incident", "error", err, "incident", id)
 		return models.Incident{}, errors.New("failed to retrieve incident")
 	}
 
-	return convertIncident(record), nil
+	return convertIncidentRow(record), nil
 }
 
 // CreateIncident creates a new incident in the database.
@@ -121,7 +121,7 @@ func UpdateIncident(r *http.Request, logger *slog.Logger, db *database.Queries, 
 
 // DeleteIncident deletes a incident from the database based on the provided incident ID.
 func DeleteIncident(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.Incident, error) {
-	record, err := db.DeleteIncidentByID(r.Context(), id)
+	record, err := db.DeleteIncident(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to delete incident", "error", err, "id", id)
 		return models.Incident{}, errors.New("failed to delete incident")
@@ -145,8 +145,24 @@ func convertIncident(dbIncident database.Incident) models.Incident {
 	}
 }
 
+// convertIncidentRow converts a database.GetIncidentRow to a models.Incident.
+func convertIncidentRow(dbIncident database.GetIncidentRow) models.Incident {
+	return models.Incident{
+		ID:                  dbIncident.ID,
+		CreatedAt:           dbIncident.CreatedAt,
+		UpdatedAt:           dbIncident.UpdatedAt,
+		ShortDescription:    dbIncident.ShortDescription,
+		Description:         dbIncident.Description,
+		ConfigurationItemID: dbIncident.ConfigurationItemID,
+		CompanyID:           dbIncident.CompanyID,
+		AssignedToID:        dbIncident.AssignedTo,
+		AssignedToName:      fmt.Sprintf("%s %s", dbIncident.FirstName.String, dbIncident.LastName.String),
+		State:               dbIncident.State,
+	}
+}
+
 // convertIncidentsAndMetadata converts a slice of database Incident records and filters into a slice of models.Incident and models.Metadata.
-func convertIncidentsAndMetadata(rows []database.GetIncidentsRow, filters models.Filters) ([]models.Incident, models.Metadata, error) {
+func convertIncidentsAndMetadata(rows []database.ListIncidentsRow, filters models.Filters) ([]models.Incident, models.Metadata, error) {
 	if len(rows) == 0 {
 		return nil, models.Metadata{}, nil
 	}
@@ -157,7 +173,7 @@ func convertIncidentsAndMetadata(rows []database.GetIncidentsRow, filters models
 		return nil, models.Metadata{}, fmt.Errorf("failed to convert total records count: %w", err)
 	}
 
-	incidents := convertManyGetIncidentsRowToIncidents(rows)
+	incidents := convertManyListIncidentsRowToIncidents(rows)
 	metadata, err := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
 	if err != nil {
 		return nil, models.Metadata{}, fmt.Errorf("failed to calculate metadata: %w", err)
@@ -166,8 +182,8 @@ func convertIncidentsAndMetadata(rows []database.GetIncidentsRow, filters models
 	return incidents, metadata, nil
 }
 
-// convertGetIncidentsRowToIncident converts a database row of type GetIncidentsRow to a Incident model.
-func convertGetIncidentsRowToIncident(row database.GetIncidentsRow) models.Incident {
+// convertListIncidentsRowToIncident converts a database row of type ListIncidentsRow to a Incident model.
+func convertListIncidentsRowToIncident(row database.ListIncidentsRow) models.Incident {
 	return models.Incident{
 		ID:                  row.ID,
 		CreatedAt:           row.CreatedAt,
@@ -182,17 +198,17 @@ func convertGetIncidentsRowToIncident(row database.GetIncidentsRow) models.Incid
 	}
 }
 
-// convertManyGetIncidentsRowToIncidents converts a database.GetIncidentsRow to an array of models.Incident.
-func convertManyGetIncidentsRowToIncidents(rows []database.GetIncidentsRow) []models.Incident {
+// convertManyListIncidentsRowToIncidents converts a database.ListIncidentsRow to an array of models.Incident.
+func convertManyListIncidentsRowToIncidents(rows []database.ListIncidentsRow) []models.Incident {
 	incidents := make([]models.Incident, len(rows))
 	for i, row := range rows {
-		incidents[i] = convertGetIncidentsRowToIncident(row)
+		incidents[i] = convertListIncidentsRowToIncident(row)
 	}
 	return incidents
 }
 
-// convertGetIncidentsLatestRowToIncident converts a database row of type GetIncidentsLatestRow to a Incident model.
-func convertGetIncidentsLatestRowToIncident(row database.GetIncidentsLatestRow) models.Incident {
+// convertListIncidentsLatestRowToIncident converts a database row of type ListIncidentsLatestRow to a Incident model.
+func convertListIncidentsLatestRowToIncident(row database.ListRecentIncidentsRow) models.Incident {
 	return models.Incident{
 		ID:                  row.ID,
 		CreatedAt:           row.CreatedAt,
@@ -206,11 +222,11 @@ func convertGetIncidentsLatestRowToIncident(row database.GetIncidentsLatestRow) 
 	}
 }
 
-// convertManyGetIncidentsLatestRowToIncidents converts a database.GetIncidentsLatestRow to an array of models.Incident.
-func convertManyGetIncidentsLatestRowToIncidents(rows []database.GetIncidentsLatestRow) []models.Incident {
+// convertManyListIncidentsLatestRowToIncidents converts a database.ListIncidentsLatestRow to an array of models.Incident.
+func convertManyListIncidentsLatestRowToIncidents(rows []database.ListRecentIncidentsRow) []models.Incident {
 	incidents := make([]models.Incident, len(rows))
 	for i, row := range rows {
-		incidents[i] = convertGetIncidentsLatestRowToIncident(row)
+		incidents[i] = convertListIncidentsLatestRowToIncident(row)
 	}
 	return incidents
 }

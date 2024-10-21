@@ -74,7 +74,7 @@ func ListRecentIncidents(logger *slog.Logger, db *database.Queries) http.Handler
 			return
 		}
 
-		latestIncidents, err := repository.GetLatestIncidents(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestIncidents, err := repository.ListRecentIncidents(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -94,7 +94,7 @@ func GetIncidentByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		incident, err := repository.GetIncidentByID(r, logger, db, id)
+		incident, err := repository.GetIncident(r, logger, db, id)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
