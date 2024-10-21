@@ -2,7 +2,6 @@
 package userhandler
 
 import (
-	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -175,7 +174,6 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateUser(v, user); !v.Valid() {
-			log.Printf("Put %v\n", v.Errors)
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}

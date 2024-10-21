@@ -3,7 +3,6 @@ package incidenthandler
 
 import (
 	"database/sql"
-	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -189,7 +188,6 @@ func UpdateIncident(logger *slog.Logger, db *database.Queries) http.Handler {
 
 		v := validator.New()
 		if models.ValidateIncident(v, incident); !v.Valid() {
-			log.Printf("Put %v\n", v.Errors)
 			httperrors.FailedValidationResponse(w, r, logger, v.Errors)
 			return
 		}
