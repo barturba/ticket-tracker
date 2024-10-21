@@ -13,6 +13,18 @@ import (
 	"github.com/google/uuid"
 )
 
+const countCompanies = `-- name: CountCompanies :one
+SELECT count(*) FROM companies
+WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
+`
+
+func (q *Queries) CountCompanies(ctx context.Context, query sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCompanies, query)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createCompany = `-- name: CreateCompany :one
 INSERT INTO companies (id, created_at, updated_at, name)
 VALUES ($1, $2, $3, $4)
@@ -43,14 +55,14 @@ func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (C
 	return i, err
 }
 
-const deleteCompanyByID = `-- name: DeleteCompanyByID :one
+const deleteCompany = `-- name: DeleteCompany :one
 DELETE FROM companies 
 WHERE id = $1
 RETURNING id, created_at, updated_at, name
 `
 
-func (q *Queries) DeleteCompanyByID(ctx context.Context, id uuid.UUID) (Company, error) {
-	row := q.db.QueryRowContext(ctx, deleteCompanyByID, id)
+func (q *Queries) DeleteCompany(ctx context.Context, id uuid.UUID) (Company, error) {
+	row := q.db.QueryRowContext(ctx, deleteCompany, id)
 	var i Company
 	err := row.Scan(
 		&i.ID,
@@ -61,7 +73,24 @@ func (q *Queries) DeleteCompanyByID(ctx context.Context, id uuid.UUID) (Company,
 	return i, err
 }
 
-const getCompanies = `-- name: GetCompanies :many
+const getCompany = `-- name: GetCompany :one
+SELECT id, created_at, updated_at, name from companies
+WHERE id = $1
+`
+
+func (q *Queries) GetCompany(ctx context.Context, id uuid.UUID) (Company, error) {
+	row := q.db.QueryRowContext(ctx, getCompany, id)
+	var i Company
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+	)
+	return i, err
+}
+
+const listCompanies = `-- name: ListCompanies :many
 SELECT count(*) OVER(), id, created_at, updated_at, name FROM companies
 WHERE (name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY
@@ -77,7 +106,7 @@ id ASC
 LIMIT $1 OFFSET $2
 `
 
-type GetCompaniesParams struct {
+type ListCompaniesParams struct {
 	Limit    int32
 	Offset   int32
 	Query    sql.NullString
@@ -85,7 +114,7 @@ type GetCompaniesParams struct {
 	OrderDir string
 }
 
-type GetCompaniesRow struct {
+type ListCompaniesRow struct {
 	Count     int64
 	ID        uuid.UUID
 	CreatedAt time.Time
@@ -93,8 +122,8 @@ type GetCompaniesRow struct {
 	Name      string
 }
 
-func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]GetCompaniesRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCompanies,
+func (q *Queries) ListCompanies(ctx context.Context, arg ListCompaniesParams) ([]ListCompaniesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCompanies,
 		arg.Limit,
 		arg.Offset,
 		arg.Query,
@@ -105,9 +134,9 @@ func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]G
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetCompaniesRow
+	var items []ListCompaniesRow
 	for rows.Next() {
-		var i GetCompaniesRow
+		var i ListCompaniesRow
 		if err := rows.Scan(
 			&i.Count,
 			&i.ID,
@@ -128,31 +157,19 @@ func (q *Queries) GetCompanies(ctx context.Context, arg GetCompaniesParams) ([]G
 	return items, nil
 }
 
-const getCompaniesCount = `-- name: GetCompaniesCount :one
-SELECT count(*) FROM companies
-WHERE (name ILIKE '%' || $1 || '%' or $1 is NULL)
-`
-
-func (q *Queries) GetCompaniesCount(ctx context.Context, query sql.NullString) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getCompaniesCount, query)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getCompaniesLatest = `-- name: GetCompaniesLatest :many
+const listRecentCompanies = `-- name: ListRecentCompanies :many
 SELECT id, created_at, updated_at, name FROM companies 
 ORDER BY companies.updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
-type GetCompaniesLatestParams struct {
+type ListRecentCompaniesParams struct {
 	Limit  int32
 	Offset int32
 }
 
-func (q *Queries) GetCompaniesLatest(ctx context.Context, arg GetCompaniesLatestParams) ([]Company, error) {
-	rows, err := q.db.QueryContext(ctx, getCompaniesLatest, arg.Limit, arg.Offset)
+func (q *Queries) ListRecentCompanies(ctx context.Context, arg ListRecentCompaniesParams) ([]Company, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentCompanies, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -177,23 +194,6 @@ func (q *Queries) GetCompaniesLatest(ctx context.Context, arg GetCompaniesLatest
 		return nil, err
 	}
 	return items, nil
-}
-
-const getCompanyByID = `-- name: GetCompanyByID :one
-SELECT id, created_at, updated_at, name from companies
-WHERE id = $1
-`
-
-func (q *Queries) GetCompanyByID(ctx context.Context, id uuid.UUID) (Company, error) {
-	row := q.db.QueryRowContext(ctx, getCompanyByID, id)
-	var i Company
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.Name,
-	)
-	return i, err
 }
 
 const updateCompany = `-- name: UpdateCompany :one

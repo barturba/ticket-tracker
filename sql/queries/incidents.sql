@@ -1,15 +1,4 @@
--- name: CreateIncident :one
-INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, configuration_item_id, company_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING *;
-
--- name: GetIncidentById :one
-SELECT * FROM incidents
-LEFT JOIN users
-ON incidents.assigned_to = users.id
-WHERE incidents.id = $1;
-
--- name: GetIncidents :many
+-- name: ListIncidents :many
 SELECT count(*) OVER(), * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -34,7 +23,7 @@ CASE WHEN (@order_by::varchar = 'last_name' AND @order_dir::varchar = 'DESC') TH
 incidents.id ASC 
 LIMIT $1 OFFSET $2;
 
--- name: GetIncidentsCount :one
+-- name: CountIncidents :one
 SELECT count(*) FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
@@ -42,15 +31,23 @@ WHERE (short_description ILIKE '%' || @query || '%' or @query is NULL)
 OR (description ILIKE '%' || @query || '%' or @query is NULL)
 OR (incidents.id::text ILIKE '%' || @query || '%' or @query is NULL);
 
--- name: GetIncidentsLatest :many
+-- name: CreateIncident :one
+INSERT INTO incidents (id, created_at, updated_at, short_description, description, state, configuration_item_id, company_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING *;
+
+-- name: GetIncident :one
+SELECT * FROM incidents
+LEFT JOIN users
+ON incidents.assigned_to = users.id
+WHERE incidents.id = $1;
+
+-- name: ListRecentIncidents :many
 SELECT * FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC
 LIMIT $1 OFFSET $2;
-
--- name: GetIncidentByID :one
-SELECT * FROM incidents WHERE id = $1;
 
 -- name: UpdateIncident :one
 UPDATE incidents
@@ -64,7 +61,7 @@ assigned_to = $8
 WHERE ID = $1
 RETURNING *;
 
--- name: DeleteIncidentByID :one
+-- name: DeleteIncident :one
 DELETE FROM incidents 
 WHERE id = $1
 RETURNING *;

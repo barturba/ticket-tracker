@@ -5,149 +5,106 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"io"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
+	"syscall"
 	"time"
 
-	"github.com/barturba/ticket-tracker/internal/data"
+	"github.com/barturba/ticket-tracker/internal/api"
+	"github.com/barturba/ticket-tracker/internal/config"
 	"github.com/barturba/ticket-tracker/internal/database"
-	"github.com/joho/godotenv"
+	"github.com/barturba/ticket-tracker/internal/models"
 	_ "github.com/lib/pq"
 )
 
-// main is the entry point for the ticket-tracker application. It calls the run function.
 func main() {
-	ctx := context.Background()
-	if err := run(ctx, os.Stdout, os.Args); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
+	if err := run(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("ticket-tracker has started\n")
 }
 
-// run initializes the application, loads environment variables, sets up the configuration,
-// opens a database connection, and starts the HTTP server. It also handles graceful shutdown
-// on receiving an interrupt signal.
-func run(ctx context.Context, w io.Writer, args []string) error {
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
-	defer cancel()
+func run() error {
+	// Initialize the logger
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	// Create a structured logger for logging messages.
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	// Load ENV variables from .env file.
-	_ = godotenv.Load()
-
-	// Get the environment type.
-	env := os.Getenv("ENV")
-	if env != "development" && env != "production" {
-		env = "production" // Default to production if not set.
-	}
-
-	// Get the host name.
-	host := os.Getenv("SERVER_HOST")
-	if host == "" {
-		log.Fatal("SERVER_HOST environment variable is not set")
-	}
-
-	// Get the port number.
-	port := os.Getenv("SERVER_PORT")
-	if port == "" {
-		log.Fatal("SERVER_PORT environment variable is not set")
-	}
-
-	// Set the database URL based on the environment.
-	dbURL := ""
-	if env == "development" {
-		dbURL = os.Getenv("DATABASE_URL_DEV")
-		if dbURL == "" {
-			log.Fatal("DATABASE_URL_DEV environment variable is not set")
-		}
-	} else {
-		dbURL = os.Getenv("DATABASE_URL_PROD")
-		if dbURL == "" {
-			log.Fatal("DATABASE_URL_PROD environment variable is not set")
-		}
-	}
-
-	// Create a config structure to hold the configuration values.
-	config := data.Config{
-		Env:  env,
-		Host: host,
-		Port: port,
-	}
-
-	// Open a database connection
-	db, err := sql.Open("postgres", dbURL)
+	// Load configuration
+	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
-	logger.Info("started database connection", "stats", db.Stats())
 
-	// Ping the database to verify the connection.
-	logger.Info("pinging db to verify the connection")
-	err = db.Ping()
+	// Initialize database
+	db, err := initDatabase(cfg.DBURL)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to initialize the database: %w", err)
 	}
+	defer db.Close()
+
+	// Create the database queries
 	dbQueries := database.New(db)
 
-	// Create a new server instance.
-	srv := newServer(logger, config, dbQueries)
-	httpServer := &http.Server{
-		Addr:         net.JoinHostPort(config.Host, config.Port),
-		Handler:      srv,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+	// Create and configure the HTTP server
+	srv := newServer(logger, cfg, dbQueries)
+
+	// Start the server
+	go func() {
+		logger.Info("starting server", "addr", srv.Addr, "env", cfg.Env)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("server error", "error", err)
+		}
+	}()
+
+	// Wait for an interrupt signal to gracefully shut down the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Info("shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		return fmt.Errorf("server forced to shutdown: %w", err)
 	}
 
-	// Start the HTTP server in a new goroutine.
-	go func() {
-		logger.Info("starting server", "addr", httpServer.Addr, "env", config.Env, "host", config.Host, "port", config.Port)
-		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("error listening and serving", "error", err)
-		}
-	}()
-
-	// Wait for an interrupt signal to gracefully shut down the server.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		<-ctx.Done()
-		shutdownCtx := context.Background()
-		shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
-		defer cancel()
-		if err := httpServer.Shutdown(shutdownCtx); err != nil {
-			logger.Error("error shutting down http server", "error", err)
-		}
-	}()
-	wg.Wait()
+	logger.Info("server exited properly")
 	return nil
 }
 
-// newServer sets up the HTTP server by creating a new ServeMux and adding
-// routes for incidents, companies, users, and configuration items.
-//
-// Returns an HTTP handler that can be used by the HTTP server.
-func newServer(logger *slog.Logger, config data.Config, db *database.Queries) http.Handler {
-
+func newServer(logger *slog.Logger, cfg models.Config, db *database.Queries) *http.Server {
 	mux := http.NewServeMux()
 
-	addRouteHealthcheck(mux, logger)
-	addRoutesIncidents(mux, logger, db)
-	addRoutesCompanies(mux, logger, db)
-	addRoutesUsers(mux, logger, db)
-	addRoutesConfigurationItems(mux, logger, db)
+	// Add routes
+	api.SetupRoutes(mux, logger, db)
 
-	var handler http.Handler = mux
+	return &http.Server{
+		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
+		Handler:      mux,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+}
 
-	return handler
+func initDatabase(dbURL string) (*sql.DB, error) {
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set connection pool settings
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxIdleTime(5 * time.Minute)
+
+	// Ping the database to verify the connection.
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+	return db, nil
 }
