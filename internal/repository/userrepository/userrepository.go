@@ -64,9 +64,9 @@ func GetLatestUsers(r *http.Request, logger *slog.Logger, db *database.Queries, 
 	return convertManyUsers(rows), nil
 }
 
-// GetUserByID retrieves a user from the database based on the provided user ID.
-func GetUserByID(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
-	record, err := db.GetUserByID(r.Context(), id)
+// GetUser retrieves a user from the database based on the provided user ID.
+func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
+	record, err := db.GetUser(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to retrieve user", "error", err, "user", id)
 		return models.User{}, errors.New("failed to retrieve user")

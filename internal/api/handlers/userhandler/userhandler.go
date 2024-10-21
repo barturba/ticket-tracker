@@ -85,8 +85,8 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 	})
 }
 
-// GetUserByID retrieves a single user by their unique identifier.
-func GetUserByID(logger *slog.Logger, db *database.Queries) http.Handler {
+// GetUser retrieves a single user by their unique identifier.
+func GetUser(logger *slog.Logger, db *database.Queries) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id, err := json.ReadUUIDPath(*r)
 		if err != nil {
@@ -94,7 +94,7 @@ func GetUserByID(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		user, err := userrepository.GetUserByID(r, logger, db, id)
+		user, err := userrepository.GetUser(r, logger, db, id)
 		if err != nil {
 			httperrors.ServerErrorResponse(w, r, logger, err)
 			return

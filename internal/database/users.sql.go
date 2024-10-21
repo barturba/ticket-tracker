@@ -135,96 +135,12 @@ func (q *Queries) GetLatestUsers(ctx context.Context, arg GetLatestUsersParams) 
 	return items, nil
 }
 
-const getUserByCompany = `-- name: GetUserByCompany :many
-SELECT users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", users.name, image, role, companies.id, companies.created_at, companies.updated_at, companies.name FROM users 
-LEFT JOIN companies 
-ON users.assigned_to = users.id
-ORDER BY users.name ASC
-`
-
-type GetUserByCompanyRow struct {
-	ID            uuid.UUID
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	FirstName     sql.NullString
-	LastName      sql.NullString
-	Email         string
-	EmailVerified sql.NullTime
-	Name          sql.NullString
-	Image         sql.NullString
-	Role          string
-	ID_2          uuid.NullUUID
-	CreatedAt_2   sql.NullTime
-	UpdatedAt_2   sql.NullTime
-	Name_2        sql.NullString
-}
-
-func (q *Queries) GetUserByCompany(ctx context.Context) ([]GetUserByCompanyRow, error) {
-	rows, err := q.db.QueryContext(ctx, getUserByCompany)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetUserByCompanyRow
-	for rows.Next() {
-		var i GetUserByCompanyRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.FirstName,
-			&i.LastName,
-			&i.Email,
-			&i.EmailVerified,
-			&i.Name,
-			&i.Image,
-			&i.Role,
-			&i.ID_2,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.Name_2,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE email = $1
-`
-
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.FirstName,
-		&i.LastName,
-		&i.Email,
-		&i.EmailVerified,
-		&i.Name,
-		&i.Image,
-		&i.Role,
-	)
-	return i, err
-}
-
-const getUserByID = `-- name: GetUserByID :one
+const getUser = `-- name: GetUser :one
 SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM USERS WHERE id = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID, id)
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
