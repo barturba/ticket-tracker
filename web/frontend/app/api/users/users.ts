@@ -55,7 +55,10 @@ export async function getUsers(
     console.log(`session: ${JSON.stringify(session, null, 2)}`);
 
     // Sign the JWT with your secret key
-    const secretKey = process.env.AUTH_SECRET; // Make sure to set this in your environment variables
+    const secretKey = process.env.AUTH_SECRET;
+    if (!secretKey) {
+      throw new Error("AUTH_SECRET is not defined in environment variables");
+    }
     const token = jwt.sign(
       { sessionToken: session?.user?.sessionToken },
       secretKey,
