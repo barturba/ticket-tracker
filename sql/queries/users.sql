@@ -17,7 +17,7 @@ CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') T
 id ASC 
 LIMIT $1 OFFSET $2;
 
--- name: GetUserByToken :one
+-- name: GetUserByTkn :one
 SELECT * FROM users
 INNER JOIN sessions
 ON users.id = sessions."userId"
