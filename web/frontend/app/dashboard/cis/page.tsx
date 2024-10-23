@@ -51,7 +51,7 @@ export default async function CIs(props: {
               href={`/dashboard/cis/${ci.id}/edit`}
               title={`CI #${ci.id}`}
             >
-              <TableCell>{ci.id}</TableCell>
+              <TableCell>{ci.id.slice(0, 8)}</TableCell>
               <TableCell className="text-zinc-500">
                 {formatDateToLocal(ci.updated_at)}
               </TableCell>

@@ -51,7 +51,7 @@ export default async function Companies(props: {
               href={`/dashboard/companies/${company.id}/edit`}
               title={`Company #${company.id}`}
             >
-              <TableCell>{company.id}</TableCell>
+              <TableCell>{company.id.slice(0, 8)}</TableCell>
               <TableCell className="text-zinc-500">
                 {formatDateToLocal(company.updated_at)}
               </TableCell>
