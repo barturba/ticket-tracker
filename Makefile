@@ -5,7 +5,7 @@
 ## run/ticket-tracker: run the cmd/ticket-tracker application
 .PHONY: run/ticket-tracker
 run/ticket-tracker:
-	# cp .env ./cmd/ticket-tracker/.env
+	cp .env ./cmd/ticket-tracker/.env
 	go run ./cmd/ticket-tracker
 
 # ==================================================================================== #

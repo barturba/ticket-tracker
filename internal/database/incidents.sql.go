@@ -96,7 +96,7 @@ func (q *Queries) DeleteIncident(ctx context.Context, id uuid.UUID) (Incident, e
 }
 
 const getIncident = `-- name: GetIncident :one
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role, active FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE incidents.id = $1
@@ -122,6 +122,7 @@ type GetIncidentRow struct {
 	Name                sql.NullString
 	Image               sql.NullString
 	Role                sql.NullString
+	Active              sql.NullBool
 }
 
 func (q *Queries) GetIncident(ctx context.Context, id uuid.UUID) (GetIncidentRow, error) {
@@ -147,12 +148,13 @@ func (q *Queries) GetIncident(ctx context.Context, id uuid.UUID) (GetIncidentRow
 		&i.Name,
 		&i.Image,
 		&i.Role,
+		&i.Active,
 	)
 	return i, err
 }
 
 const listIncidents = `-- name: ListIncidents :many
-SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
+SELECT count(*) OVER(), incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role, active FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 WHERE (incidents.short_description ILIKE '%' || $3 || '%' or $3 is NULL)
@@ -206,6 +208,7 @@ type ListIncidentsRow struct {
 	Name                sql.NullString
 	Image               sql.NullString
 	Role                sql.NullString
+	Active              sql.NullBool
 }
 
 func (q *Queries) ListIncidents(ctx context.Context, arg ListIncidentsParams) ([]ListIncidentsRow, error) {
@@ -244,6 +247,7 @@ func (q *Queries) ListIncidents(ctx context.Context, arg ListIncidentsParams) ([
 			&i.Name,
 			&i.Image,
 			&i.Role,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}
@@ -259,7 +263,7 @@ func (q *Queries) ListIncidents(ctx context.Context, arg ListIncidentsParams) ([
 }
 
 const listRecentIncidents = `-- name: ListRecentIncidents :many
-SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM incidents
+SELECT incidents.id, incidents.created_at, incidents.updated_at, short_description, description, configuration_item_id, company_id, state, assigned_to, users.id, users.created_at, users.updated_at, first_name, last_name, email, "emailVerified", name, image, role, active FROM incidents
 LEFT JOIN users
 ON incidents.assigned_to = users.id
 ORDER BY incidents.updated_at DESC
@@ -291,6 +295,7 @@ type ListRecentIncidentsRow struct {
 	Name                sql.NullString
 	Image               sql.NullString
 	Role                sql.NullString
+	Active              sql.NullBool
 }
 
 func (q *Queries) ListRecentIncidents(ctx context.Context, arg ListRecentIncidentsParams) ([]ListRecentIncidentsRow, error) {
@@ -322,6 +327,7 @@ func (q *Queries) ListRecentIncidents(ctx context.Context, arg ListRecentInciden
 			&i.Name,
 			&i.Image,
 			&i.Role,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}

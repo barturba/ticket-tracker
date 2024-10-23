@@ -124,6 +124,7 @@ type User struct {
 	Name          sql.NullString
 	Image         sql.NullString
 	Role          string
+	Active        sql.NullBool
 }
 
 type UsersPermission struct {
