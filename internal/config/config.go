@@ -45,12 +45,18 @@ func Load() (models.Config, error) {
 		}
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		return models.Config{}, errors.New("JWT_SECRET environment variable is not set")
+	}
+
 	// Create a config structure to hold the configuration values.
 	config := models.Config{
-		Env:   env,
-		Host:  host,
-		Port:  port,
-		DBURL: dbURL,
+		Env:       env,
+		Host:      host,
+		Port:      port,
+		DBURL:     dbURL,
+		JWTSecret: jwtSecret,
 	}
 	return config, nil
 }

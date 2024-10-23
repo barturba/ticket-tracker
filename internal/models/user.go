@@ -16,7 +16,10 @@ type User struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email,omitempty"`
 	Role      string    `json:"role"`
+	Active    bool      `json:"active"`
 }
+
+var AnonymousUser = &User{}
 
 // ValidateUser validates the fields of a User struct using the provided validator.
 // It checks that:
@@ -33,5 +36,8 @@ func ValidateUser(v *validator.Validator, user *User) {
 
 	v.Check(user.Email != "", "email", "must be provided")
 	v.Check(len(user.Email) <= 320, "email", "must not be more than 320 bytes long")
+}
 
+func IsAnonymous(u *User) bool {
+	return u == AnonymousUser
 }

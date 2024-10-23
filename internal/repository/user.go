@@ -75,6 +75,18 @@ func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid
 	return convertUser(record), nil
 }
 
+// GetUserByToken retrieves a user from the database based on the provided
+// session token.
+func GetUserByToken(r *http.Request, logger *slog.Logger, db *database.Queries, token string) (models.User, error) {
+	record, err := db.GetUserByToken(r.Context(), token)
+	if err != nil {
+		logger.Error("failed to retrieve user by token", "error", err, "token", token)
+		return models.User{}, errors.New("failed to retrieve user by token")
+	}
+
+	return convertUserByTokenRow(record), nil
+}
+
 // CreateUser creates a new user in the database.
 func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user models.User) (models.User, error) {
 	params := database.CreateUserParams{
@@ -134,6 +146,19 @@ func convertUser(dbUser database.User) models.User {
 		FirstName: dbUser.FirstName.String,
 		LastName:  dbUser.LastName.String,
 		Email:     dbUser.Email,
+	}
+}
+
+// convertUserByTokenRow converts a database.UserByTokenRow to a models.User.
+func convertUserByTokenRow(dbUser database.GetUserByTokenRow) models.User {
+	return models.User{
+		ID:        dbUser.ID,
+		CreatedAt: dbUser.CreatedAt,
+		UpdatedAt: dbUser.UpdatedAt,
+		FirstName: dbUser.FirstName.String,
+		LastName:  dbUser.LastName.String,
+		Email:     dbUser.Email,
+		Active:    dbUser.Active.Bool,
 	}
 }
 

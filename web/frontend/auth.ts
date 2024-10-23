@@ -14,6 +14,7 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
+      sessionToken: string;
     } & DefaultSession["user"];
   }
 }
@@ -37,9 +38,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       const [userData] = await Promise.all([getUser(user.id)]);
-      console.log(
-        `got userData as follows ${JSON.stringify(userData, null, 2)}`
-      );
+      // console.log(`user: ${JSON.stringify(user, null, 2)}`);
+      console.log(`session: ${JSON.stringify(session, null, 2)}`);
+      // console.log(`userData: ${JSON.stringify(userData, null, 2)}`);
 
       // session.user.id = user.id;
       return {
@@ -47,6 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user: {
           ...session.user,
           role: userData.role,
+          sessionToken: session.sessionToken,
         },
       };
     },

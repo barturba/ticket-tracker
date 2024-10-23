@@ -6,9 +6,10 @@ import (
 
 	"github.com/barturba/ticket-tracker/internal/api/handlers"
 	"github.com/barturba/ticket-tracker/internal/database"
+	"github.com/barturba/ticket-tracker/internal/models"
 )
 
-func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) {
+func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries, cfg models.Config) http.Handler {
 	// Healthcheck
 	mux.Handle("GET /v1/healthcheck", handlers.GetHealthcheck(logger))
 
@@ -31,7 +32,7 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) 
 	mux.Handle("DELETE /v1/companies/{id}", handlers.DeleteCompany(logger, db))
 
 	// Users
-	mux.Handle("GET /v1/users", handlers.ListUsers(logger, db))
+	mux.Handle("GET /v1/users", RequireActiveUser(logger, db, cfg, handlers.ListUsers(logger, db, cfg)))
 	mux.Handle("GET /v1/users_all", handlers.ListAllUsers(logger, db))
 	mux.Handle("POST /v1/users", handlers.CreateUser(logger, db))
 	mux.Handle("GET /v1/users/{id}", handlers.GetUser(logger, db))
@@ -47,4 +48,6 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries) 
 	mux.Handle("GET /v1/cis_latest", handlers.ListRecentCIs(logger, db))
 	mux.Handle("PUT /v1/cis/{id}", handlers.UpdateCI(logger, db))
 	mux.Handle("DELETE /v1/cis/{id}", handlers.DeleteCI(logger, db))
+
+	return Authenticate(logger, db, cfg, mux)
 }

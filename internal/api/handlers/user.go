@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -11,12 +13,40 @@ import (
 	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
 
 // ListUsers retrieves a list of users with optional filtering, sorting, and pagination.
-func ListUsers(logger *slog.Logger, db *database.Queries) http.Handler {
+func ListUsers(logger *slog.Logger, db *database.Queries, cfg models.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// DEBUG
+		// res, err := httputil.DumpRequest(r, true)
+		// if err != nil {
+		// 	logger.Error("error", err)
+		// }
+		// logger.Info(fmt.Sprintf("%v\n", string(res)))
+		authorization := r.Header.Get("Authorization")
+		tokenString := strings.TrimPrefix(authorization, "Bearer ")
+		claims := jwt.MapClaims{}
+		logger.Info(fmt.Sprintf("tokenString: %v\n", tokenString))
+		_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(cfg.JWTSecret), nil
+		})
+		if err != nil {
+			errors.ServerErrorResponse(w, r, logger, err)
+			return
+		}
+		for key, val := range claims {
+			fmt.Printf("Key: %v, value: %v\n", key, val)
+		}
+		fmt.Printf("Key: email, value: %v\n", claims["email"])
+
+		// Check if token has expired
+
+		fmt.Printf("Key: id, value: %v\n", claims["id"])
+		// DEBUG
+		logger.Info("ListUsers")
 		v := validator.New()
 		input := parseUserFilters(r, v)
 

@@ -2,6 +2,7 @@
 package errors
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -42,6 +43,28 @@ func ServerErrorResponse(w http.ResponseWriter, r *http.Request, logger *slog.Lo
 	LogError(r, logger, err)
 	message := "the server encountered a problem and couldn't process your request"
 	ErrorResponse(w, r, logger, http.StatusInternalServerError, message)
+}
+
+func InvalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request, logger *slog.Logger) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+
+	message := "invalid or missing authentication token"
+	LogError(r, logger, fmt.Errorf("error: %s", message))
+	ErrorResponse(w, r, logger, http.StatusUnauthorized, message)
+}
+
+func AuthenticationRequiredResponse(w http.ResponseWriter, r *http.Request, logger *slog.Logger) {
+	message := "you must be authenticated to access this resource"
+
+	LogError(r, logger, fmt.Errorf("error: %s", message))
+	ErrorResponse(w, r, logger, http.StatusUnauthorized, message)
+}
+
+func InactiveAccountResponse(w http.ResponseWriter, r *http.Request, logger *slog.Logger) {
+	message := "your account must be active to access this resource"
+
+	LogError(r, logger, fmt.Errorf("error: %s", message))
+	ErrorResponse(w, r, logger, http.StatusUnauthorized, message)
 }
 
 // LogError logs the provided error along with the HTTP method and request URI.

@@ -78,11 +78,11 @@ func newServer(logger *slog.Logger, cfg models.Config, db *database.Queries) *ht
 	mux := http.NewServeMux()
 
 	// Add routes
-	api.SetupRoutes(mux, logger, db)
+	handler := api.SetupRoutes(mux, logger, db, cfg)
 
 	return &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
