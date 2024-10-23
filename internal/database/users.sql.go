@@ -158,67 +158,35 @@ func (q *Queries) ListRecentUsers(ctx context.Context, arg ListRecentUsersParams
 }
 
 const listUsers = `-- name: ListUsers :many
-WITH filtered_users AS (
-  SELECT id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
-  FROM users
-  WHERE (
-    CASE WHEN $5 IS NOT NULL THEN
-      email ILIKE '%' || $5 || '%' OR
-      first_name ILIKE '%' || $5 || '%' OR
-      last_name ILIKE '%' || $5 || '%'
-    ELSE true END
-  )
-)
-SELECT 
-  count(*) OVER() as total_count,
-  id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role
-FROM filtered_users
+SELECT count(*) OVER(), id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role FROM users 
+WHERE (email ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (first_name ILIKE '%' || $3 || '%' or $3 is NULL)
+OR (last_name ILIKE '%' || $3 || '%' or $3 is NULL)
 ORDER BY
-  CASE 
-    WHEN $3::varchar = 'id' AND $4::varchar = 'ASC' THEN id
-  END ASC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'id' AND $4::varchar = 'DESC' THEN id
-  END DESC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'created_at' AND $4::varchar = 'ASC' THEN created_at
-  END ASC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'created_at' AND $4::varchar = 'DESC' THEN created_at
-  END DESC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'updated_at' AND $4::varchar = 'ASC' THEN updated_at
-  END ASC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'updated_at' AND $4::varchar = 'DESC' THEN updated_at
-  END DESC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'last_name' AND $4::varchar = 'ASC' THEN last_name
-  END ASC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'last_name' AND $4::varchar = 'DESC' THEN last_name
-  END DESC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'first_name' AND $4::varchar = 'ASC' THEN first_name
-  END ASC NULLS LAST,
-  CASE 
-    WHEN $3::varchar = 'first_name' AND $4::varchar = 'DESC' THEN first_name
-  END DESC NULLS LAST,
-  id ASC  -- Default sort for stable pagination
-LIMIT $1 
-OFFSET $2
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'ASC') THEN id END ASC,
+CASE WHEN ($4::varchar = 'id' AND $5::varchar = 'DESC') THEN id END DESC,
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'ASC') THEN created_at END ASC,
+CASE WHEN ($4::varchar = 'created_at' AND $5::varchar = 'DESC') THEN created_at END DESC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'ASC') THEN updated_at END ASC,
+CASE WHEN ($4::varchar = 'updated_at' AND $5::varchar = 'DESC') THEN updated_at END DESC,
+CASE WHEN ($4::varchar = 'last_name' AND $5::varchar = 'ASC') THEN last_name END ASC,
+CASE WHEN ($4::varchar = 'last_name' AND $5::varchar = 'DESC') THEN last_name END DESC,
+CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'ASC') THEN first_name END ASC,
+CASE WHEN ($4::varchar = 'first_name' AND $5::varchar = 'DESC') THEN first_name END DESC,
+id ASC 
+LIMIT $1 OFFSET $2
 `
 
 type ListUsersParams struct {
 	Limit    int32
 	Offset   int32
+	Query    sql.NullString
 	OrderBy  string
 	OrderDir string
-	Query    interface{}
 }
 
 type ListUsersRow struct {
-	TotalCount    int64
+	Count         int64
 	ID            uuid.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
@@ -231,21 +199,13 @@ type ListUsersRow struct {
 	Role          string
 }
 
-// Retrieves a paginated list of users with optional filtering and sorting.
-// Parameters:
-//
-//	query: Search term for filtering (optional)
-//	order_by: Column name for sorting (id, created_at, updated_at, last_name, first_name)
-//	order_dir: Sort direction (ASC or DESC)
-//	limit: Maximum number of records to return
-//	offset: Number of records to skip
 func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
 	rows, err := q.db.QueryContext(ctx, listUsers,
 		arg.Limit,
 		arg.Offset,
+		arg.Query,
 		arg.OrderBy,
 		arg.OrderDir,
-		arg.Query,
 	)
 	if err != nil {
 		return nil, err
@@ -255,7 +215,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUse
 	for rows.Next() {
 		var i ListUsersRow
 		if err := rows.Scan(
-			&i.TotalCount,
+			&i.Count,
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
