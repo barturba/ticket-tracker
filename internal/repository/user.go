@@ -78,7 +78,7 @@ func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid
 // GetUserByToken retrieves a user from the database based on the provided
 // session token.
 func GetUserByToken(r *http.Request, logger *slog.Logger, db *database.Queries, token string) (models.User, error) {
-	record, err := db.GetUserByToken(r.Context(), token)
+	record, err := db.GetUserByTkn(r.Context(), token)
 	if err != nil {
 		logger.Error("failed to retrieve user by token", "error", err, "token", token)
 		return models.User{}, errors.New("failed to retrieve user by token")
@@ -150,7 +150,7 @@ func convertUser(dbUser database.User) models.User {
 }
 
 // convertUserByTokenRow converts a database.UserByTokenRow to a models.User.
-func convertUserByTokenRow(dbUser database.GetUserByTokenRow) models.User {
+func convertUserByTokenRow(dbUser database.GetUserByTknRow) models.User {
 	return models.User{
 		ID:        dbUser.ID,
 		CreatedAt: dbUser.CreatedAt,

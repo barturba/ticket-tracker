@@ -115,14 +115,14 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const getUserByToken = `-- name: GetUserByToken :one
+const getUserByTkn = `-- name: GetUserByTkn :one
 SELECT users.id, created_at, updated_at, first_name, last_name, email, "emailVerified", name, image, role, active, sessions.id, "userId", expires, "sessionToken" FROM users
 INNER JOIN sessions
 ON users.id = sessions."userId"
 WHERE sessions."sessionToken" = $1
 `
 
-type GetUserByTokenRow struct {
+type GetUserByTknRow struct {
 	ID            uuid.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
@@ -140,9 +140,9 @@ type GetUserByTokenRow struct {
 	SessionToken  string
 }
 
-func (q *Queries) GetUserByToken(ctx context.Context, sessiontoken string) (GetUserByTokenRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserByToken, sessiontoken)
-	var i GetUserByTokenRow
+func (q *Queries) GetUserByTkn(ctx context.Context, sessiontoken string) (GetUserByTknRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByTkn, sessiontoken)
+	var i GetUserByTknRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
