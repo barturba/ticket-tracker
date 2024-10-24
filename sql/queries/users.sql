@@ -17,6 +17,12 @@ CASE WHEN (@order_by::varchar = 'first_name' AND @order_dir::varchar = 'DESC') T
 id ASC 
 LIMIT $1 OFFSET $2;
 
+-- name: GetUserByTkn :one
+SELECT * FROM users
+INNER JOIN sessions
+ON users.id = sessions."userId"
+WHERE sessions."sessionToken" = $1;
+
 -- name: CountUsers :one
 SELECT count(*) FROM users 
 WHERE (first_name ILIKE '%' || @query || '%' or @query is NULL)

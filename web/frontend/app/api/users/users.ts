@@ -5,6 +5,8 @@ import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 import { UsersData } from "@/app/api/users/users.d";
 import setAlert from "@/app/lib/setAlert";
+import jwt from "jsonwebtoken";
+import { auth } from "@/auth";
 
 export type UserState = {
   message?: string;
@@ -48,8 +50,28 @@ export async function getUsers(
     searchParams.set("page", currentPage.toString());
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
+    const session = await auth();
+
+    console.log(`session: ${JSON.stringify(session, null, 2)}`);
+
+    // Sign the JWT with your secret key
+    const secretKey = process.env.AUTH_SECRET;
+    if (!secretKey) {
+      throw new Error("AUTH_SECRET is not defined in environment variables");
+    }
+    const token = jwt.sign(
+      { sessionToken: session?.user?.sessionToken },
+      secretKey,
+      {
+        expiresIn: "1h",
+      }
+    ); // Adjust expiration as needed
+
     const data = await fetch(url.toString(), {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     if (data.ok) {
       const UsersData: UsersData = await data.json();

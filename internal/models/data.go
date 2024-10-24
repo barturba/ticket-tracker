@@ -7,11 +7,12 @@ import (
 
 // Config represents the application configuration settings.
 type Config struct {
-	Host     string
-	Port     string
-	Env      string // Environment (e.g., development, production)
-	PageSize int
-	DBURL    string
+	Host      string
+	Port      string
+	Env       string // Environment (e.g., development, production)
+	PageSize  int
+	DBURL     string
+	JWTSecret string
 }
 
 // Envelope is a type alias for a map that can hold any type of value. It is
