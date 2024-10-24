@@ -24,7 +24,7 @@ func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 	return h
 }
 
-func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
+func Auth(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
 	return func(next http.Handler) http.Handler {
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config) 
 				return
 			}
 
-			// // Get the actual token
+			// Get the actual token
 			tokenString := headerParts[1]
 
 			claims := jwt.MapClaims{}
@@ -84,7 +84,8 @@ func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config) 
 		})
 	}
 }
-func RequireActiveUserMiddleware(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
+
+func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Use the ContextGetUser() helper to retrieve the user information.
@@ -104,26 +105,6 @@ func RequireActiveUserMiddleware(logger *slog.Logger, db *database.Queries, cfg 
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Config, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Use the ContextGetUser() helper to retrieve the user information.
-		user := ContextGetUser(r)
-
-		if models.IsAnonymous(user) {
-			errors.AuthenticationRequiredResponse(w, r, logger)
-			return
-		}
-
-		if !user.Active {
-			errors.InactiveAccountResponse(w, r, logger)
-			return
-		}
-
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
 }
 
 // Log each request to an id
@@ -172,7 +153,7 @@ func (rw *ResponseWriter) WriteHeader(code int) {
 }
 
 // Should use middleware for consistent logging
-func LoggingMiddleware(logger *slog.Logger) Middleware {
+func Logger(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
