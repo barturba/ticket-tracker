@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import setAlert from "@/app/lib/setAlert";
 import { UserCreateInput, UserResponse, UserUpdateInput } from "./types";
-import { CreateUser, FormSchemaUser } from "./constants";
+import { CreateUser, UpdateUser, FormSchemaUser } from "./constants";
 import { UserFormState } from "@/types/users/base";
 import { ApiError } from "next/dist/server/api-utils";
 import { fetchApi } from "@/app/lib/api";
@@ -51,7 +51,6 @@ export async function createUser(
   }
 }
 
-const UpdateUser = FormSchemaUser.omit({ id: true });
 export async function updateUser(
   id: string,
   prevState: UserFormState,
@@ -73,53 +72,30 @@ export async function updateUser(
     };
   }
 
-  // Validate form fields using Zod
-  const { first_name, last_name, email } = validatedFields.data;
-
   // Prepare data for sending to the API.
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
-    const data = await fetch(url.toString(), {
+    const response = await fetchApi<UserResponse>(url.toString(), {
       method: "PUT",
-      body: JSON.stringify({
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-      }),
+      body: JSON.stringify(validatedFields.data),
     });
-    if (data.ok) {
-      const user = await data.json();
-      if (user) {
-        console.log(`update success`);
-      } else {
-        console.log(`update error: !user`);
-        return {
-          message: "Database Error: Failed to Update User.",
-        };
-      }
-    } else {
-      console.log(
-        `update error: !data.ok ${data.status} ${JSON.stringify(
-          data.statusText
-        )}`
-      );
+
+    await setAlert({ type: "success", value: "User updated successfully!" });
+    revalidatePath("/dashboard/users");
+    redirect("/dashboard/users");
+
+    return { message: "Update Successful" };
+  } catch (error) {
+    console.error(`update user error:`, error);
+    if (error instanceof ApiError) {
       return {
-        message: "Database Error: Failed to Update User.",
+        message: error.message || "Failed to update user.",
       };
     }
-  } catch (error) {
-    console.log(`createUser error: ${error}`);
     return {
-      message: "Database Error: Failed to Update User.",
+      message: "An unexpected error occurred. Failed to update user.",
     };
   }
-  await setAlert({ type: "success", value: "User updated successfully!" });
-  // Revalidate the cache for the users page and redirect the user.
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
-  return {
-    message: "Update Successful",
-  };
 }
 
 // DELETE
