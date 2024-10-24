@@ -3,18 +3,18 @@ import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "../constants/constants";
 import { UsersResponse } from "./types";
 import { JWT_SECRET } from "./constants";
 import jwt from "jsonwebtoken";
+import { GetUserParams } from "@/types/users/base";
 
-export async function getUsers(
-  query: string,
-  currentPage: number
-): Promise<UsersResponse> {
+export async function getUsers(params: GetUserParams): Promise<UsersResponse> {
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users`);
 
     const searchParams = url.searchParams;
-    searchParams.set("query", query);
+    if (params.query) {
+      searchParams.set("query", params.query);
+    }
     searchParams.set("sort", "-updated_at");
-    searchParams.set("page", currentPage.toString());
+    searchParams.set("page", (params.page ?? 1).toString());
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
     const session = await auth();

@@ -2,18 +2,23 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import setAlert from "@/app/lib/setAlert";
-import { UserState } from "./types";
+import { UserCreateInput, UserResponse, UserUpdateInput } from "./types";
 import { CreateUser, FormSchemaUser } from "./constants";
+import { UserFormState } from "@/types/users/base";
+import { ApiError } from "next/dist/server/api-utils";
+import { fetchApi } from "@/app/lib/api";
 
 export async function createUser(
-  prevState: UserState,
+  prevState: UserFormState,
   formData: FormData
-): Promise<UserState> {
-  const validatedFields = CreateUser.safeParse({
-    first_name: formData.get("first_name"),
-    last_name: formData.get("last_name"),
-    email: formData.get("email"),
-  });
+): Promise<UserFormState> {
+  const input: UserCreateInput = {
+    first_name: formData.get("first_name") as string,
+    last_name: formData.get("last_name") as string,
+    email: formData.get("email") as string,
+  };
+
+  const validatedFields = CreateUser.safeParse(input);
 
   if (!validatedFields.success) {
     return {
@@ -22,63 +27,44 @@ export async function createUser(
     };
   }
 
-  // Validate form fields using Zod
-  const { first_name, last_name, email } = validatedFields.data;
-
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users`);
-    const data = await fetch(url.toString(), {
+    const response = await fetchApi<UserResponse>(url.toString(), {
       method: "POST",
-      body: JSON.stringify({
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-      }),
+      body: JSON.stringify(validatedFields.data),
     });
-    if (data.ok) {
-      const user = await data.json();
-      if (user) {
-        console.log(`createUser success`);
-      } else {
-        console.log(`createUser error: !user`);
-        return {
-          message: "Database Error: Failed to Create User.",
-        };
-      }
-    } else {
-      console.log(
-        `createUser error: !data.ok ${data.status} ${JSON.stringify(
-          data.statusText
-        )}`
-      );
+
+    await setAlert({ type: "success", value: "User created successfully!" });
+    revalidatePath("/dashboard/users");
+    redirect("/dashboard/users");
+    return { message: "User created successfully!" };
+  } catch (error) {
+    console.error(`create user error:`, error);
+    if (error instanceof ApiError) {
       return {
-        message: "Database Error: Failed to Create User.",
+        message: error.message || "Failed to create user.",
       };
     }
-  } catch (error) {
-    console.log(`createUser error: ${error}`);
     return {
-      message: "Database Error: Failed to Create User.",
+      message: "An unexpected error occurred. Failed to create user.",
     };
   }
-  await setAlert({ type: "success", value: "User created successfully!" });
-  // Revalidate the cache for the users page and redirect the user.
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
 }
 
 const UpdateUser = FormSchemaUser.omit({ id: true });
 export async function updateUser(
   id: string,
-  prevState: UserState,
+  prevState: UserFormState,
   formData: FormData
-): Promise<UserState> {
+): Promise<UserFormState> {
   // Parse the form data using Zod
-  const validatedFields = UpdateUser.safeParse({
-    first_name: formData.get("first_name"),
-    last_name: formData.get("last_name"),
-    email: formData.get("email"),
-  });
+  const input: UserUpdateInput = {
+    first_name: formData.get("first_name") as string,
+    last_name: formData.get("last_name") as string,
+    email: formData.get("email") as string,
+  };
+
+  const validatedFields = UpdateUser.safeParse(input);
 
   if (!validatedFields.success) {
     return {
