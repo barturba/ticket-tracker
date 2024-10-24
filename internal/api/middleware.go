@@ -10,6 +10,7 @@ import (
 	"github.com/barturba/ticket-tracker/internal/repository"
 	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 )
 
 func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config, next http.Handler) http.Handler {
@@ -87,5 +88,14 @@ func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Con
 
 		// Call the next handler
 		next.ServeHTTP(w, r)
+	})
+}
+
+func WithRequestID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestID := uuid.New().String()
+		ctx := ContextSetRequestId(r, requestID)
+		w.Header().Set("X-Request-ID", requestID)
+		next.ServeHTTP(w, ctx)
 	})
 }
