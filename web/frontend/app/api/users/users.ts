@@ -5,8 +5,11 @@ import { z } from "zod";
 import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "@/app/api/constants/constants";
 import { UsersData } from "@/app/api/users/users.d";
 import setAlert from "@/app/lib/setAlert";
-import jwt from "jsonwebtoken";
 import { auth } from "@/auth";
+import jwt from "jsonwebtoken";
+import { verifyJWT } from "../protected/users/route";
+
+const JWT_SECRET = process.env.AUTH_SECRET;
 
 export type UserState = {
   message?: string;
@@ -51,23 +54,45 @@ export async function getUsers(
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
     const session = await auth();
+    console.log(`getUsers session: ${JSON.stringify(session, null, 2)}`);
 
-    const secretKey = process.env.AUTH_SECRET;
-    if (!secretKey) {
-      throw new Error("AUTH_SECRET is not defined in environment variables");
+    // const secretKey = process.env.AUTH_SECRET;
+    // if (!secretKey) {
+    //   throw new Error("AUTH_SECRET is not defined in environment variables");
+    // }
+    // const token = await jwt.sign(
+    //   { sessionToken: session?.user?.sessionToken },
+    //   secretKey,
+    //   {
+    //     expiresIn: "1h",
+    //   }
+    // );
+    if (!session) {
+      throw new Error("Session is null");
     }
-    const token = await jwt.sign(
-      { sessionToken: session?.user?.sessionToken },
-      secretKey,
-      {
-        expiresIn: "1h",
-      }
+    if (!JWT_SECRET) {
+      throw new Error("JWT secret not defined");
+    }
+    const payload = { userId: session.userId! };
+    console.log(`getUsers payload: ${JSON.stringify(payload, null, 2)}`);
+    const newToken = jwt.sign(payload, JWT_SECRET, {
+      algorithm: "HS256",
+      audience: "api",
+      expiresIn: "1h",
+    });
+
+    console.log(
+      `/protected/users newToken: ${JSON.stringify(
+        verifyJWT(newToken),
+        null,
+        2
+      )}`
     );
 
     const data = await fetch(url.toString(), {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${newToken}`,
       },
     });
     if (data.ok) {
@@ -108,25 +133,8 @@ export async function getUsersAll(
     searchParams.set("page", currentPage.toString());
     searchParams.set("page_size", ALL_ITEMS_LIMIT.toString());
 
-    const session = await auth();
-
-    const secretKey = process.env.AUTH_SECRET;
-    if (!secretKey) {
-      throw new Error("AUTH_SECRET is not defined in environment variables");
-    }
-    const token = jwt.sign(
-      { sessionToken: session?.user?.sessionToken },
-      secretKey,
-      {
-        expiresIn: "1h",
-      }
-    );
-
     const data = await fetch(url.toString(), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (data.ok) {
       const UsersData: UsersData = await data.json();
@@ -160,25 +168,8 @@ export async function fetchLatestUsers() {
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
     searchParams.set("page", "1");
 
-    const session = await auth();
-
-    const secretKey = process.env.AUTH_SECRET;
-    if (!secretKey) {
-      throw new Error("AUTH_SECRET is not defined in environment variables");
-    }
-    const token = jwt.sign(
-      { sessionToken: session?.user?.sessionToken },
-      secretKey,
-      {
-        expiresIn: "1h",
-      }
-    );
-
     const data = await fetch(url.toString(), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (data.ok) {
       const users = await data.json();
@@ -245,19 +236,6 @@ export async function createUser(
 
   // Validate form fields using Zod
   const { first_name, last_name, email } = validatedFields.data;
-  const session = await auth();
-
-  const secretKey = process.env.AUTH_SECRET;
-  if (!secretKey) {
-    throw new Error("AUTH_SECRET is not defined in environment variables");
-  }
-  const token = jwt.sign(
-    { sessionToken: session?.user?.sessionToken },
-    secretKey,
-    {
-      expiresIn: "1h",
-    }
-  );
 
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users`);
@@ -268,9 +246,6 @@ export async function createUser(
         last_name: last_name,
         email: email,
       }),
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (data.ok) {
       const user = await data.json();
@@ -329,20 +304,6 @@ export async function updateUser(
   // Validate form fields using Zod
   const { first_name, last_name, email } = validatedFields.data;
 
-  const session = await auth();
-
-  const secretKey = process.env.AUTH_SECRET;
-  if (!secretKey) {
-    throw new Error("AUTH_SECRET is not defined in environment variables");
-  }
-  const token = jwt.sign(
-    { sessionToken: session?.user?.sessionToken },
-    secretKey,
-    {
-      expiresIn: "1h",
-    }
-  );
-
   // Prepare data for sending to the API.
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
@@ -353,9 +314,6 @@ export async function updateUser(
         last_name: last_name,
         email: email,
       }),
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     if (data.ok) {
       const user = await data.json();
@@ -395,27 +353,11 @@ export async function updateUser(
 // DELETE
 
 export async function deleteUser(id: string) {
-  const session = await auth();
-
-  const secretKey = process.env.AUTH_SECRET;
-  if (!secretKey) {
-    throw new Error("AUTH_SECRET is not defined in environment variables");
-  }
-  const token = jwt.sign(
-    { sessionToken: session?.user?.sessionToken },
-    secretKey,
-    {
-      expiresIn: "1h",
-    }
-  );
   // Prepare data for sending to the API.
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
     await fetch(url.toString(), {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     await setAlert({ type: "success", value: "User deleted successfully!" });
     // Revalidate the cache for the user page

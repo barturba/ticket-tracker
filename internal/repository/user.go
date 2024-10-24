@@ -138,6 +138,7 @@ func convertUser(dbUser database.User) models.User {
 		FirstName: dbUser.FirstName.String,
 		LastName:  dbUser.LastName.String,
 		Email:     dbUser.Email,
+		Active:    dbUser.Active.Bool,
 	}
 }
 
@@ -194,6 +195,7 @@ func convertListUsersRowToUser(row database.ListUsersRow) models.User {
 		LastName:  row.LastName.String,
 		Email:     row.Email,
 		Role:      row.Role,
+		Active:    row.Active.Bool,
 	}
 }
 
