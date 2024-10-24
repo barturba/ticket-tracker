@@ -17,8 +17,6 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-type Middleware2 func(http.HandlerFunc) http.HandlerFunc
-
 func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		h = middlewares[i](h)
@@ -51,7 +49,7 @@ func Auth(logger *slog.Logger, db *database.Queries, cfg models.Config) Middlewa
 				return
 			}
 
-			// // Get the actual token
+			// Get the actual token
 			tokenString := headerParts[1]
 
 			claims := jwt.MapClaims{}
@@ -82,27 +80,6 @@ func Auth(logger *slog.Logger, db *database.Queries, cfg models.Config) Middlewa
 			r = ContextSetUser(r, &user)
 
 			// Call the next handler in the chain
-			next.ServeHTTP(w, r)
-		})
-	}
-}
-func RequireActiveUserMiddleware(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Use the ContextGetUser() helper to retrieve the user information.
-			user := ContextGetUser(r)
-
-			if models.IsAnonymous(user) {
-				errors.AuthenticationRequiredResponse(w, r, logger)
-				return
-			}
-
-			if !user.Active {
-				errors.InactiveAccountResponse(w, r, logger)
-				return
-			}
-
-			// Call the next handler
 			next.ServeHTTP(w, r)
 		})
 	}
