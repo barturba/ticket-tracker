@@ -15,7 +15,7 @@ import SubmitButton from "@/app/application-components/resources/button-submit";
 import { CIField } from "@/app/api/cis/cis.d";
 import { CompanyField } from "@/app/api/companies/companies.d";
 import { IncidentForm } from "@/app/api/incidents/incidents.d";
-import { UserField } from "@/app/api/users/users.d";
+import { UserField } from "@/app/api/users/types";
 
 export default function EditIncidentForm({
   incident,

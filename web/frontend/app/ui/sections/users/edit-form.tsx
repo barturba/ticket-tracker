@@ -3,7 +3,7 @@ import { Button } from "@/app/components/button";
 import { useActionState } from "react";
 import { updateUser } from "@/app/api/users/users";
 import { Divider } from "@/app/components/divider";
-import { UserForm } from "@/app/api/users/users.d";
+import { UserForm } from "@/app/api/users/types";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";

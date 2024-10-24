@@ -1,3 +1,5 @@
+import { getUsers } from "@/app/api/users/queries";
+import { UsersResponse } from "@/app/api/users/types";
 import AppHeading from "@/app/application-components/heading";
 import {
   Table,
@@ -7,11 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { getUsers } from "@/app/api/users/users";
 import { formatDateToLocal } from "@/app/lib/utils";
 import PaginationApp from "@/app/ui/utils/pagination-app";
 import type { Metadata } from "next";
-import { UsersData } from "@/app/api/users/users.d";
 
 export const metadata: Metadata = {
   title: "Users",
@@ -27,7 +27,7 @@ export default async function Users(props: {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
 
-  const usersData: UsersData = await getUsers(query, currentPage);
+  const usersData: UsersResponse = await getUsers(query, currentPage);
 
   return (
     <>
