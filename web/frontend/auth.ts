@@ -1,11 +1,25 @@
 import NextAuth, { type DefaultSession } from "next-auth";
+import authConfig from "./auth.config";
 
-import GitHub from "next-auth/providers/github";
-import Google from "next-auth/providers/google";
+import { JWT } from "next-auth/jwt";
 import PostgresAdapter from "@auth/pg-adapter";
+import type { Session } from "next-auth";
 
 import { Pool } from "pg";
-import { getUser } from "./app/api/users/users";
+
+// Types for your session and token
+interface CustomSession extends Session {
+  accessToken: string;
+  userRole?: string;
+  userId?: string;
+}
+
+interface CustomToken extends JWT {
+  accessToken?: string;
+  userRole?: string;
+  userId?: string;
+}
+
 declare module "next-auth" {
   /**
    * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
@@ -14,8 +28,21 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
-      sessionToken: string;
+      accessToken: string;
     } & DefaultSession["user"];
+    accessToken: string;
+    userRole?: string;
+    userId?: string;
+  }
+
+  interface User {
+    role?: string;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface User {
+    role?: string;
   }
 }
 
@@ -32,25 +59,53 @@ const pool = new Pool({
   },
 });
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PostgresAdapter(pool),
-  providers: [GitHub, Google],
-  callbacks: {
-    async session({ session, user }) {
-      const [userData] = await Promise.all([getUser(user.id)]);
-      // console.log(`user: ${JSON.stringify(user, null, 2)}`);
-      // console.log(`session: ${JSON.stringify(session, null, 2)}`);
-      // console.log(`userData: ${JSON.stringify(userData, null, 2)}`);
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
 
-      // session.user.id = user.id;
+  // providers are already defined in authConfig
+
+  callbacks: {
+    // Modify the JWT content
+    async jwt({ token, user, account }): Promise<CustomToken> {
+      // Initial sign in
+      if (account && user) {
+        // console.log(
+        //   "jwt account.access_token: ",
+        //   JSON.stringify(account.access_token, null, 2)
+        // );
+        // console.log("jwt user.role: ", JSON.stringify(user.role, null, 2));
+        // console.log("jwt user.id: ", JSON.stringify(user.id, null, 2));
+        return {
+          ...token,
+          userRole: user.role || "user", // Add custom claims
+          userId: user.id,
+        };
+      }
+      // console.log("jwt token: ", JSON.stringify(token, null, 2));
+      return token;
+    },
+    async session({
+      session,
+      token,
+    }: {
+      session: CustomSession;
+      token: CustomToken;
+    }): Promise<CustomSession> {
+      // console.log("session session: ", JSON.stringify(session, null, 2));
+      // console.log("session token: ", JSON.stringify(token, null, 2));
       return {
         ...session,
-        user: {
-          ...session.user,
-          role: userData.role,
-          sessionToken: session.sessionToken,
-        },
+        userRole: token.userRole,
+        userId: token.userId,
       };
     },
+    authorized: async ({ auth }) => {
+      return !!auth;
+    },
   },
+  ...authConfig,
 });

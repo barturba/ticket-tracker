@@ -9,8 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/core": "^0.37.1",
-    "@auth/pg-adapter": "^1.7.1",
+    "@auth/pg-adapter": "^1.7.2",
     "@headlessui/react": "^2.1.10",
     "@heroicons/react": "^2.1.5",
     "@tailwindcss/forms": "^0.5.9",
@@ -22,9 +21,9 @@
     "google": "link:@next/font/google",
     "jsonwebtoken": "^9.0.2",
     "next": "15.0.0-canary.186",
-    "next-auth": "5.0.0-beta.22",
+    "next-auth": "5.0.0-beta.25",
     "nextjs-toploader": "^3.7.15",
-    "pg": "^8.13.0",
+    "pg": "^8.13.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-toastify": "^10.0.6",
@@ -32,8 +31,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20.16.13",
-    "@types/react": "^18.3.11",
+    "@types/node": "^20.17.0",
+    "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.14",
