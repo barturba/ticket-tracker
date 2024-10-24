@@ -10,10 +10,33 @@ type Config struct {
 	Host      string
 	Port      string
 	Env       string // Environment (e.g., development, production)
-	PageSize  int
 	DBURL     string
 	JWTSecret string
 }
+
+func (c *Config) Validate() error {
+	if c.Host == "" {
+		return fmt.Errorf("host is required")
+	}
+	if c.Port == "" {
+		return fmt.Errorf("port is required")
+	}
+	if c.Env == "" {
+		return fmt.Errorf("env is required")
+	}
+	if c.JWTSecret == "" {
+		return fmt.Errorf("JWT secret is required")
+	}
+	if c.DBURL == "" {
+		return fmt.Errorf("database URL is required")
+	}
+	return nil
+}
+
+const (
+	MaxPageSize     = 10_000_000
+	DefaultPageSize = 20
+)
 
 // Envelope is a type alias for a map that can hold any type of value. It is
 // used when returning JSON data from an endpoint.

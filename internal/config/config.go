@@ -58,5 +58,9 @@ func Load() (models.Config, error) {
 		DBURL:     dbURL,
 		JWTSecret: jwtSecret,
 	}
-	return config, nil
+
+	// Validate the configuration
+	err := config.Validate()
+
+	return config, err
 }

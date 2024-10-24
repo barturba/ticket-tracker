@@ -33,12 +33,12 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries, 
 
 	// Users
 	mux.Handle("GET /v1/users", RequireActiveUser(logger, db, cfg, handlers.ListUsers(logger, db, cfg)))
-	mux.Handle("GET /v1/users_all", handlers.ListAllUsers(logger, db))
-	mux.Handle("POST /v1/users", handlers.CreateUser(logger, db))
-	mux.Handle("GET /v1/users/{id}", handlers.GetUser(logger, db))
-	mux.Handle("GET /v1/users_latest", handlers.ListRecentUsers(logger, db))
-	mux.Handle("PUT /v1/users/{id}", handlers.UpdateUser(logger, db))
-	mux.Handle("DELETE /v1/users/{id}", handlers.DeleteUser(logger, db))
+	mux.Handle("GET /v1/users_all", RequireActiveUser(logger, db, cfg, handlers.ListAllUsers(logger, db)))
+	mux.Handle("POST /v1/users", RequireActiveUser(logger, db, cfg, handlers.CreateUser(logger, db)))
+	mux.Handle("GET /v1/users/{id}", RequireActiveUser(logger, db, cfg, handlers.GetUser(logger, db)))
+	mux.Handle("GET /v1/users_latest", RequireActiveUser(logger, db, cfg, handlers.ListRecentUsers(logger, db)))
+	mux.Handle("PUT /v1/users/{id}", RequireActiveUser(logger, db, cfg, handlers.UpdateUser(logger, db)))
+	mux.Handle("DELETE /v1/users/{id}", RequireActiveUser(logger, db, cfg, handlers.DeleteUser(logger, db)))
 
 	// Configuration Items
 	mux.Handle("GET /v1/cis", handlers.ListCIs(logger, db))
@@ -49,5 +49,12 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries, 
 	mux.Handle("PUT /v1/cis/{id}", handlers.UpdateCI(logger, db))
 	mux.Handle("DELETE /v1/cis/{id}", handlers.DeleteCI(logger, db))
 
-	return Authenticate(logger, db, cfg, mux)
+	// Create middleware stack
+
+	handler := Chain(mux,
+		WithRequestID(),
+		Authenticate(logger, db, cfg),
+		LoggingMiddleware(logger))
+
+	return handler
 }
