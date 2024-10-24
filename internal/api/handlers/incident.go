@@ -43,7 +43,7 @@ func ListAllIncidents(logger *slog.Logger, db *database.Queries) http.Handler {
 		v := validator.New()
 
 		input := parseUserFilters(r, v)
-		input.Filters.PageSize = 10_000_000
+		input.Filters.PageSize = models.MaxPageSize
 
 		if models.ValidateFiltersGetAll(v, input.Filters); !v.Valid() {
 			errors.FailedValidationResponse(w, r, logger, v.Errors)
@@ -67,7 +67,7 @@ func ListRecentIncidents(logger *slog.Logger, db *database.Queries) http.Handler
 		v := validator.New()
 
 		input := parseUserFilters(r, v)
-		input.Filters.PageSize = 20
+		input.Filters.PageSize = models.DefaultPageSize
 
 		if models.ValidateFilters(v, input.Filters); !v.Valid() {
 			errors.FailedValidationResponse(w, r, logger, v.Errors)

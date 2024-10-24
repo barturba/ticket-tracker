@@ -33,6 +33,11 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+const (
+	MaxPageSize     = 10_000_000
+	DefaultPageSize = 20
+)
+
 // Envelope is a type alias for a map that can hold any type of value. It is
 // used when returning JSON data from an endpoint.
 type Envelope map[string]any
