@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { createUser, UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { Divider } from "@/app/components/divider";
@@ -8,9 +7,11 @@ import { useActionState } from "react";
 import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
+import { createUser } from "@/app/api/users/mutations";
+import { UserFormState } from "@/types/users/base";
 
 export default function CreateUserForm() {
-  const initialState: UserState = { message: "", errors: {} };
+  const initialState: UserFormState = { message: "", errors: {} };
   const [state, formAction] = useActionState(createUser, initialState);
 
   return (

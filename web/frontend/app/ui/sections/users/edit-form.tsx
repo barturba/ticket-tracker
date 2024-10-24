@@ -1,58 +1,73 @@
 "use client";
 import { Button } from "@/app/components/button";
-import { useActionState } from "react";
-import { updateUser } from "@/app/api/users/users";
+import { useState, useTransition } from "react";
 import { Divider } from "@/app/components/divider";
-import { UserForm } from "@/app/api/users/types";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
-import { UserState } from "@/app/api/users/users";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
-import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
+import { User } from "@/types/users/base";
+import { updateUser } from "@/app/api/users/mutations";
 
-export default function EditUserForm({ user }: { user: UserForm }) {
-  const initialState: UserState = { message: "", errors: {} };
-  const updateUserWithId = updateUser.bind(null, user.id);
-  const [state, formAction] = useActionState(updateUserWithId, initialState);
+interface EditUserFormProps {
+  user: User;
+}
+
+export default function EditUserForm({ user }: { user: EditUserFormProps }) {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        await updateUser(user.user.id, {}, formData);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred."
+        );
+      }
+    });
+  };
 
   return (
     <FormWrapper subheading="Summary">
-      <form action={formAction}>
+      <form action={handleSubmit} space-y-6>
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
         <Fieldset aria-label="User details">
           <FieldGroup>
             {/* First Name*/}
             <ShortDescriptionInput
+              disabled={isPending}
               label="First Name"
               name="first_name"
-              defaultValue={user.first_name}
-              invalid={
-                !!state.errors?.first_name && state.errors.first_name.length > 0
-              }
-              errorMessage={state.errors?.first_name?.join(", ") || ""}
+              defaultValue={user.user.first_name}
+              invalid={false}
+              errorMessage={""}
             />
             {/* Last Name*/}
             <ShortDescriptionInput
+              disabled={isPending}
               label="Last Name"
               name="last_name"
-              defaultValue={user.last_name}
-              invalid={
-                !!state.errors?.last_name && state.errors.last_name.length > 0
-              }
-              errorMessage={state.errors?.last_name?.join(", ") || ""}
+              defaultValue={user.user.last_name}
+              invalid={false}
+              errorMessage={""}
             />
             {/* Email */}
             <ShortDescriptionInput
+              disabled={isPending}
               label="Email"
               name="email"
-              defaultValue={user.email}
-              invalid={!!state.errors?.email && state.errors.email.length > 0}
-              errorMessage={state.errors?.email?.join(", ") || ""}
+              defaultValue={user.user.email}
+              invalid={false}
+              errorMessage={""}
             />
           </FieldGroup>
-
-          {/* Message Area */}
-          <MessageArea state={state} />
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -61,7 +76,7 @@ export default function EditUserForm({ user }: { user: UserForm }) {
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={isPending} />
         </div>
       </form>
     </FormWrapper>
