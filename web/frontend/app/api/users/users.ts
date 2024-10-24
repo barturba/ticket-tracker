@@ -56,7 +56,7 @@ export async function getUsers(
     if (!secretKey) {
       throw new Error("AUTH_SECRET is not defined in environment variables");
     }
-    const token = jwt.sign(
+    const token = await jwt.sign(
       { sessionToken: session?.user?.sessionToken },
       secretKey,
       {
