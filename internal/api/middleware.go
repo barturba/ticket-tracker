@@ -175,7 +175,6 @@ func (rw *ResponseWriter) WriteHeader(code int) {
 func LoggingMiddleware(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			logger.Info("LoggingMiddleware")
 			start := time.Now()
 			requestID := GetRequestID(r.Context())
 
@@ -190,7 +189,7 @@ func LoggingMiddleware(logger *slog.Logger) Middleware {
 			)
 
 			// Add logger to context
-			ctx := context.WithValue(r.Context(), "logger", loggerWithRequestID)
+			ctx := context.WithValue(r.Context(), LoggerContextKey, loggerWithRequestID)
 			r = r.WithContext(ctx)
 
 			// Process request
