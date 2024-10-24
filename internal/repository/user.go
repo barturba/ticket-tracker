@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -27,7 +26,7 @@ func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, q
 	rows, err := db.ListUsers(ctx, params)
 	if err != nil {
 		logger.Error("failed to retrieve users", "error", err)
-		return nil, models.Metadata{}, errors.New("failed to retrieve users")
+		return nil, models.Metadata{}, fmt.Errorf("failed to retrieve users: %w", err)
 	}
 
 	users, metadata, err := convertUsersAndMetadata(rows, filters)
@@ -43,7 +42,7 @@ func CountUsers(r *http.Request, logger *slog.Logger, db *database.Queries, quer
 	count, err := db.CountUsers(r.Context(), sql.NullString{String: query, Valid: query != ""})
 	if err != nil {
 		logger.Error("failed to count users", "error", err)
-		return 0, errors.New("failed to count users")
+		return 0, fmt.Errorf("failed to count users: %w", err)
 	}
 	return count, nil
 }
@@ -58,7 +57,7 @@ func ListRecentUsers(r *http.Request, logger *slog.Logger, db *database.Queries,
 	rows, err := db.ListRecentUsers(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to retrieve recent users", "error", err)
-		return nil, errors.New("failed to retrieve recent users")
+		return nil, fmt.Errorf("failed to retrieve recent users: %w", err)
 	}
 
 	return convertManyUsers(rows), nil
@@ -68,8 +67,12 @@ func ListRecentUsers(r *http.Request, logger *slog.Logger, db *database.Queries,
 func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
 	record, err := db.GetUser(r.Context(), id)
 	if err != nil {
-		logger.Error("failed to retrieve user", "error", err, "user", id)
-		return models.User{}, errors.New("failed to retrieve user")
+		logger.Error("failed to retrieve user",
+			"error", err,
+			"user_id", id,
+			"operation", "GetUser",
+			"component", "repository")
+		return models.User{}, fmt.Errorf("failed to retrieve user: %w", err)
 	}
 
 	return convertUser(record), nil
@@ -81,7 +84,7 @@ func GetUserByToken(r *http.Request, logger *slog.Logger, db *database.Queries, 
 	record, err := db.GetUserByTkn(r.Context(), token)
 	if err != nil {
 		logger.Error("failed to retrieve user by token", "error", err, "token", token)
-		return models.User{}, errors.New("failed to retrieve user by token")
+		return models.User{}, fmt.Errorf("failed to retrieve user by token: %w", err)
 	}
 
 	return convertUserByTokenRow(record), nil
@@ -101,7 +104,7 @@ func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 	record, err := db.CreateUser(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to create user", "error", err)
-		return models.User{}, errors.New("failed to create user")
+		return models.User{}, fmt.Errorf("failed to create user: %w", err)
 	}
 
 	return convertUser(record), nil
@@ -120,7 +123,7 @@ func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 	record, err := db.UpdateUser(r.Context(), params)
 	if err != nil {
 		logger.Error("failed to update user", "error", err, "id", user.ID)
-		return models.User{}, errors.New("failed to update user")
+		return models.User{}, fmt.Errorf("failed to update user: %w", err)
 	}
 
 	return convertUser(record), nil
@@ -131,7 +134,7 @@ func DeleteUser(r *http.Request, logger *slog.Logger, db *database.Queries, id u
 	record, err := db.DeleteUser(r.Context(), id)
 	if err != nil {
 		logger.Error("failed to delete user", "error", err, "id", id)
-		return models.User{}, errors.New("failed to delete user")
+		return models.User{}, fmt.Errorf("failed to delete user: %w", err)
 	}
 
 	return convertUser(record), nil
