@@ -45,7 +45,7 @@ export default function EditUserForm({ user }: { user: EditUserFormProps }) {
               disabled={isPending}
               label="First Name"
               name="first_name"
-              defaultValue={user.user.first_name}
+              defaultValue={user.first_name}
               invalid={false}
               errorMessage={""}
             />
@@ -54,7 +54,7 @@ export default function EditUserForm({ user }: { user: EditUserFormProps }) {
               disabled={isPending}
               label="Last Name"
               name="last_name"
-              defaultValue={user.user.last_name}
+              defaultValue={user.last_name}
               invalid={false}
               errorMessage={""}
             />
@@ -63,7 +63,7 @@ export default function EditUserForm({ user }: { user: EditUserFormProps }) {
               disabled={isPending}
               label="Email"
               name="email"
-              defaultValue={user.user.email}
+              defaultValue={user.email}
               invalid={false}
               errorMessage={""}
             />

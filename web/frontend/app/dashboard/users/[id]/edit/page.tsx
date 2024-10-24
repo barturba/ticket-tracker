@@ -4,9 +4,8 @@ import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 import EditUserForm from "@/app/ui/sections/users/edit-form";
 import { getUser } from "@/app/api/users/queries";
-import { Suspense } from "react";
 import { User } from "@/types/users/base";
-import { title } from "process";
+import { Suspense } from "react";
 
 interface UserPageProps {
   params: Promise<{ id: string }>;
@@ -46,7 +45,7 @@ export async function generateMetadata({
     }
 
     return {
-      title: `Edit User #${user.id}`,
+      title: `Edit User #${user.user.id}`,
       description: "Edit user details for ${user.first_name} ${user.last_name}",
     };
   } catch (error) {
