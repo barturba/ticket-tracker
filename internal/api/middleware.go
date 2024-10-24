@@ -17,6 +17,8 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
+type Middleware2 func(http.HandlerFunc) http.HandlerFunc
+
 func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		h = middlewares[i](h)
@@ -24,7 +26,7 @@ func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 	return h
 }
 
-func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
+func Auth(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
 	return func(next http.Handler) http.Handler {
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -106,24 +108,26 @@ func RequireActiveUserMiddleware(logger *slog.Logger, db *database.Queries, cfg 
 	}
 }
 
-func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Config, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Use the ContextGetUser() helper to retrieve the user information.
-		user := ContextGetUser(r)
+func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Use the ContextGetUser() helper to retrieve the user information.
+			user := ContextGetUser(r)
 
-		if models.IsAnonymous(user) {
-			errors.AuthenticationRequiredResponse(w, r, logger)
-			return
-		}
+			if models.IsAnonymous(user) {
+				errors.AuthenticationRequiredResponse(w, r, logger)
+				return
+			}
 
-		if !user.Active {
-			errors.InactiveAccountResponse(w, r, logger)
-			return
-		}
+			if !user.Active {
+				errors.InactiveAccountResponse(w, r, logger)
+				return
+			}
 
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
+			// Call the next handler
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // Log each request to an id
@@ -172,7 +176,7 @@ func (rw *ResponseWriter) WriteHeader(code int) {
 }
 
 // Should use middleware for consistent logging
-func LoggingMiddleware(logger *slog.Logger) Middleware {
+func Logger(logger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
