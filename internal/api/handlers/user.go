@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -13,40 +11,12 @@ import (
 	"github.com/barturba/ticket-tracker/internal/utils/errors"
 	"github.com/barturba/ticket-tracker/internal/utils/json"
 	"github.com/barturba/ticket-tracker/internal/utils/validator"
-	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
 
 // ListUsers retrieves a list of users with optional filtering, sorting, and pagination.
 func ListUsers(logger *slog.Logger, db *database.Queries, cfg models.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// DEBUG
-		// res, err := httputil.DumpRequest(r, true)
-		// if err != nil {
-		// 	logger.Error("error", err)
-		// }
-		// logger.Info(fmt.Sprintf("%v\n", string(res)))
-		authorization := r.Header.Get("Authorization")
-		tokenString := strings.TrimPrefix(authorization, "Bearer ")
-		claims := jwt.MapClaims{}
-		logger.Info(fmt.Sprintf("tokenString: %v\n", tokenString))
-		_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(cfg.JWTSecret), nil
-		})
-		if err != nil {
-			errors.ServerErrorResponse(w, r, logger, err)
-			return
-		}
-		for key, val := range claims {
-			fmt.Printf("Key: %v, value: %v\n", key, val)
-		}
-		fmt.Printf("Key: email, value: %v\n", claims["email"])
-
-		// Check if token has expired
-
-		fmt.Printf("Key: id, value: %v\n", claims["id"])
-		// DEBUG
-		logger.Info("ListUsers")
 		v := validator.New()
 		input := parseUserFilters(r, v)
 
@@ -103,7 +73,7 @@ func ListRecentUsers(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		latestUsers, err := repository.ListRecentUsers(r, logger, db, input.Filters.Limit(), input.Filters.Offset())
+		latestUsers, err := repository.ListRecentUsers(logger, db, r.Context(), input.Filters.Limit(), input.Filters.Offset())
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -123,7 +93,7 @@ func GetUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		user, err := repository.GetUser(r, logger, db, id)
+		user, err := repository.GetUser(logger, db, r.Context(), id)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -162,7 +132,7 @@ func CreateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		createdUser, err := repository.CreateUser(r, logger, db, *user)
+		createdUser, err := repository.CreateUser(logger, db, r.Context(), *user)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -207,7 +177,7 @@ func UpdateUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		updatedUser, err := repository.UpdateUser(r, logger, db, *user)
+		updatedUser, err := repository.UpdateUser(logger, db, r.Context(), *user)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
@@ -227,7 +197,7 @@ func DeleteUser(logger *slog.Logger, db *database.Queries) http.Handler {
 			return
 		}
 
-		if _, err = repository.DeleteUser(r, logger, db, id); err != nil {
+		if _, err = repository.DeleteUser(logger, db, r.Context(), id); err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
 		}

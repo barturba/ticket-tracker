@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"time"
 
 	"github.com/barturba/ticket-tracker/internal/database"
@@ -37,24 +36,14 @@ func ListUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, q
 	return users, metadata, nil
 }
 
-// CountUsers retrieves the count of users from the database based on the provided query.
-func CountUsers(r *http.Request, logger *slog.Logger, db *database.Queries, query string, limit, offset int) (int64, error) {
-	count, err := db.CountUsers(r.Context(), sql.NullString{String: query, Valid: query != ""})
-	if err != nil {
-		logger.Error("failed to count users", "error", err)
-		return 0, fmt.Errorf("failed to count users: %w", err)
-	}
-	return count, nil
-}
-
 // ListRecentUsers retrieves the latest users from the database.
-func ListRecentUsers(r *http.Request, logger *slog.Logger, db *database.Queries, limit, offset int32) ([]models.User, error) {
+func ListRecentUsers(logger *slog.Logger, db *database.Queries, ctx context.Context, limit, offset int32) ([]models.User, error) {
 	params := database.ListRecentUsersParams{
 		Limit:  limit,
 		Offset: offset,
 	}
 
-	rows, err := db.ListRecentUsers(r.Context(), params)
+	rows, err := db.ListRecentUsers(ctx, params)
 	if err != nil {
 		logger.Error("failed to retrieve recent users", "error", err)
 		return nil, fmt.Errorf("failed to retrieve recent users: %w", err)
@@ -64,8 +53,8 @@ func ListRecentUsers(r *http.Request, logger *slog.Logger, db *database.Queries,
 }
 
 // GetUser retrieves a user from the database based on the provided user ID.
-func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
-	record, err := db.GetUser(r.Context(), id)
+func GetUser(logger *slog.Logger, db *database.Queries, ctx context.Context, id uuid.UUID) (models.User, error) {
+	record, err := db.GetUser(ctx, id)
 	if err != nil {
 		logger.Error("failed to retrieve user",
 			"error", err,
@@ -80,8 +69,8 @@ func GetUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid
 
 // GetUserByToken retrieves a user from the database based on the provided
 // session token.
-func GetUserByToken(r *http.Request, logger *slog.Logger, db *database.Queries, token string) (models.User, error) {
-	record, err := db.GetUserByTkn(r.Context(), token)
+func GetUserByToken(logger *slog.Logger, db *database.Queries, ctx context.Context, token string) (models.User, error) {
+	record, err := db.GetUserByTkn(ctx, token)
 	if err != nil {
 		logger.Error("failed to retrieve user by token", "error", err, "token", token)
 		return models.User{}, fmt.Errorf("failed to retrieve user by token: %w", err)
@@ -91,7 +80,7 @@ func GetUserByToken(r *http.Request, logger *slog.Logger, db *database.Queries, 
 }
 
 // CreateUser creates a new user in the database.
-func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user models.User) (models.User, error) {
+func CreateUser(logger *slog.Logger, db *database.Queries, ctx context.Context, user models.User) (models.User, error) {
 	params := database.CreateUserParams{
 		ID:        user.ID,
 		CreatedAt: time.Now(),
@@ -101,7 +90,7 @@ func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 		Email:     user.Email,
 	}
 
-	record, err := db.CreateUser(r.Context(), params)
+	record, err := db.CreateUser(ctx, params)
 	if err != nil {
 		logger.Error("failed to create user", "error", err)
 		return models.User{}, fmt.Errorf("failed to create user: %w", err)
@@ -111,7 +100,7 @@ func CreateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 }
 
 // UpdateUser updates an existing user in the database.
-func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user models.User) (models.User, error) {
+func UpdateUser(logger *slog.Logger, db *database.Queries, ctx context.Context, user models.User) (models.User, error) {
 	params := database.UpdateUserParams{
 		ID:        user.ID,
 		UpdatedAt: time.Now(),
@@ -120,7 +109,7 @@ func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 		Email:     user.Email,
 	}
 
-	record, err := db.UpdateUser(r.Context(), params)
+	record, err := db.UpdateUser(ctx, params)
 	if err != nil {
 		logger.Error("failed to update user", "error", err, "id", user.ID)
 		return models.User{}, fmt.Errorf("failed to update user: %w", err)
@@ -130,8 +119,8 @@ func UpdateUser(r *http.Request, logger *slog.Logger, db *database.Queries, user
 }
 
 // DeleteUser deletes a user from the database based on the provided user ID.
-func DeleteUser(r *http.Request, logger *slog.Logger, db *database.Queries, id uuid.UUID) (models.User, error) {
-	record, err := db.DeleteUser(r.Context(), id)
+func DeleteUser(logger *slog.Logger, db *database.Queries, ctx context.Context, id uuid.UUID) (models.User, error) {
+	record, err := db.DeleteUser(ctx, id)
 	if err != nil {
 		logger.Error("failed to delete user", "error", err, "id", id)
 		return models.User{}, fmt.Errorf("failed to delete user: %w", err)

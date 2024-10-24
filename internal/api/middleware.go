@@ -56,7 +56,7 @@ func Authenticate(logger *slog.Logger, db *database.Queries, cfg models.Config, 
 		// Retrieve the details of the user associated with the authentication
 		// token, again calling the InvalidAuthenticationTokenResponse() helper
 		// if no record was found.
-		user, err := repository.GetUserByToken(r, logger, db, sessionTokenClaim)
+		user, err := repository.GetUserByToken(logger, db, r.Context(), sessionTokenClaim)
 		if err != nil {
 			errors.ServerErrorResponse(w, r, logger, err)
 			return
