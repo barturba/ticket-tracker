@@ -7,7 +7,6 @@ import { UsersData } from "@/app/api/users/users.d";
 import setAlert from "@/app/lib/setAlert";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
-import { verifyJWT } from "../protected/users/route";
 
 const JWT_SECRET = process.env.AUTH_SECRET;
 
@@ -54,19 +53,7 @@ export async function getUsers(
     searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
     const session = await auth();
-    console.log(`getUsers session: ${JSON.stringify(session, null, 2)}`);
 
-    // const secretKey = process.env.AUTH_SECRET;
-    // if (!secretKey) {
-    //   throw new Error("AUTH_SECRET is not defined in environment variables");
-    // }
-    // const token = await jwt.sign(
-    //   { sessionToken: session?.user?.sessionToken },
-    //   secretKey,
-    //   {
-    //     expiresIn: "1h",
-    //   }
-    // );
     if (!session) {
       throw new Error("Session is null");
     }
@@ -74,20 +61,11 @@ export async function getUsers(
       throw new Error("JWT secret not defined");
     }
     const payload = { userId: session.userId! };
-    console.log(`getUsers payload: ${JSON.stringify(payload, null, 2)}`);
     const newToken = jwt.sign(payload, JWT_SECRET, {
       algorithm: "HS256",
       audience: "api",
       expiresIn: "1h",
     });
-
-    console.log(
-      `/protected/users newToken: ${JSON.stringify(
-        verifyJWT(newToken),
-        null,
-        2
-      )}`
-    );
 
     const data = await fetch(url.toString(), {
       method: "GET",
@@ -106,7 +84,6 @@ export async function getUsers(
         throw new Error("Failed to fetch users data: !UsersData");
       }
     } else {
-      console.log(`getUsers url: ${url.toString()}`);
       console.log(
         `getUsers error: !data.ok ${data.status} ${JSON.stringify(
           data.statusText
