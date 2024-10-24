@@ -37,14 +37,17 @@ export async function createUser(
     await setAlert({ type: "success", value: "User created successfully!" });
     revalidatePath("/dashboard/users");
     redirect("/dashboard/users");
+
     return { message: "User created successfully!" };
   } catch (error) {
     console.error(`create user error:`, error);
+
     if (error instanceof ApiError) {
       return {
         message: error.message || "Failed to create user.",
       };
     }
+
     return {
       message: "An unexpected error occurred. Failed to create user.",
     };
@@ -56,7 +59,6 @@ export async function updateUser(
   prevState: UserFormState,
   formData: FormData
 ): Promise<UserFormState> {
-  // Parse the form data using Zod
   const input: UserUpdateInput = {
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
@@ -72,7 +74,6 @@ export async function updateUser(
     };
   }
 
-  // Prepare data for sending to the API.
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
     const response = await fetchApi<UserResponse>(url.toString(), {
@@ -87,35 +88,37 @@ export async function updateUser(
     return { message: "Update Successful" };
   } catch (error) {
     console.error(`update user error:`, error);
+
     if (error instanceof ApiError) {
       return {
         message: error.message || "Failed to update user.",
       };
     }
+
     return {
       message: "An unexpected error occurred. Failed to update user.",
     };
   }
 }
 
-// DELETE
-
-export async function deleteUser(id: string) {
-  // Prepare data for sending to the API.
+export async function deleteUser(id: string): Promise<{ message: string }> {
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
-    await fetch(url.toString(), {
+    await fetchApi<UserResponse>(url.toString(), {
       method: "DELETE",
     });
+
     await setAlert({ type: "success", value: "User deleted successfully!" });
-    // Revalidate the cache for the user page
     revalidatePath("/dashboard/users");
+
     return { message: "Deleted User." };
   } catch (error) {
-    console.log(`deleteUser error: ${error}`);
-    // If a database error occurs, return a more specific error.
-    return {
-      message: "Database Error: Failed to Update User.",
-    };
+    console.log(`Delete user error: ${error}`);
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    throw new ApiError(500, "Failed to delete user.");
   }
 }
