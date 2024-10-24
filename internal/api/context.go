@@ -27,17 +27,16 @@ func ContextGetUser(r *http.Request) *models.User {
 	return user
 }
 
-const requestContextKey = contextKey("request")
+const RequestIDContextKey contextKey = "request_id"
 
 func ContextSetRequestId(r *http.Request, requestId string) *http.Request {
-	ctx := context.WithValue(r.Context(), requestContextKey, requestId)
+	ctx := context.WithValue(r.Context(), RequestIDContextKey, requestId)
 	return r.WithContext(ctx)
 }
 
-func ContextGetRequestId(r *http.Request) *string {
-	requestID, ok := r.Context().Value(requestContextKey).(*string)
-	if !ok {
-		panic("missing requestID value in request context")
+func GetRequestID(ctx context.Context) string {
+	if requestID, ok := ctx.Value(RequestIDContextKey).(string); ok {
+		return requestID
 	}
-	return requestID
+	return "unknown"
 }

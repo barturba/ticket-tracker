@@ -49,5 +49,12 @@ func SetupRoutes(mux *http.ServeMux, logger *slog.Logger, db *database.Queries, 
 	mux.Handle("PUT /v1/cis/{id}", handlers.UpdateCI(logger, db))
 	mux.Handle("DELETE /v1/cis/{id}", handlers.DeleteCI(logger, db))
 
-	return Authenticate(logger, db, cfg, mux)
+	// Create middleware stack
+
+	handler := Chain(mux,
+		WithRequestID(),
+		Authenticate(logger, db, cfg),
+		LoggingMiddleware(logger))
+
+	return handler
 }
