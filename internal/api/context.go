@@ -40,3 +40,5 @@ func GetRequestID(ctx context.Context) string {
 	}
 	return "unknown"
 }
+
+const LoggerContextKey contextKey = "logger"

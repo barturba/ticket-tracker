@@ -190,7 +190,7 @@ func LoggingMiddleware(logger *slog.Logger) Middleware {
 			)
 
 			// Add logger to context
-			ctx := context.WithValue(r.Context(), "logger", loggerWithRequestID)
+			ctx := context.WithValue(r.Context(), LoggerContextKey, loggerWithRequestID)
 			r = r.WithContext(ctx)
 
 			// Process request
