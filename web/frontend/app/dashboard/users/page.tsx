@@ -66,9 +66,9 @@ function UsersTable({ users }: UsersTableProps) {
             title={`User #${user.id}`}
           >
             <TableCell>{user.id.slice(0, 8)}</TableCell>
-            {/* <TableCell className="text-zinc-500">
-                {formatDateToLocal(JSON.stringify(user.updated_at))}
-              </TableCell> */}
+            <TableCell className="text-zinc-500">
+              {formatDateToLocal(JSON.stringify(user.updated_at))}
+            </TableCell>
             <TableCell>{user.first_name}</TableCell>
             <TableCell>{user.last_name}</TableCell>
           </TableRow>
