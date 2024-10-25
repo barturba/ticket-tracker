@@ -9,11 +9,11 @@ import DescriptionTextarea from "@/app/application-components/incident/descripti
 import StateListbox from "@/app/application-components/incident/state-listbox";
 import { Divider } from "@/app/components/divider";
 import { useActionState } from "react";
-import MessageArea from "@/app/application-components/resources/message-area";
+// import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import { CIField } from "@/app/api/cis/cis.d";
 import { CompanyField } from "@/app/api/companies/companies.d";
-import { UserField } from "@/app/api/users/users.d";
+import { User } from "@/types/users/base";
 
 export default function CreateIncidentForm({
   companies,
@@ -21,7 +21,7 @@ export default function CreateIncidentForm({
   cis,
 }: {
   companies: CompanyField[];
-  users: UserField[];
+  users: User[];
   cis: CIField[];
 }) {
   const initialState: IncidentState = { message: "", errors: {} };
@@ -105,7 +105,7 @@ export default function CreateIncidentForm({
           </FieldGroup>
 
           {/* Message Area */}
-          <MessageArea state={state} />
+          {/* <MessageArea state={state} /> */}
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -114,7 +114,7 @@ export default function CreateIncidentForm({
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={false} />
         </div>
       </form>
     </FormWrapper>

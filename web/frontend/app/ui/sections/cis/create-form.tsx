@@ -5,7 +5,7 @@ import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { Divider } from "@/app/components/divider";
 import { useActionState } from "react";
-import MessageArea from "@/app/application-components/resources/message-area";
+// import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 
@@ -28,7 +28,7 @@ export default function CreateCIForm() {
           </FieldGroup>
 
           {/* Message Area */}
-          <MessageArea state={state} />
+          {/* <MessageArea state={state} /> */}
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -37,7 +37,7 @@ export default function CreateCIForm() {
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={false} />
         </div>
       </form>
     </FormWrapper>
