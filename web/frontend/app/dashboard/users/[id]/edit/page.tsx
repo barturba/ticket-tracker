@@ -21,11 +21,11 @@ class UserFetchError extends Error {
 function UserFormSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="h-8 w-1/4 bg-gray-200 rounded mb-4" />
+      <div className="h-8 w-1/4 bg-zinc-800 rounded mb-4" />
       <div className="space-y-4">
-        <div className="h-12 bg-gray-200 rounded" />
-        <div className="h-12 bg-gray-200 rounded" />
-        <div className="h-12 bg-gray-200 rounded" />
+        <div className="h-12 bg-zinc-800 rounded" />
+        <div className="h-12 bg-zinc-800 rounded" />
+        <div className="h-12 bg-zinc-800 rounded" />
       </div>
     </div>
   );
@@ -38,7 +38,8 @@ export async function generateMetadata({
     const resolvedParams = await params;
 
     const response = await getUser(resolvedParams.id);
-    const user = response.user;
+    console.log(`response:`, JSON.stringify(response, null, 2));
+    const user = response;
 
     if (!user) {
       return {
@@ -77,7 +78,7 @@ export default async function UserEditPage({ params }: UserPageProps) {
     }
 
     const response = await getUser(id);
-    const user = response.user;
+    const user = response;
 
     if (!user) {
       notFound();

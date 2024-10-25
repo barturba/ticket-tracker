@@ -40,10 +40,7 @@ export type UsersResponse = {
   users: User[];
   metadata: Metadata;
 };
-export type UserResponse = {
-  user: User;
-  metadata: Metadata;
-};
+export type UserResponse = User;
 
 export type UserFormState = {
   message?: string;
