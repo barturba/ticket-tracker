@@ -7,7 +7,7 @@ import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
-import MessageArea from "@/app/application-components/resources/message-area";
+// import MessageArea from "@/app/application-components/resources/message-area";
 import { CompanyForm } from "@/app/api/companies/companies.d";
 
 export default function EditCompanyForm({ company }: { company: CompanyForm }) {
@@ -31,7 +31,7 @@ export default function EditCompanyForm({ company }: { company: CompanyForm }) {
             />
           </FieldGroup>
           {/* Message Area */}
-          <MessageArea state={state} />
+          {/* <MessageArea state={state} /> */}
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -40,7 +40,7 @@ export default function EditCompanyForm({ company }: { company: CompanyForm }) {
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={false} />
         </div>
       </form>
     </FormWrapper>

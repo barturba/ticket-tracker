@@ -6,7 +6,7 @@ import { Divider } from "@/app/components/divider";
 import { FieldGroup, Fieldset } from "@/app/components/fieldset";
 import { CIState } from "@/app/api/cis/cis";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
-import MessageArea from "@/app/application-components/resources/message-area";
+// import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import { CIForm } from "@/app/api/cis/cis.d";
@@ -32,7 +32,7 @@ export default function EditCIForm({ ci }: { ci: CIForm }) {
           </FieldGroup>
 
           {/* Message Area */}
-          <MessageArea state={state} />
+          {/* <MessageArea state={state} /> */}
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -41,7 +41,7 @@ export default function EditCIForm({ ci }: { ci: CIForm }) {
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={false} />
         </div>
       </form>
     </FormWrapper>

@@ -1,15 +1,27 @@
 import type { Metadata, Timestamp } from "../common";
 
+export type UserState =
+  | "New"
+  | "Assigned"
+  | "In Progress"
+  | "On Hold"
+  | "Resolved";
+
 export type UserProperties = {
   first_name: string;
   last_name: string;
   email: string;
 };
 
-export type User = UserProperties &
-  Timestamp & {
-    id: string;
-  };
+export type User = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  state?: UserState;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+};
 
 export type UserCreateInput = UserProperties;
 export type UserUpdateInput = Partial<UserProperties>;
@@ -24,8 +36,14 @@ export type SingleResponse<T> = {
   metadata: Metadata;
 };
 
-export type UsersResponse = PaginatedResponse<User>;
-export type userResponse = SingleResponse<User>;
+export type UsersResponse = {
+  users: User[];
+  metadata: Metadata;
+};
+export type UserResponse = {
+  user: User;
+  metadata: Metadata;
+};
 
 export type UserFormState = {
   message?: string;
@@ -48,7 +66,7 @@ export type GetUserParams = {
 
 export interface UserAPI {
   getUsers: (params: GetUserParams) => Promise<UsersResponse>;
-  getUser: (id: string) => Promise<userResponse>;
+  getUser: (id: string) => Promise<UserResponse>;
   createUser: (data: UserCreateInput) => Promise<SingleResponse<User>>;
   updateUser: (
     id: string,

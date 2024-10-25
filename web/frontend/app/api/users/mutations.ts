@@ -2,9 +2,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import setAlert from "@/app/lib/setAlert";
-import { UserCreateInput, UserResponse, UserUpdateInput } from "./types";
-import { CreateUser, UpdateUser, FormSchemaUser } from "./constants";
-import { UserFormState } from "@/types/users/base";
+import { CreateUser, UpdateUser } from "./constants";
+import {
+  UserCreateInput,
+  UserFormState,
+  UserResponse,
+  UserUpdateInput,
+} from "@/types/users/base";
 import { ApiError } from "next/dist/server/api-utils";
 import { fetchApi } from "@/app/lib/api";
 
@@ -29,7 +33,7 @@ export async function createUser(
 
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users`);
-    const response = await fetchApi<UserResponse>(url.toString(), {
+    await fetchApi<UserResponse>(url.toString(), {
       method: "POST",
       body: JSON.stringify(validatedFields.data),
     });
@@ -76,7 +80,7 @@ export async function updateUser(
 
   try {
     const url = new URL(`${process.env.BACKEND}/v1/users/${id}`);
-    const response = await fetchApi<UserResponse>(url.toString(), {
+    await fetchApi<UserResponse>(url.toString(), {
       method: "PUT",
       body: JSON.stringify(validatedFields.data),
     });

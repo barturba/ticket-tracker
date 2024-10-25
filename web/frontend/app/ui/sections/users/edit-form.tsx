@@ -11,9 +11,11 @@ import { updateUser } from "@/app/api/users/mutations";
 
 interface EditUserFormProps {
   user: User;
+  onSuccess?: () => void;
+  oneError?: (error: string) => void;
 }
 
-export default function EditUserForm({ user }: { user: EditUserFormProps }) {
+export default function EditUserForm({ user }: EditUserFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +23,7 @@ export default function EditUserForm({ user }: { user: EditUserFormProps }) {
     setError(null);
     startTransition(async () => {
       try {
-        await updateUser(user.user.id, {}, formData);
+        await updateUser(user.id, {}, formData);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "An unexpected error occurred."

@@ -1,9 +1,8 @@
 import { auth } from "@/auth";
-import { ALL_ITEMS_LIMIT, ITEMS_PER_PAGE } from "../constants/constants";
-import { UserResponse, UsersResponse } from "./types";
+import { ITEMS_PER_PAGE } from "../constants/constants";
 import { JWT_SECRET } from "./constants";
 import jwt from "jsonwebtoken";
-import { GetUserParams } from "@/types/users/base";
+import { GetUserParams, UserResponse, UsersResponse } from "@/types/users/base";
 import { ApiError } from "@/app/lib/api";
 
 // Utility function to generate JWT token
@@ -57,13 +56,15 @@ async function authenticatedFetch<T>(
 }
 
 // Query functions
-export async function getUsers(params: GetUserParams): Promise<UsersResponse> {
+export async function getUsers(
+  query: string,
+  currentPage: number
+): Promise<UsersResponse> {
   const url = new URL(`${process.env.BACKEND}/v1/users`);
-  const { query = "", page = 1 } = params;
 
   url.searchParams.set("query", query);
   url.searchParams.set("sort", "-updated_at");
-  url.searchParams.set("page", page.toString());
+  url.searchParams.set("page", currentPage.toString());
   url.searchParams.set("page_size", ITEMS_PER_PAGE.toString());
 
   return authenticatedFetch<UsersResponse>(url);

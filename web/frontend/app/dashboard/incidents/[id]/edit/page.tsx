@@ -6,7 +6,7 @@ import { getCompaniesAll } from "@/app/api/companies/companies";
 import { getIncident } from "@/app/api/incidents/incidents";
 import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
-import { getUsersAll } from "@/app/api/users/users";
+import { getUsersAll } from "@/app/api/users/queries";
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
@@ -23,9 +23,9 @@ export default async function Incident(props: {
 }) {
   const params = await props.params;
   const id = params.id;
-  const [incident, usersData, companiesData, cisData] = await Promise.all([
+  const [incident, usersResponse, companiesData, cisData] = await Promise.all([
     getIncident(id),
-    getUsersAll("", 1),
+    getUsersAll({}),
     getCompaniesAll("", 1),
     getCIsAll("", 1),
   ]);
@@ -45,7 +45,7 @@ export default async function Incident(props: {
       <EditIncidentForm
         incident={incident}
         companies={companiesData.companies}
-        users={usersData.users}
+        users={usersResponse.data}
         cis={cisData.cis}
       />
     </>

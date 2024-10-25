@@ -4,7 +4,7 @@ import HeadingEdit from "@/app/application-components/heading-edit";
 import HeadingSubEdit from "@/app/application-components/heading-sub-edit";
 import EditUserForm from "@/app/ui/sections/users/edit-form";
 import { getUser } from "@/app/api/users/queries";
-import { User } from "@/types/users/base";
+import { User, UserState } from "@/types/users/base";
 import { Suspense } from "react";
 
 interface UserPageProps {
@@ -36,7 +36,9 @@ export async function generateMetadata({
 }: UserPageProps): Promise<Metadata> {
   try {
     const resolvedParams = await params;
-    const user = await getUser(resolvedParams.id);
+
+    const response = await getUser(resolvedParams.id);
+    const user = response.user;
 
     if (!user) {
       return {
@@ -45,7 +47,7 @@ export async function generateMetadata({
     }
 
     return {
-      title: `Edit User #${user.user.id}`,
+      title: `Edit User #${user.id}`,
       description: "Edit user details for ${user.first_name} ${user.last_name}",
     };
   } catch (error) {
@@ -74,13 +76,14 @@ export default async function UserEditPage({ params }: UserPageProps) {
       notFound();
     }
 
-    const user = await getUser(id);
+    const response = await getUser(id);
+    const user = response.user;
 
     if (!user) {
       notFound();
     }
 
-    const userState = user.state || "unknown";
+    const userState: UserState = user.state || "New";
 
     return (
       <div className="space-y-6">
@@ -88,8 +91,8 @@ export default async function UserEditPage({ params }: UserPageProps) {
 
         <HeadingSubEdit
           name={`User #${user.id}`}
-          badgeState={user.state}
-          badgeText={user.state}
+          badgeState={userState}
+          badgeText={userState}
         />
 
         <UserFormWrapper user={user} />
@@ -106,21 +109,4 @@ export default async function UserEditPage({ params }: UserPageProps) {
 
     throw error;
   }
-}
-
-export function ErrorBoundary({ error }: { error: Error }) {
-  return (
-    <div className="rounded-md bg-red-50 p-4">
-      <div className="flex">
-        <div className="ml-3">
-          <h3 className="text-sm font-medium text-red-800">
-            Error Loading User
-          </h3>
-          <div className="mt-2 text-sm text-red-700">
-            <p>{error.message}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }

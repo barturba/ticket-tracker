@@ -10,12 +10,12 @@ import DescriptionTextarea from "@/app/application-components/incident/descripti
 import ShortDescriptionInput from "@/app/application-components/incident/short-description-input";
 import { IncidentState } from "@/app/api/incidents/incidents";
 import FormWrapper from "@/app/application-components/resources/form-wrapper";
-import MessageArea from "@/app/application-components/resources/message-area";
+// import MessageArea from "@/app/application-components/resources/message-area";
 import SubmitButton from "@/app/application-components/resources/button-submit";
 import { CIField } from "@/app/api/cis/cis.d";
 import { CompanyField } from "@/app/api/companies/companies.d";
 import { IncidentForm } from "@/app/api/incidents/incidents.d";
-import { UserField } from "@/app/api/users/types";
+import { User } from "@/types/users/base";
 
 export default function EditIncidentForm({
   incident,
@@ -24,7 +24,7 @@ export default function EditIncidentForm({
   cis,
 }: {
   incident: IncidentForm;
-  users: UserField[];
+  users: User[];
   companies: CompanyField[];
   cis: CIField[];
 }) {
@@ -118,7 +118,7 @@ export default function EditIncidentForm({
           </FieldGroup>
 
           {/* Message Area */}
-          <MessageArea state={state} />
+          {/* <MessageArea state={state} /> */}
         </Fieldset>
 
         <Divider className="my-10" soft />
@@ -127,7 +127,7 @@ export default function EditIncidentForm({
           <Button type="reset" plain>
             Reset
           </Button>
-          <SubmitButton />
+          <SubmitButton isPending={false} />
         </div>
       </form>
     </FormWrapper>
