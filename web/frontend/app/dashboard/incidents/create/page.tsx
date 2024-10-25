@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CreateIncident() {
-  const [usersData, companiesData, cisData] = await Promise.all([
+  const [users, companiesData, cisData] = await Promise.all([
     getUsersAll({}),
     getCompaniesAll("", 1),
     getCIsAll("", 1),
@@ -27,7 +27,7 @@ export default async function CreateIncident() {
       />
       <CreateIncidentForm
         companies={companiesData.companies}
-        users={usersData.data}
+        users={users.users}
         cis={cisData.cis}
       />
     </>
