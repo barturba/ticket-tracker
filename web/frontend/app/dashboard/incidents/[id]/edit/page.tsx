@@ -23,7 +23,7 @@ export default async function Incident(props: {
 }) {
   const params = await props.params;
   const id = params.id;
-  const [incident, usersResponse, companiesData, cisData] = await Promise.all([
+  const [incident, users, companiesData, cisData] = await Promise.all([
     getIncident(id),
     getUsersAll({}),
     getCompaniesAll("", 1),
@@ -45,7 +45,7 @@ export default async function Incident(props: {
       <EditIncidentForm
         incident={incident}
         companies={companiesData.companies}
-        users={usersResponse.data}
+        users={users.users}
         cis={cisData.cis}
       />
     </>
