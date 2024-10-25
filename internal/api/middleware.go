@@ -30,22 +30,9 @@ func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 type CustomClaims struct {
 	jwt.RegisteredClaims
 	UserID string `json:"userId,omitempty"`
-	// Issuer   string `json:"iss,omitempty"`
-	// UserRole string `json:"userRole,omitempty"`
-	// Name     string `json:"name,omitempty"`
-	// Email    string `json:"email,omitempty"`
-	// Picture  string `json:"picture,omitempty"`
-	// "sub": "0c1120ed-daed-428b-b6fd-6cad6d57d720",
-	// "userRole": "user",
-	// "userId": "0c1120ed-daed-428b-b6fd-6cad6d57d720",
-	// "iat": 1729796927,
-	// "exp": 1732388927,
-	// "jti": "bc84366a-11d5-4469-a3d7-cfc5471731db"
-	// Name     string `json:"name"`
 }
 
 func Auth(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
-	fmt.Printf("> Auth\n")
 	return func(next http.Handler) http.Handler {
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -131,40 +118,6 @@ func ValidateToken(logger *slog.Logger, cfg models.Config, tokenString string) (
 	return nil, fmt.Errorf("invalid token claims")
 }
 
-// func parseJWTClaims(logger *slog.Logger, tokenString string) error {
-// 	// Parse the token without validating the signature
-// 	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
-// 	if err != nil {
-// 		return fmt.Errorf("failed to parse token: %v", err)
-// 	}
-
-// 	// Get the claims
-// 	claims, ok := token.Claims.(jwt.MapClaims)
-// 	if !ok {
-// 		return fmt.Errorf("failed to get claims from token")
-// 	}
-
-// 	// Loop through all claims
-// 	for key, value := range claims {
-// 		switch v := value.(type) {
-// 		case string:
-// 			logger.Info("Claim", "key", key, "type", "(string)", "value", v)
-// 		case float64:
-// 			logger.Info("Claim", "key", key, "type", "(float64)", "value", v)
-// 		case bool:
-// 			logger.Info("Claim", "key", key, "type", "(bool)", "value", v)
-// 		case []interface{}:
-// 			logger.Info("Claim", "key", key, "type", "(array)", "value", v)
-// 		case map[string]interface{}:
-// 			logger.Info("Claim", "key", key, "type", "(object)", "value", v)
-// 		default:
-// 			logger.Info("Claim", "key", key, "type", "(unknown type)", "value", v)
-// 		}
-// 	}
-
-// 	return nil
-// }
-
 func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Config) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +142,6 @@ func RequireActiveUser(logger *slog.Logger, db *database.Queries, cfg models.Con
 
 // Log each request to an id
 func WithRequestID() Middleware {
-	fmt.Printf("> WithRequestID\n")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Check if there's already an id
@@ -235,7 +187,6 @@ func (rw *ResponseWriter) WriteHeader(code int) {
 
 // Should use middleware for consistent logging
 func Logger(logger *slog.Logger) Middleware {
-	fmt.Printf("> Logger\n")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
